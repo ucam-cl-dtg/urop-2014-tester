@@ -20,9 +20,10 @@ public class StaticLogger implements AuditListener
 
 	public void addError(AuditEvent arg0)
 	{
-        //System.out.println("Error " + arg0.getFileName() + "@" + arg0.getLine() + ": " + arg0.getMessage());
-		sReportItem newItem = new sReportItem();	//create a new report item. TODO: add data to the report item
-		output.add(newItem);						//add the item to the linked list in the report
+		//create a new report item.
+		sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),arg0.getFileName(),arg0.getLine(),arg0.getMessage());							
+		//add the item to the linked list in the report
+		output.add(newItem);
 	}
 
 	public void addException(AuditEvent arg0, Throwable arg1)
@@ -30,16 +31,17 @@ public class StaticLogger implements AuditListener
         System.out.println("Exception " + arg0.getFileName() + "@" + arg0.getLine() + ": " + arg0.getMessage());
 	}
 
+	
 	public void auditFinished(AuditEvent arg0)
 	{
-        System.out.println("Audit finished!");
+       
 	}
 
 	public void auditStarted(AuditEvent arg0)
 	{
-        System.out.println("Audit started!");
+    
 	}
-
+	
 	public void fileFinished(AuditEvent arg0)
 	{
        

@@ -40,9 +40,6 @@ public class Tester {
 		
 		
 		try {
-			//place we'll store all outputs
-			Report report = new Report();
-			
 			//loop through each test, decide what type of test it is and run it, adding the result to outputs
 			for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
 				String testFileName = e.getKey();
@@ -61,6 +58,16 @@ public class Tester {
 					throw new WrongFileTypeError(); 
 				} 
 			}
+			
+			//all tests have finished
+			
+			//return report with results of all tests
+			Report report = new Report(sReport,dReport);
+			
+			for(sReportItem i : report.getStaticResults()){
+				System.out.println("file " + i.getFileName() + "  at line " + i.getLineNumber() + " has error " + i.getMessage() + " with severity " + i.getSeverity());
+			}
+			
 		}
 		catch (CheckstyleException err){
 			System.out.println("Checkstyle error");
@@ -86,9 +93,7 @@ public class Tester {
 	public void runStaticAnalysis(String testFileName,LinkedList<String> fileNames) throws CheckstyleException, TestHarnessError {
 		
 		for (String file : fileNames) {
-			System.out.println("testing " + testFileName + " on " + file);
 			StaticParser.test(dir + testFileName, dir + file, this.sReport);
-			System.out.println("finished");
 		}
 		
 		/* 
