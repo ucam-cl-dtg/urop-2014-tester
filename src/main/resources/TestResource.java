@@ -1,11 +1,8 @@
-import java.io;
-import java.awt;
-
 public class TestResource {
 	public void testFunction() {
 		try {
 			System.out.println("Hi");
-			long x = 10l;
+			long x = 10L;
 		} 
 		catch (IOException e) {
 			//comment!

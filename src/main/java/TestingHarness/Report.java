@@ -31,6 +31,7 @@ public class Report {
 	//constructor if tests were force exited due to an error
 	public Report(String error) {
 		this.reportStatus = error;
+		this.result = "undetermined";
 	}
 	
 	public List<sReportItem> getStaticResults() {
