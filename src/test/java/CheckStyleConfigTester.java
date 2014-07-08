@@ -8,7 +8,7 @@ import org.junit.Test;
 
 public class CheckStyleConfigTester {
 	
-	//@Test
+	@Test
 	public void testIndentation() throws IOException 
 	{
 		runTest("IndentationBadTab",        "indentation level", true,  "Should report badly indented code if indented too far with tab");
@@ -55,8 +55,8 @@ public class CheckStyleConfigTester {
 	{
 		runTest("TooLittleWhitespaceBeforeEquals", "should be preceded with whitespace",                               true,  "Should report not enough whitespace before '='");
 		runTest("TooLittleWhitespaceAfterEquals",  "should be followed by whitespace",                                 true,  "Should report not enough whitespace after '='");
-		runTest("TooMuchWhitespaceBeforeEquals",   "only one space",                                                   true,  "Should report too much whitespace before '='");
-		runTest("TooMuchWhitespaceAfterEquals",    "only one space",                                                   true,  "Should report too much whitespace after '='");
+		runTest("TooMuchWhitespaceBeforeEquals",   "Multiple spaces",                                                   true,  "Should report too much whitespace before '='");
+		runTest("TooMuchWhitespaceAfterEquals",    "Multiple spaces",                                                  true,  "Should report too much whitespace after '='");
 		runTest("TabBeforeEquals",                 "tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
 		runTest("NoWhitespacePlusPlus",            "should be preceded with whitespace",                               false, "Should not report not enough whitespace before ++");
 		runTest("NoWhitespacePlusPlus",            "not should be followed by whitespace",                             false, "Should not report not enough whitespace after ++");
