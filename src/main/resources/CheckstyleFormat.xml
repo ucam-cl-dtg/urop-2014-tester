@@ -5,7 +5,10 @@
 
 <!-- This is a checkstyle configuration file. For descriptions of
 what the following rules do, please see the checkstyle configuration
-page at http://checkstyle.sourceforge.net/config.html -->
+page at http://checkstyle.sourceforge.net/config.html.
+ -->
+ 
+ <!-- Note: default severity for each check is error -->
 
 <module name="Checker">
 	<!-- check for presence of TODO or FIXME in comments -->
@@ -24,7 +27,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
 	<!-- check for tabs in lines -->
 	<module name="RegexpSingleline">
 	    <property name="format"  value="\S\t" />
-	    <property name="message" value='Tabs should only be used as whitespace at the beginning of lines'/>
+	    <property name="message" value='Tab in line ~ tabs should only be used as whitespace at the beginning of lines'/>
 	    <property name="severity" value="warning" />
 	</module>
 	
@@ -68,6 +71,8 @@ page at http://checkstyle.sourceforge.net/config.html -->
         			LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS,
         			MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION,
         			SL, SL_ASSIGN, SR_ASSIGN, STAR, STAR_ASSIGN"/>
+        	<message key="ws.notPreceded" value="Operator whitespace ~ ''{0}'' should be preceded with whitespace" />
+        	<message key="ws.notFollowed" value="Operator whitespace ~ ''{0}'' should be followed by whitespace" />
       		<property name="severity" value="warning" />
     	</module>
     	
