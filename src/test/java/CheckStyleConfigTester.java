@@ -53,14 +53,14 @@ public class CheckStyleConfigTester {
 	@Test
 	public void testWhitespaceAroundOperators() throws IOException
 	{
-		runTest("TooLittleWhitespaceBeforeEquals", "not preceded with whitespace",                    true,  "Should report not enough whitespace before '='");
-		runTest("TooLittleWhitespaceAfterEquals",  "not followed by whitespace",                      true,  "Should report not enough whitespace after '='");
-		runTest("TooMuchWhitespaceBeforeEquals",   "only one space", true,  "Should report too much whitespace before '='");
-		runTest("TooMuchWhitespaceAfterEquals",    "only one space", true,  "Should report too much whitespace after '='");
-		runTest("TabBeforeEquals",                 "Tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
-		runTest("NoWhitespacePlusPlus",            "not preceded with whitespace",                    false, "Should not report not enough whitespace before ++");
-		runTest("NoWhitespacePlusPlus",            "not followed by whitespace",                      false, "Should not report not enough whitespace after ++");
-		runTest("ExpectedWhitespacePlusEquals",    "not preceded with whitespace",                    false, "Should not report error with +=");
+		runTest("TooLittleWhitespaceBeforeEquals", "should be preceded with whitespace",                    true,  "Should report not enough whitespace before '='");
+		runTest("TooLittleWhitespaceAfterEquals",  "should be followed by whitespace",                      true,  "Should report not enough whitespace after '='");
+		runTest("TooMuchWhitespaceBeforeEquals",   "only one space",                                        true,  "Should report too much whitespace before '='");
+		runTest("TooMuchWhitespaceAfterEquals",    "only one space",                                        true,  "Should report too much whitespace after '='");
+		runTest("TabBeforeEquals",                 "tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
+		runTest("NoWhitespacePlusPlus",            "should be preceded with whitespace",                        false, "Should not report not enough whitespace before ++");
+		runTest("NoWhitespacePlusPlus",            "not should be followed by whitespace",                      false, "Should not report not enough whitespace after ++");
+		runTest("ExpectedWhitespacePlusEquals",    "not should be preceded with whitespace",                    false, "Should not report error with +=");
 	}
 	
 	@Test
