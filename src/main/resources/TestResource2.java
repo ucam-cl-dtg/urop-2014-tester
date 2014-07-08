@@ -2,16 +2,16 @@
 public class TestResource2 {
 	public void testFunction() {
 		try {
-			
-		}
-		catch (Exception e) {
-			
+			System.out.println("Hi");
+		} 
+		catch (IOException e) {
+			//comment!
 		}
 		try {
-			
-		}
-		catch (Exception e) {
-			
+			System.out.println("Hi");
+		} 
+		catch (IOException e) {
+			//comment!
 		}
 	}
 }

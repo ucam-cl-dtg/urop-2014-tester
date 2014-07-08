@@ -10,14 +10,22 @@ public class Report {
 	private List<sReportItem> sReport;
 	private List<dReportItem> dReport;
 	private String reportStatus;
-	// TODO: private String result;
+	private String result;
 	
 	//constructor if all tests finished normally
 	public Report(List<sReportItem> sReport, List<dReportItem> dReport) {
 		this.sReport = sReport;
 		Collections.sort(sReport);
+		for (sReportItem s : sReport) {
+			if (s.getSeverity().equals("error")) {
+				this.result = "FAIL";
+			}
+		}
 		this.dReport = dReport;
 		this.reportStatus = "complete";
+		if(this.result == null) {
+			this.result = "PASS";
+		}
 	}
 
 	//constructor if tests were force exited due to an error
@@ -35,5 +43,9 @@ public class Report {
 	
 	public String getReportStatus() {
 		return this.reportStatus;
+	}
+	
+	public String getResult() {
+		return this.result;
 	}
 }

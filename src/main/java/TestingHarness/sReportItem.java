@@ -13,16 +13,12 @@ public class sReportItem implements Comparable<sReportItem>{
 	private String detail="";
 	
 
-	public sReportItem(String severity, String fileName, int lineNo, String message) {
+	public sReportItem(String severity, String fileName, int lineNo, String problem, String detail) {
 		this.severity = severity;
 		this.fileName = fileName;
 		this.lineNumberList.add(lineNo);
-		
-		message=message.replaceAll("\'", "");
-		//split the message into the two parts: more general problem type and more specific details (if the details exist)
-		String[] messageParts = message.split(" ~ ");
-		this.problem = messageParts[0];
-		if (messageParts.length > 1) this.detail  = messageParts[1];
+		this.problem = problem;
+		this.detail  = detail;
 	}
 
 	public String getSeverity() {
@@ -61,7 +57,20 @@ public class sReportItem implements Comparable<sReportItem>{
 		Collections.sort(this.getLineNumbers());
 		Collections.sort(reportItem2.getLineNumbers());
 		if (this.getFileName().compareTo(reportItem2.getFileName()) == 0) {
-			return this.getLineNumbers().get(0) - reportItem2.getLineNumbers().get(0);
+			if (this.getSeverity().equals("error") & reportItem2.getSeverity().equals("warning")) {
+				return -1;
+			}
+			else if (this.getSeverity().equals("warning") & reportItem2.getSeverity().equals("error")) {
+				return 1;
+			}
+			else {
+				if (this.getLineNumbers().get(0) - reportItem2.getLineNumbers().get(0) == 0) {
+					return this.getProblem().compareTo(reportItem2.getProblem());
+				}
+				else {
+					return this.getLineNumbers().get(0) - reportItem2.getLineNumbers().get(0);
+				}
+			}
 		}
 		else {
 			return this.getFileName().compareTo(reportItem2.getFileName());

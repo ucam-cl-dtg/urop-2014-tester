@@ -30,18 +30,23 @@ public class StaticLogger implements AuditListener
 	{
 		boolean exists = false;
 		String fileName = getName(arg0.getFileName());
-		String message = arg0.getMessage();
+		String[] messages = arg0.getMessage().split(" ~ ");
+		String problem = messages[0].replaceAll("\'","");
+		String detail = "";
+		if (messages.length > 1) {
+			detail = messages[1].replaceAll("\'","");
+		}
 		
 		for(sReportItem i : output) {
-			if (i.getFileName().equals(fileName) & i.getMessage().equals(message)) {
+			if (i.getFileName().equals(fileName) & i.getProblem().equals(problem) & i.getDetail().equals(detail)) {
 				exists = true;
 				i.addErrorAtLine(arg0.getLine());
 			}
 		}
-		
+	
 		if (!exists) {
 			//create a new report item.
-			sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),fileName,arg0.getLine(),arg0.getMessage());							
+			sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),fileName,arg0.getLine(),problem,detail);							
 			//add the item to the linked list in the report
 			output.add(newItem);
 		}

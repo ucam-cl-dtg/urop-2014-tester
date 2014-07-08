@@ -61,12 +61,14 @@ public class Tester {
 			Report report = new Report(sReport,dReport);
 			
 			for(sReportItem i : report.getStaticResults()){
-				System.out.print("file " + i.getFileName() + "  at line(s) "); 
+				System.out.print(i.getSeverity() + ": file " + i.getFileName() + "  at line(s) "); 
 				for(int l : i.getLineNumbers()) {
 					System.out.print(l + ", ");
 				}
-				System.out.println("has error " + i.getMessage());
+				System.out.println(i.getMessage());
 			}
+			System.out.println();
+			System.out.println("Your result: " + report.getResult());
 		}
 		
 		//TODO: change report status and return it such that the error encountered is obvious
