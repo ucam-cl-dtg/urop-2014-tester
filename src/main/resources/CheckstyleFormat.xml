@@ -11,30 +11,21 @@ page at http://checkstyle.sourceforge.net/config.html -->
 	<!-- check for presence of TODO or FIXME in comments -->
 	<module name="RegexpSingleline">
 	    <property name="format" value="((//.*)|(\*.*))((TO|to|To)\-*(DO|do|Do)|FIXME|fixme|FixMe|Fixme)" />
-	    <property name="message" value='TODO or FIXME found in comment'/>
+	    <property name="message" value="TODO or FIXME found in comment"/>
 	</module>
 	
 	<!-- check for too much whitespace between anything (i.e. more than one space) -->
 	<module name="RegexpSingleline">
 	    <property name="format"  value="\S\s{2,}\S" />
-	    <property name="message" value='Only one space should be used between operators'/>
+	    <property name="message" value='Operator whitespace ~ only one space should be used between ______ TODO!!!'/>
+	    <property name="severity" value="warning" />
 	</module>
 	
 	<!-- check for tabs in lines -->
 	<module name="RegexpSingleline">
 	    <property name="format"  value="\S\t" />
 	    <property name="message" value='Tabs should only be used as whitespace at the beginning of lines'/>
-	</module>
-	
-	<!-- check for use += 1 instead of ++ -->
-	<module name="RegexpSingleline">
-		<property name="format"  value="\+\s*=\s*1" />
-		<property name="message" value="Recommend ++ instead of += 1" />
-	</module>
-	<!-- check for use -= 1 instead of - - -->
-	<module name="RegexpSingleline">
-		<property name="format"  value="\-\s*=\s*1" />
-		<property name="message" value="Recommend -- instead of -= 1" />
+	    <property name="severity" value="warning" />
 	</module>
 	
 	<module name="TreeWalker">
@@ -49,11 +40,15 @@ page at http://checkstyle.sourceforge.net/config.html -->
 		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in same package, or imports java.lang -->
 		<module name="RedundantImport">
 			<message key="import.duplicate" value="Duplicate import ~ ''{1}'' already imported in line ''{0}''" />
+			<message key="import.lang"      value="Unnecessary import ~ java.lang is imported automatically" />
+			<message key="import.same"      value="Unnecessary import ~ ''{0}'' is imported automatically because it is in the same package"/>
+			<property name="severity" value="warning" />
 		</module>
 		
 		<!-- Checks for unused imports -->
 		<module name="UnusedImports">
 			<message key="import.unused" value="Unused import ~ ''{0}''" />
+			<property name="severity" value="warning" />
 		</module>
 		
 		<!-- Checks for empty catch, do, if else, finally. try, for, while, and init blocks, but NOT empty exception declarations. 
@@ -61,7 +56,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
 		<module name="EmptyBlock">
    			<property name="tokens" value="LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, INSTANCE_INIT, STATIC_INIT"/>
    			<property name="option" value="text"/> <!-- Without this, blocks containing only comments would count as being empty -->
-   			<message key="block.empty" value="Empty ''{0}'' block ~ If it should never run, a justifying comment in the block is required" />
+   			<message key="block.empty" value="Empty ''{0}'' block ~ if it should never run, a justifying comment in the block is required" />
 		</module>
 		
 		<!-- Checks that the listed tokens are surrounded by whitespace -->
@@ -73,20 +68,25 @@ page at http://checkstyle.sourceforge.net/config.html -->
         			LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS,
         			MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION,
         			SL, SL_ASSIGN, SR_ASSIGN, STAR, STAR_ASSIGN"/>
-      		<!-- <property name="message" value="Exact white space around operators required"/> -->
+      		<property name="severity" value="warning" />
     	</module>
     	
     	<!-- Checks that there is no whitespace before ; . - - ++ -->
-    	<module name="NoWhitespaceBefore" />
+    	<module name="NoWhitespaceBefore">
+    		<message key="ws.preceded" value="Preceding whitespace ~ ''{0}'' should not be preceded by whitespace" />
+    		<property name="severity" value="warning" />
+    	</module>
     	
     	<!-- Checks that there is no whitespace after . ++ - - ! ~ -->
     	<module name="NoWhitespaceAfter">
     		<property name="tokens" value="DOT, INC, DEC, LNOT, BNOT" />
+    		<message  key ="ws.followed" value="Succeeding whitespace ~ ''{0}'' should not be followed by whitespace" />
+    		<property name="severity" value="warning" />
     	</module>
 		
 		<!-- Checks that strings are not compared with == or != -->
 		<module name="StringLiteralEquality">
-			<message key="string.literal.equality" value="String comparison with ''{0}'' | In Java, .equals() should be used" />
+			<message key="string.literal.equality" value="String comparison with ''{0}'' ~ in Java, .equals() should be used" />
 		</module>
 		
 		<!-- Check that Java naming conventions are observed -->
@@ -104,7 +104,10 @@ page at http://checkstyle.sourceforge.net/config.html -->
 		<module name="TypeName" />					<!-- ^[A-Z][a-zA-Z0-9]*$ -->
 			
 		<!-- checks that long variables are declared with an upper case L instead of a lower case l -->
-		<module name="UpperEll" />
+		<module name="UpperEll">
+			<message key="upperEll" value="Lower case long assignment ~ using upper case L instead of lower case l is much more readable" />
+			<property name="severity" value="warning" />
+		</module>
 		
 		<!-- checks for Exception, RuntimeException, and Throwable being caught -->
 		<module name="IllegalCatch" />

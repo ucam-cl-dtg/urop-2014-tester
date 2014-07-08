@@ -22,7 +22,7 @@ public class CheckStyleConfigTester {
 	public void testUnusedImport() throws IOException
 	{
 		runTest("RedundantImportsRepeated", "Duplicate import", true,  "Should report presence of duplicate import");
-		runTest("UnnecessaryImport",        "Redundant import", true,  "Should report presence of unncessary java.lang import");
+		runTest("UnnecessaryImport",        "Unnecessary import", true,  "Should report presence of unncessary java.lang import");
 		runTest("UnusedImportsFail",        "Unused import",    true,  "Should report presence of unused import");
 		runTest("UnusedImportPass",         "import",           false, "Should not report presence of unused import");
 	}
@@ -66,8 +66,8 @@ public class CheckStyleConfigTester {
 	@Test
 	public void testNoWhitespaceAround() throws IOException
 	{
-		runTest("WhitespaceBeforeColon",         "is preceded with whitespace", true,  "Should report whitespace should not be used before a colon");
-		runTest("WhitespaceFollowingLogicalNot", "is followed by whitespace",   true,  "Should report that logical not should not be followed by whitespace");
+		runTest("WhitespaceBeforeColon",         "Preceding whitespace",  true,  "Should report whitespace should not be used before a colon");
+		runTest("WhitespaceFollowingLogicalNot", "Succeeding whitespace", true,  "Should report that logical not should not be followed by whitespace");
 	}
 	
 	@Test
@@ -87,14 +87,8 @@ public class CheckStyleConfigTester {
 	@Test
 	public void testUpperCaseL() throws IOException
 	{
-		runTest("LongUpperL", "Should use uppercase 'L'", false, "Should not report anything");
-		runTest("LongLowerL", "Should use uppercase 'L'", true,  "Should report that upper case L should be used");
-	}
-	
-	@Test
-	public void testPlusEqualsOne() throws IOException
-	{
-		runTest("PlusEqualsOne", "Recommend ++ instead of += 1", true,  "Should report that using ++ instead of += 1 is reccommended");
+		runTest("LongUpperL", "Lower case long assignment", false, "Should not report anything");
+		runTest("LongLowerL", "Lower case long assignment", true,  "Should report that upper case L should be used");
 	}
 	
 	//worker function for running tests
