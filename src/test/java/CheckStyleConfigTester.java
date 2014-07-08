@@ -21,10 +21,10 @@ public class CheckStyleConfigTester {
 	@Test
 	public void testUnusedImport() throws IOException
 	{
-		runTest("RedundantImportsRepeated", "Duplicate import", true,  "Should report presence of duplicate import");
+		runTest("RedundantImportsRepeated", "Duplicate import",   true,  "Should report presence of duplicate import");
 		runTest("UnnecessaryImport",        "Unnecessary import", true,  "Should report presence of unncessary java.lang import");
-		runTest("UnusedImportsFail",        "Unused import",    true,  "Should report presence of unused import");
-		runTest("UnusedImportPass",         "import",           false, "Should not report presence of unused import");
+		runTest("UnusedImportsFail",        "Unused import",      true,  "Should report presence of unused import");
+		runTest("UnusedImportPass",         "import",             false, "Should not report presence of unused import");
 	}
 	
 	@Test
@@ -53,14 +53,14 @@ public class CheckStyleConfigTester {
 	@Test
 	public void testWhitespaceAroundOperators() throws IOException
 	{
-		runTest("TooLittleWhitespaceBeforeEquals", "should be preceded with whitespace",                    true,  "Should report not enough whitespace before '='");
-		runTest("TooLittleWhitespaceAfterEquals",  "should be followed by whitespace",                      true,  "Should report not enough whitespace after '='");
-		runTest("TooMuchWhitespaceBeforeEquals",   "only one space",                                        true,  "Should report too much whitespace before '='");
-		runTest("TooMuchWhitespaceAfterEquals",    "only one space",                                        true,  "Should report too much whitespace after '='");
+		runTest("TooLittleWhitespaceBeforeEquals", "should be preceded with whitespace",                               true,  "Should report not enough whitespace before '='");
+		runTest("TooLittleWhitespaceAfterEquals",  "should be followed by whitespace",                                 true,  "Should report not enough whitespace after '='");
+		runTest("TooMuchWhitespaceBeforeEquals",   "only one space",                                                   true,  "Should report too much whitespace before '='");
+		runTest("TooMuchWhitespaceAfterEquals",    "only one space",                                                   true,  "Should report too much whitespace after '='");
 		runTest("TabBeforeEquals",                 "tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
-		runTest("NoWhitespacePlusPlus",            "should be preceded with whitespace",                        false, "Should not report not enough whitespace before ++");
-		runTest("NoWhitespacePlusPlus",            "not should be followed by whitespace",                      false, "Should not report not enough whitespace after ++");
-		runTest("ExpectedWhitespacePlusEquals",    "not should be preceded with whitespace",                    false, "Should not report error with +=");
+		runTest("NoWhitespacePlusPlus",            "should be preceded with whitespace",                               false, "Should not report not enough whitespace before ++");
+		runTest("NoWhitespacePlusPlus",            "not should be followed by whitespace",                             false, "Should not report not enough whitespace after ++");
+		runTest("ExpectedWhitespacePlusEquals",    "not should be preceded with whitespace",                           false, "Should not report error with +=");
 	}
 	
 	@Test
