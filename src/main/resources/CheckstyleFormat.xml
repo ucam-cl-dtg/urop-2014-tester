@@ -48,12 +48,12 @@ page at http://checkstyle.sourceforge.net/config.html -->
 		
 		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in same package, or imports java.lang -->
 		<module name="RedundantImport">
-			<message key="import.duplicate" value="Duplicate import | ''{1}'' already imported in line ''{0}''" />
+			<message key="import.duplicate" value="Duplicate import ~ ''{1}'' already imported in line ''{0}''" />
 		</module>
 		
 		<!-- Checks for unused imports -->
 		<module name="UnusedImports">
-			<message key="import.unused" value="Unused import | ''{0}''" />
+			<message key="import.unused" value="Unused import ~ ''{0}''" />
 		</module>
 		
 		<!-- Checks for empty catch, do, if else, finally. try, for, while, and init blocks, but NOT empty exception declarations. 
@@ -61,7 +61,7 @@ page at http://checkstyle.sourceforge.net/config.html -->
 		<module name="EmptyBlock">
    			<property name="tokens" value="LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, INSTANCE_INIT, STATIC_INIT"/>
    			<property name="option" value="text"/> <!-- Without this, blocks containing only comments would count as being empty -->
-   			<message key="block.empty" value="Empty ''{0}'' Block | If it should never run, a justifiying comment in the block is required" />
+   			<message key="block.empty" value="Empty ''{0}'' block ~ If it should never run, a justifying comment in the block is required" />
 		</module>
 		
 		<!-- Checks that the listed tokens are surrounded by whitespace -->
