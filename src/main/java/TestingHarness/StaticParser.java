@@ -3,6 +3,7 @@ package TestingHarness;
 import java.io.File;
 import java.io.OutputStream;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import com.puppycrawl.tools.checkstyle.Checker;
@@ -17,7 +18,7 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 public class StaticParser {
 	
-	public static void test(String test, String file, OutputStream staticOutput) throws TestHarnessError{ 
+	public static void test(String test, String file, List<sReportItem> sReport) throws TestHarnessError{ 
 		
 	     //make .java a file in a List and check it exists
 	     LinkedList<File> fileList = new LinkedList<File>();
@@ -33,10 +34,11 @@ public class StaticParser {
 	     //get system properties
 	     Properties properties = System.getProperties();
 	     
-	     //set the file to test the java with and run it
+	     //test the java file and use the listener to add each line with an error
+	     //in it to the linked list of static report items
 	     try {
 	    	 Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
-	    	 AuditListener listener = new DefaultLogger(staticOutput, true);
+	    	 AuditListener listener = new StaticLogger(sReport);
 			 Checker c = createChecker(config, listener); 
 			 int errs = c.process(fileList); 
 			 c.destroy();
