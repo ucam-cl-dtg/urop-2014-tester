@@ -16,7 +16,7 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 public class StaticParser {
 	
-	public static void test(String test, String file, List<sReportItem> sReport) throws TestHarnessError{ 
+	public static void test(String test, String file, List<sReportItem> sReport) throws TestHarnessError, CheckstyleException{ 
 		
 		String fileName = getName(file);
 		
@@ -36,19 +36,15 @@ public class StaticParser {
 	     
 	    //test the java file and use the listener to add each line with an error
 	    //in it to the linked list of static report items
-	    try {
-	    	Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
-	    	AuditListener listener = new StaticLogger(sReport);
-			Checker c = createChecker(config, listener); 
-			int errs = c.process(fileList); 
-			c.destroy();
-	    } 
-	    catch (final CheckstyleException e) { 
-	    	throw new TestHarnessError("Could not find test file: " + test);
-	    } 
+	    
+	    Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
+	    AuditListener listener = new StaticLogger(sReport);
+		Checker c = createChecker(config, listener); 
+		int errs = c.process(fileList); 
+		c.destroy();
 	}
 	
-	private static Checker createChecker(Configuration config, AuditListener listener) {
+	private static Checker createChecker(Configuration config, AuditListener listener) throws CheckstyleException {
 		Checker c = null; 
          
         try {
@@ -59,12 +55,7 @@ public class StaticParser {
 		} 
         final ClassLoader moduleClassLoader = Checker.class.getClassLoader(); 
         c.setModuleClassLoader(moduleClassLoader); 
-        try {
-			c.configure(config);
-        }
-        catch (CheckstyleException e) {
-        	System.out.println(e.getMessage());
-		} 
+        c.configure(config);
         c.addListener(listener); 
         
         return c; 

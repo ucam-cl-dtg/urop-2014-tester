@@ -60,21 +60,21 @@ public class Tester {
 			//return report with results of all tests
 			Report report = new Report(sReport,dReport);
 			
+			System.out.println("Your result: " + report.getResult());
+			System.out.println();
 			for(sReportItem i : report.getStaticResults()){
 				System.out.print(i.getSeverity() + ": file " + i.getFileName() + "  at line(s) "); 
 				for(int l : i.getLineNumbers()) {
 					System.out.print(l + ", ");
 				}
 				System.out.println(i.getMessage());
-			}
-			System.out.println();
-			System.out.println("Your result: " + report.getResult());
+			}		
 		}
 		
 		//TODO: change report status and return it such that the error encountered is obvious
 		catch (CheckstyleException err){
 			Report report = new Report(err.getMessage());
-			System.out.println("Checkstyle error");
+			System.out.println(err.getMessage());
 		}
 		catch (WrongFileTypeError err) {
 			Report report = new Report(err.getMessage());
