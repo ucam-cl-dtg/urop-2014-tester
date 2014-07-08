@@ -17,13 +17,34 @@ public class StaticLogger implements AuditListener
 	{
 		this.output=output;
 	}
+	
+	private String getName(String filePath) {
+		String name = "";
+		for(int i = filePath.lastIndexOf("\\") + 1; i<filePath.length();i++) {
+			name += filePath.charAt(i);
+		}
+		return name;
+	}
 
 	public void addError(AuditEvent arg0)
 	{
-		//create a new report item.
-		sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),arg0.getFileName(),arg0.getLine(),arg0.getMessage());							
-		//add the item to the linked list in the report
-		output.add(newItem);
+		boolean exists = false;
+		String fileName = getName(arg0.getFileName());
+		String message = arg0.getMessage();
+		
+		for(sReportItem i : output) {
+			if (i.getFileName().equals(fileName) & i.getMessage().equals(message)) {
+				exists = true;
+				i.addErrorAtLine(arg0.getLine());
+			}
+		}
+		
+		if (!exists) {
+			//create a new report item.
+			sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),fileName,arg0.getLine(),arg0.getMessage());							
+			//add the item to the linked list in the report
+			output.add(newItem);
+		}
 	}
 
 	public void addException(AuditEvent arg0, Throwable arg1)

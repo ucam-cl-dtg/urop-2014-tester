@@ -2,6 +2,8 @@ package TestingHarness;
 
 import java.util.List;
 
+import edu.emory.mathcs.backport.java.util.Collections;
+
 public class Report {
 
 	private List<sReportItem> sReport;
@@ -9,6 +11,7 @@ public class Report {
 	
 	public Report(List<sReportItem> sReport, List<dReportItem> dReport) {
 		this.sReport = sReport;
+		Collections.sort(sReport);
 		this.dReport = dReport;
 	}
 	

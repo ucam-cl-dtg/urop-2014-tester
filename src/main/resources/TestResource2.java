@@ -7,5 +7,11 @@ public class TestResource2 {
 		catch (Exception e) {
 			
 		}
+		try {
+			
+		}
+		catch (Exception e) {
+			
+		}
 	}
 }

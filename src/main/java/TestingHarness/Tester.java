@@ -36,7 +36,7 @@ public class Tester {
 		LinkedList<String> ll = new LinkedList<String>();
 		ll.add("/src/main/resources/TestResource.java");
 		ll.add("/src/main/resources/TestResource2.java");
-		testingQueue.put("/src/main/resources/staticTest.xml",ll);
+		testingQueue.put("/src/main/resources/CheckstyleFormat.xml",ll);
 		
 		
 		try {
@@ -65,7 +65,11 @@ public class Tester {
 			Report report = new Report(sReport,dReport);
 			
 			for(sReportItem i : report.getStaticResults()){
-				System.out.println("file " + i.getFileName() + "  at line " + i.getLineNumber() + " has error " + i.getMessage() + " with severity " + i.getSeverity());
+				System.out.print("file " + i.getFileName() + "  at line(s) "); 
+				for(int l : i.getLineNumbers()) {
+					System.out.print(l + ", ");
+				}
+				System.out.println("has error " + i.getMessage());
 			}
 			
 		}
