@@ -38,18 +38,30 @@ page at http://checkstyle.sourceforge.net/config.html -->
 	</module>
 	
 	<module name="TreeWalker">
+		<!-- Check Indentation -->
+		<!-- <module name="Indentation">
+			<property name="caseIndent"      value="4"/>  Checks that case indents are 4 spaces 
+			<property name="basicOffset"     value="4"/>  Number of spaces to take as equivalent to tab. Set to tab == 4 spaces 
+			<property name="braceAdjustment" value="0"/>  Checks that open braces which are moved to next line are not indented
+			<property name="throwsIndent"    value="4"/>  Checks that throws statements which are moved to next line are exactly one indentation level in
+		</module> -->
 		
 		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in same package, or imports java.lang -->
-		<module name="RedundantImport" />
+		<module name="RedundantImport">
+			<message key="import.duplicate" value="Duplicate import ~ ''{1}'' already imported in line ''{0}''" />
+		</module>
 		
 		<!-- Checks for unused imports -->
-		<module name="UnusedImports" />
+		<module name="UnusedImports">
+			<message key="import.unused" value="Unused import ~ ''{0}''" />
+		</module>
 		
 		<!-- Checks for empty catch, do, if else, finally. try, for, while, and init blocks, but NOT empty exception declarations. 
 				Commented blocks do not count as empty -->
 		<module name="EmptyBlock">
    			<property name="tokens" value="LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, INSTANCE_INIT, STATIC_INIT"/>
    			<property name="option" value="text"/> <!-- Without this, blocks containing only comments would count as being empty -->
+   			<message key="block.empty" value="Empty ''{0}'' block ~ If it should never run, a justifying comment in the block is required" />
 		</module>
 		
 		<!-- Checks that the listed tokens are surrounded by whitespace -->
@@ -73,7 +85,9 @@ page at http://checkstyle.sourceforge.net/config.html -->
     	</module>
 		
 		<!-- Checks that strings are not compared with == or != -->
-		<module name="StringLiteralEquality" />
+		<module name="StringLiteralEquality">
+			<message key="string.literal.equality" value="String comparison with ''{0}'' | In Java, .equals() should be used" />
+		</module>
 		
 		<!-- Check that Java naming conventions are observed -->
 		<module name="AbstractClassName" />			<!-- ^Abstract.*$|^.*Factory$ -->
@@ -96,14 +110,8 @@ page at http://checkstyle.sourceforge.net/config.html -->
 		<module name="IllegalCatch" />
 		
 		<!-- checks for Exception, RuntimeException, and Throwable being thrown -->
-		<module name="IllegalThrows" />
-		
-		<module name="MemberName">
-    <property name="format" value="^m[a-zA-Z0-9]*$"/>
-    <message key="name.invalidPattern"
-             value="Member ''{0}'' must start with a lowercase ''m'' (checked pattern ''{1}'')."
-             />
-</module>
-		
+		<module name="IllegalThrows" />		
 	</module>
 </module>
+
+

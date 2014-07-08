@@ -9,14 +9,20 @@ public class sReportItem implements Comparable<sReportItem>{
 	private String severity;
 	private String fileName;
 	private List<Integer> lineNumberList = new LinkedList<Integer>();
-	private String message;
+	private String problem;
+	private String detail="";
 	
 
 	public sReportItem(String severity, String fileName, int lineNo, String message) {
 		this.severity = severity;
 		this.fileName = fileName;
 		this.lineNumberList.add(lineNo);
-		this.message = message;
+		
+		message=message.replaceAll("\'", "");
+		//split the message into the two parts: more general problem type and more specific details (if the details exist)
+		String[] messageParts = message.split(" ~ ");
+		this.problem = messageParts[0];
+		if (messageParts.length > 1) this.detail  = messageParts[1];
 	}
 
 	public String getSeverity() {
@@ -31,8 +37,23 @@ public class sReportItem implements Comparable<sReportItem>{
 		return this.lineNumberList;
 	}
 	
+	public String getProblem() {
+		return problem;
+	}
+	
+	public String getDetail() {
+		return detail;
+	}
+	
 	public String getMessage() {
-		return this.message;
+		if (detail.equals(""))
+		{
+			return problem;
+		}
+		else
+		{
+			return problem + " (" + detail + ")";
+		}
 	}
 	
 	@Override
