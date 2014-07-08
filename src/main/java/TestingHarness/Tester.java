@@ -1,7 +1,5 @@
 package TestingHarness;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,8 +12,6 @@ public class Tester {
 	List<dReportItem> dReport = new LinkedList<dReportItem>();
 	final String dir = System.getProperty("user.dir");
 	
-	OutputStream staticOutput = new ByteArrayOutputStream();
-	String dynamicOutput;
 	//instantiated in constructor when joined with other project
 	private String crsid = "eg1";
 	private HashMap<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
@@ -71,44 +67,27 @@ public class Tester {
 				}
 				System.out.println("has error " + i.getMessage());
 			}
-			
 		}
+		
+		//TODO: change report status and return it such that the error encountered is obvious
 		catch (CheckstyleException err){
+			Report report = new Report(err.getMessage());
 			System.out.println("Checkstyle error");
 		}
-		catch (StringIndexOutOfBoundsException err) {
-			
-		}
 		catch (WrongFileTypeError err) {
-			
-		} 
-		catch (TestHarnessError err) {
+			Report report = new Report(err.getMessage());
 			System.out.println(err.getMessage());
 		} 
-		// catch (IOException err) {
-		//	System.out.println("IO Error");
-		// }
-		finally {
-			
-		}
+		catch (TestHarnessError err) {
+			Report report = new Report(err.getMessage());
+			System.out.println(err.getMessage());
+		} 
 	}
 	
-	//loops through files to test
+	//loops through files to test statically
 	public void runStaticAnalysis(String testFileName,LinkedList<String> fileNames) throws CheckstyleException, TestHarnessError {
-		
 		for (String file : fileNames) {
 			StaticParser.test(dir + testFileName, dir + file, this.sReport);
 		}
-		
-		/* 
-		String results = staticOutput.toString();
-		String[] resultLines = results.split("\n");
-				
-		for(String line : resultLines){
-			if(!("Starting Audit...".equals(line)) && !("Audit done.".equals(line))) {
-				report.addStaticReport(line);
-			}
-		}
-		*/
 	}
 }

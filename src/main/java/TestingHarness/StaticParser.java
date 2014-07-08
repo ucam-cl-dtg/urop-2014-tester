@@ -18,32 +18,34 @@ public class StaticParser {
 	
 	public static void test(String test, String file, List<sReportItem> sReport) throws TestHarnessError{ 
 		
-	     //make .java a file in a List and check it exists
-	     LinkedList<File> fileList = new LinkedList<File>();
+		String fileName = getName(file);
+		
+		//must be in list for .process to work
+	    LinkedList<File> fileList = new LinkedList<File>();
 	     
-	     File javaFile = new File(file);
-	     if (javaFile.exists()){
-	    	 fileList.add(javaFile);
-	     }
-	     else {
-		    	 throw new TestHarnessError("Could not find file: " + file);
-	     }
+	    File javaFile = new File(file);
+	    if (javaFile.exists()){
+	    	fileList.add(javaFile);
+	    }
+	    else {
+	    	throw new TestHarnessError("Could not find file: " + fileName);
+	    }
 	     
-	     //get system properties
-	     Properties properties = System.getProperties();
+	    //get system properties
+	    Properties properties = System.getProperties();
 	     
-	     //test the java file and use the listener to add each line with an error
-	     //in it to the linked list of static report items
-	     try {
-	    	 Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
-	    	 AuditListener listener = new StaticLogger(sReport);
-			 Checker c = createChecker(config, listener); 
-			 int errs = c.process(fileList); 
-			 c.destroy();
-	     } 
-	     catch (final CheckstyleException e) { 
-	    	 throw new TestHarnessError("Could not find test file: " + test);
-	     } 
+	    //test the java file and use the listener to add each line with an error
+	    //in it to the linked list of static report items
+	    try {
+	    	Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
+	    	AuditListener listener = new StaticLogger(sReport);
+			Checker c = createChecker(config, listener); 
+			int errs = c.process(fileList); 
+			c.destroy();
+	    } 
+	    catch (final CheckstyleException e) { 
+	    	throw new TestHarnessError("Could not find test file: " + test);
+	    } 
 	}
 	
 	private static Checker createChecker(Configuration config, AuditListener listener) {
@@ -66,5 +68,13 @@ public class StaticParser {
         c.addListener(listener); 
         
         return c; 
+	}
+	
+	private static String getName(String filePath) {
+		String name = "";
+		for(int i = filePath.lastIndexOf("/") + 1; i<filePath.length();i++) {
+			name += filePath.charAt(i);
+		}
+		return name;
 	}
 } 
