@@ -55,8 +55,8 @@ public class CheckStyleConfigTester {
 	{
 		runTest("TooLittleWhitespaceBeforeEquals", "not preceded with whitespace",                    true,  "Should report not enough whitespace before '='");
 		runTest("TooLittleWhitespaceAfterEquals",  "not followed by whitespace",                      true,  "Should report not enough whitespace after '='");
-		runTest("TooMuchWhitespaceBeforeEquals",   "Only one space should be used between operators", true,  "Should report too much whitespace before '='");
-		runTest("TooMuchWhitespaceAfterEquals",    "Only one space should be used between operators", true,  "Should report too much whitespace after '='");
+		runTest("TooMuchWhitespaceBeforeEquals",   "only one space", true,  "Should report too much whitespace before '='");
+		runTest("TooMuchWhitespaceAfterEquals",    "only one space", true,  "Should report too much whitespace after '='");
 		runTest("TabBeforeEquals",                 "Tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
 		runTest("NoWhitespacePlusPlus",            "not preceded with whitespace",                    false, "Should not report not enough whitespace before ++");
 		runTest("NoWhitespacePlusPlus",            "not followed by whitespace",                      false, "Should not report not enough whitespace after ++");
