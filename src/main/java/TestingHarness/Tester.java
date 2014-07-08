@@ -52,7 +52,7 @@ public class Tester {
 				
 				if ("xml".equals(ext)) {
 					//run static analysis tests
-					runStaticAnalysis(testFileName,fileNames,report);
+					runStaticAnalysis(testFileName,fileNames);
 				}
 				else if ("java".equals(ext)) {
 					//run dynamic analysis tests
@@ -83,14 +83,15 @@ public class Tester {
 	}
 	
 	//loops through files to test
-	public void runStaticAnalysis(String testFileName,LinkedList<String> fileNames, Report report) throws CheckstyleException, TestHarnessError {
+	public void runStaticAnalysis(String testFileName,LinkedList<String> fileNames) throws CheckstyleException, TestHarnessError {
 		
 		for (String file : fileNames) {
 			System.out.println("testing " + testFileName + " on " + file);
-			StaticParser.test(dir + testFileName, dir + file, staticOutput);
+			StaticParser.test(dir + testFileName, dir + file, this.sReport);
 			System.out.println("finished");
 		}
 		
+		/* 
 		String results = staticOutput.toString();
 		String[] resultLines = results.split("\n");
 				
@@ -99,5 +100,6 @@ public class Tester {
 				report.addStaticReport(line);
 			}
 		}
+		*/
 	}
 }
