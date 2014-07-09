@@ -11,11 +11,14 @@ public class CheckStyleConfigTester {
 	@Test
 	public void testIndentation() throws IOException 
 	{
-		runTest("IndentationBadTab",        "indentation level", true,  "Should report badly indented code if indented too far with tab");
-		runTest("IndentationBadSpace",      "indentation level", true,  "Should report badly indented code if indented too far with space");
-		runTest("IndentationBadRightBrace", "indentation level", true,  "Should report badly indented close braces");
-		runTest("IndentationBadLeftBrace",  "indentation level", true,  "Should report badly indented open braces");
-		runTest("IndentationExpected",      "indentation level", false, "Should not report any indentation issues");
+		String indentationString = "Bad indentation";
+		runTest("IndentationBadTab",        indentationString, true,  "Should report badly indented code if indented too far with tab");
+		runTest("IndentationBadSpace",      indentationString, true,  "Should report badly indented code if indented too far with space");
+		runTest("IndentationBadRightBrace", indentationString, true,  "Should report badly indented close braces");
+		runTest("IndentationBadLeftBrace",  indentationString, true,  "Should report badly indented open braces");
+		runTest("IndentationExpected",      indentationString, false, "Should not report any indentation issues");
+		runTest("IndentationBadChild",      indentationString, true,  "Should report a badly indented child of another block");
+		runTest("IndentationBadChild2",     indentationString, true,  "Should report a badly indented child of another block");
 	}
 	
 	@Test

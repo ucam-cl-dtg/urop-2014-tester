@@ -35,9 +35,11 @@ page at http://checkstyle.sourceforge.net/config.html.
 		<!-- Check Indentation -->
 		<module name="Indentation">
 			<property name="caseIndent"      value="4"/>  <!-- Checks that case indents are 4 spaces -->
-			<property name="basicOffset"     value="4"/>  <!-- Number of spaces to take as equivalent to tab. Set to tab == 4 spaces -->
+			<property name="basicOffset"     value="4"/>  <!-- Number of spaces to take as equivalent to tab. Set to tab is equivalent to 4 spaces -->
 			<property name="braceAdjustment" value="0"/>  <!-- Checks that open braces which are moved to next line are not indented-->
 			<property name="throwsIndent"    value="4"/>  <!-- Checks that throws statements which are moved to next line are exactly one indentation level in-->
+			<message key="indentation.error"       value="Bad indentation ~ expected ''{2}'' spaces, but found ''{1}''" />
+			<message key="indentation.child.error" value="Bad indentation ~ expected ''{2}'' spaces, but found ''{1}''" /> <!-- I have no idea why I need this -->
 		</module>
 		
 		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in same package, or imports java.lang -->
@@ -118,7 +120,13 @@ page at http://checkstyle.sourceforge.net/config.html.
 		<module name="IllegalCatch" />
 		
 		<!-- checks for Exception, RuntimeException, and Throwable being thrown -->
-		<module name="IllegalThrows" />		
+		<module name="IllegalThrows" />
+		
+		<!-- @Override annotation checx demo -->
+		<!--<module name="Regexp">
+			<property name="format" value="@Override\s*public\s*void\s*overridingFunction" />
+			<property name="illegalPattern" value="false" /> 
+		</module>-->		
 	</module>
 </module>
 
