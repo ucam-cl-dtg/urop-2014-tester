@@ -107,6 +107,12 @@ public class CheckStyleConfigTester {
 		runTest("ThrowsException", "Throwing 'Exception' is bad practice" , true, "'throws Exception' should be reported as an error");
 	}
 	
+	@Test
+	public void testSwitch() throws IOException
+	{
+		runTest("SwitchDefaultNotLast", "Switch default label is not last", true, "Should report that a default label not last should come first");
+	}
+	
 	//worker function for running tests
 	public void runTest(String testCase, String desiredString, boolean desiredResponse, String message) throws IOException
 	{
