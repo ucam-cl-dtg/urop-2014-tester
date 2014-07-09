@@ -98,18 +98,39 @@ page at http://checkstyle.sourceforge.net/config.html.
 		</module>
 		
 		<!-- Check that Java naming conventions are observed -->
-		<module name="AbstractClassName" />			<!-- ^Abstract.*$|^.*Factory$ -->
-		<module name="ClassTypeParameterName"/>		<!-- ^[A-Z]$ -->
-		<module name="ConstantName" />				<!-- ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
-		<module name="LocalFinalVariableName" />	<!-- ^[a-z][a-zA-Z0-9]*$ -->
-		<module name="LocalVariableName" />			<!-- ^[a-z][a-zA-Z0-9]*$ -->
-		<module name="MemberName" />				<!-- ^[a-z][a-zA-Z0-9]*$ -->
-		<module name="MethodName" />				<!-- ^[a-z][a-zA-Z0-9]*$ -->
-		<module name="MethodTypeParameterName" />	<!-- ^[A-Z]$ -->
-		<module name="PackageName" />				<!-- ^[a-z]+(\.[a-zA-Z_][a-zA-Z0-9_]*)*$ -->
-		<module name="ParameterName" />				<!-- ^[a-z][a-zA-Z0-9]*$ -->
-		<module name="StaticVariableName" />		<!-- ^[a-z][a-zA-Z0-9]*$ -->
-		<module name="TypeName" />					<!-- ^[A-Z][a-zA-Z0-9]*$ -->
+		<module name="AbstractClassName"> <!-- ^Abstract.*$|^.*Factory$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="ClassTypeParameterName"> <!-- ^[A-Z]$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="ConstantName"> <!-- ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="LocalFinalVariableName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="LocalVariableName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="MemberName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>				
+		<module name="MethodName" > <!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>		
+		<module name="MethodTypeParameterName" > <!-- ^[A-Z]$-->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="ParameterName" > <!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>	
+		<module name="StaticVariableName" >	<!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>		
+		<module name="TypeName" ><!-- ^[A-Z][a-zA-Z0-9]*$ -->
+			<property name="severity" value="warning" /> 
+		</module>
 			
 		<!-- checks that long variables are declared with an upper case L instead of a lower case l -->
 		<module name="UpperEll">
@@ -118,12 +139,17 @@ page at http://checkstyle.sourceforge.net/config.html.
 		</module>
 		
 		<!-- checks for Exception, RuntimeException, and Throwable being caught -->
-		<module name="IllegalCatch" />
+		<module name="IllegalCatch">
+			<message key="illegal.catch" value="Catching ''{0}'' is bad practice" />
+		</module>
 		
 		<!-- checks for Exception, RuntimeException, and Throwable being thrown -->
-		<module name="IllegalThrows" />
+		<module name="IllegalThrows">
+			<property name="illegalClassNames" value="java.lang.Throwable, java.lang.Error, java.lang.RuntimeException, java.lang.Exception" />
+			<message key="illegal.throw" value="Throwing ''{0}'' is bad practice" />
+		</module>
 		
-		<!-- @Override annotation checx demo -->
+		<!-- @Override annotation check demo -->
 		<!--<module name="Regexp">
 			<property name="format" value="@Override\s*public\s*void\s*overridingFunction" />
 			<property name="illegalPattern" value="false" /> 

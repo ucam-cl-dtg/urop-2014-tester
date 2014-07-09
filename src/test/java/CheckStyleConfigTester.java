@@ -94,6 +94,19 @@ public class CheckStyleConfigTester {
 		runTest("LongLowerL", "Lower case long assignment", true,  "Should report that upper case L should be used");
 	}
 	
+	@Test
+	public void testIllegalCatch() throws IOException
+	{
+		runTest("CatchException", "Catching 'Exception' is bad practice", true, "Should report an error because Exception is being caught");
+	}
+	
+	@Test
+	public void testIllegalThrows() throws IOException
+	{
+		//runTest("ThrowException",  "Throwing 'Exception' is bad practice" , true, "'throw new Exception()' should be reported as an error");
+		runTest("ThrowsException", "Throwing 'Exception' is bad practice" , true, "'throws Exception' should be reported as an error");
+	}
+	
 	//worker function for running tests
 	public void runTest(String testCase, String desiredString, boolean desiredResponse, String message) throws IOException
 	{
