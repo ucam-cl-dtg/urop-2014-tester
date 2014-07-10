@@ -8,14 +8,17 @@ import org.junit.Test;
 
 public class CheckStyleConfigTester {
 	
-	//@Test
+	@Test
 	public void testIndentation() throws IOException 
 	{
-		runTest("IndentationBadTab",        "indentation level", true,  "Should report badly indented code if indented too far with tab");
-		runTest("IndentationBadSpace",      "indentation level", true,  "Should report badly indented code if indented too far with space");
-		runTest("IndentationBadRightBrace", "indentation level", true,  "Should report badly indented close braces");
-		runTest("IndentationBadLeftBrace",  "indentation level", true,  "Should report badly indented open braces");
-		runTest("IndentationExpected",      "indentation level", false, "Should not report any indentation issues");
+		String indentationString = "Bad indentation";
+		runTest("IndentationBadTab",        indentationString, true,  "Should report badly indented code if indented too far with tab");
+		runTest("IndentationBadSpace",      indentationString, true,  "Should report badly indented code if indented too far with space");
+		runTest("IndentationBadRightBrace", indentationString, true,  "Should report badly indented close braces");
+		runTest("IndentationBadLeftBrace",  indentationString, true,  "Should report badly indented open braces");
+		runTest("IndentationExpected",      indentationString, false, "Should not report any indentation issues");
+		runTest("IndentationBadChild",      indentationString, true,  "Should report a badly indented child of another block");
+		runTest("IndentationBadChild2",     indentationString, true,  "Should report a badly indented child of another block");
 	}
 	
 	@Test
@@ -54,12 +57,12 @@ public class CheckStyleConfigTester {
 	public void testWhitespaceAroundOperators() throws IOException
 	{
 		runTest("TooLittleWhitespaceBeforeEquals", "should be preceded with whitespace",                               true,  "Should report not enough whitespace before '='");
-		runTest("TooLittleWhitespaceAfterEquals",  "should be followed by whitespace",                                 true,  "Should report not enough whitespace after '='");
-		runTest("TooMuchWhitespaceBeforeEquals",   "only one space",                                                   true,  "Should report too much whitespace before '='");
-		runTest("TooMuchWhitespaceAfterEquals",    "only one space",                                                   true,  "Should report too much whitespace after '='");
+		runTest("TooLittleWhitespaceAfterEquals",  "should be followed with whitespace",                                 true,  "Should report not enough whitespace after '='");
+		runTest("TooMuchWhitespaceBeforeEquals",   "Multiple spaces",                                                  true,  "Should report too much whitespace before '='");
+		runTest("TooMuchWhitespaceAfterEquals",    "Multiple spaces",                                                  true,  "Should report too much whitespace after '='");
 		runTest("TabBeforeEquals",                 "tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
 		runTest("NoWhitespacePlusPlus",            "should be preceded with whitespace",                               false, "Should not report not enough whitespace before ++");
-		runTest("NoWhitespacePlusPlus",            "not should be followed by whitespace",                             false, "Should not report not enough whitespace after ++");
+		runTest("NoWhitespacePlusPlus",            "not should be followed with whitespace",                             false, "Should not report not enough whitespace after ++");
 		runTest("ExpectedWhitespacePlusEquals",    "not should be preceded with whitespace",                           false, "Should not report error with +=");
 	}
 	
@@ -89,6 +92,25 @@ public class CheckStyleConfigTester {
 	{
 		runTest("LongUpperL", "Lower case long assignment", false, "Should not report anything");
 		runTest("LongLowerL", "Lower case long assignment", true,  "Should report that upper case L should be used");
+	}
+	
+	@Test
+	public void testIllegalCatch() throws IOException
+	{
+		runTest("CatchException", "Catching 'Exception' is bad practice", true, "Should report an error because Exception is being caught");
+	}
+	
+	@Test
+	public void testIllegalThrows() throws IOException
+	{
+		//runTest("ThrowException",  "Throwing 'Exception' is bad practice" , true, "'throw new Exception()' should be reported as an error");
+		runTest("ThrowsException", "Throwing 'Exception' is bad practice" , true, "'throws Exception' should be reported as an error");
+	}
+	
+	@Test
+	public void testSwitch() throws IOException
+	{
+		runTest("SwitchDefaultNotLast", "Switch default label is not last", true, "Should report that a default label not last should come first");
 	}
 	
 	//worker function for running tests
