@@ -10,7 +10,7 @@ public class sReportItem implements Comparable<sReportItem>{
 	private String fileName;
 	private List<Integer> lineNumberList = new LinkedList<Integer>();
 	private String problem;
-	private String detail="";
+	private String detail;
 	
 
 	public sReportItem(String severity, String fileName, int lineNo, String problem, String detail) {
