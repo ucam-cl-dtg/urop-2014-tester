@@ -52,7 +52,7 @@ public class Tester {
 					//run dynamic analysis tests
 				}
 				else { 
-					throw new WrongFileTypeError(); 
+					throw new WrongFileTypeException(); 
 				} 
 			}
 			
@@ -79,12 +79,12 @@ public class Tester {
 			System.out.println(err.getMessage());
 			this.report = report;
 		}
-		catch (WrongFileTypeError err) {
+		catch (WrongFileTypeException err) {
 			Report report = new Report(err.getMessage());
 			System.out.println(err.getMessage());
 			this.report = report;
 		} 
-		catch (TestHarnessError err) {
+		catch (TestHarnessException err) {
 			System.out.println();
 			Report report = new Report(err.getMessage());
 			System.out.println(err.getMessage());
@@ -93,7 +93,7 @@ public class Tester {
 	}
 	
 	//loops through files to test statically
-	public void runStaticAnalysis(String testFileName,LinkedList<String> fileNames) throws CheckstyleException, TestHarnessError {
+	public void runStaticAnalysis(String testFileName,LinkedList<String> fileNames) throws CheckstyleException, TestHarnessException {
 		for (String file : fileNames) {
 			StaticParser.test(testFileName, file, this.sReport);
 		}

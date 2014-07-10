@@ -56,10 +56,10 @@ public class sReportItem implements Comparable<sReportItem>{
 		Collections.sort(this.getLineNumbers());
 		Collections.sort(reportItem2.getLineNumbers());
 		if (this.getFileName().compareTo(reportItem2.getFileName()) == 0) {
-			if (this.getSeverity().equals("error") & reportItem2.getSeverity().equals("warning")) {
+			if (this.getSeverity().equals("error") && reportItem2.getSeverity().equals("warning")) {
 				return -1;
 			}
-			else if (this.getSeverity().equals("warning") & reportItem2.getSeverity().equals("error")) {
+			else if (this.getSeverity().equals("warning") && reportItem2.getSeverity().equals("error")) {
 				return 1;
 			}
 			else {

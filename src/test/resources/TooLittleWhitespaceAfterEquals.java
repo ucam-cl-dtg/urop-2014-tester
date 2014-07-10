@@ -1,5 +1,5 @@
 //test case for an empty method
-public class TooLitteWhitespaceBeforeEquals
+public class TooLitteWhitespaceAfterEquals
 {
     public void someFunction()
     {
