@@ -52,7 +52,6 @@ public class sReportItem implements Comparable<sReportItem>{
 		}
 	}
 	
-	@Override
 	public int compareTo(sReportItem reportItem2) {
 		Collections.sort(this.getLineNumbers());
 		Collections.sort(reportItem2.getLineNumbers());

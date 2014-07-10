@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="ISO-8859-1">
+<title>Report</title>
+<script src="webjars/jquery/2.1.1/jquery.js"></script>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+    printReport();
+});
+
+function printReport() {
+	$.ajax({
+	type: "POST",
+	url: "rest/getReport",
+	success: function(data){
+		if(data.reportStatus != "complete") {
+			$("#resultTitle").text("Error");
+			$("#results").text(data.reportStatus);
+		}
+		else {
+			var currentFile = "";
+			if (data.result === "FAIL") {
+				$('<p style="text-align:center;color:red;font-size:40px">' + data.result + '</p>').appendTo('#results');
+			} 
+			else {
+				$('<p style="text-align:center;color:green;font-size:50px">' + data.result + '</p>').appendTo('#results');
+			}
+			for(i=0;i<data.staticResults.length;i++) {
+				 if(data.staticResults[i].fileName != currentFile) {
+					 $('<p><b>' +data.staticResults[i].fileName + '</b></p>').appendTo('#results');
+					 currentFile = data.staticResults[i].fileName;
+				 }
+				 if (data.staticResults[i].severity === "error") {
+				 	$('<p style="color:red">' + data.staticResults[i].severity + ": at line(s) " + getLines(data.staticResults[i].lineNumbers) + data.staticResults[i].message + '<p>').appendTo('#results');
+				 }
+				 else {
+					 $('<p style="color:orange">' + data.staticResults[i].severity + ": at line(s) " + getLines(data.staticResults[i].lineNumbers) + data.staticResults[i].message + '<p>').appendTo('#results');
+				 }
+			}
+		}
+	},
+	dataType: "json"
+	});
+}
+
+function getLines(lineNos){
+	var lines = "";
+	for(j=0;j<lineNos.length;j++) {
+	 	lines += lineNos[j] + ", ";
+	}
+	return lines;
+}
+</script>
+</head>
+<body>
+	<p style="text-align:center;color:purple;font-family:arial;font-size:40px" id="resultTitle">Your Result:</p>
+	<div style="text-align:left;color:black;font-family:arial;font-size:20px" id="results">
+	<!--  do a table -->
+	</div>
+</body>
+</html>

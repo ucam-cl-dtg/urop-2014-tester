@@ -8,9 +8,10 @@ import java.util.LinkedList;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 public class Tester {
-	List<sReportItem> sReport = new LinkedList<sReportItem>();
-	List<dReportItem> dReport = new LinkedList<dReportItem>();
-	final String dir = System.getProperty("user.dir");
+	private List<sReportItem> sReport = new LinkedList<sReportItem>();
+	private List<dReportItem> dReport = new LinkedList<dReportItem>();
+	private Report report;
+	// private final String dir = System.getProperty("user.dir");
 	
 	//instantiated in constructor when joined with other project
 	private String crsid = "eg1";
@@ -30,10 +31,10 @@ public class Tester {
 		
 		//temporary files used to test this works
 		LinkedList<String> ll = new LinkedList<String>();
-		ll.add("/src/main/resources/TestResource.java");
-		ll.add("/src/main/resources/TestResource2.java");
-		testingQueue.put("/src/main/resources/CheckstyleFormat.xml",ll);
-		
+		// may need: /src/main/resources/
+		ll.add("C:\\ResourcesForUROP/TestResource.java");
+		ll.add("C:\\ResourcesForUROP/TestResource2.java");
+		testingQueue.put("C:\\ResourcesForUROP/CheckstyleFormat.xml",ll);
 		
 		try {
 			//loop through each test, decide what type of test it is and run it, adding the result to outputs
@@ -59,6 +60,7 @@ public class Tester {
 			
 			//return report with results of all tests
 			Report report = new Report(sReport,dReport);
+			this.report = report;
 			
 			System.out.println("Your result: " + report.getResult());
 			System.out.println();
@@ -75,21 +77,31 @@ public class Tester {
 		catch (CheckstyleException err){
 			Report report = new Report(err.getMessage());
 			System.out.println(err.getMessage());
+			this.report = report;
 		}
 		catch (WrongFileTypeError err) {
 			Report report = new Report(err.getMessage());
 			System.out.println(err.getMessage());
+			this.report = report;
 		} 
 		catch (TestHarnessError err) {
+			System.out.println();
 			Report report = new Report(err.getMessage());
 			System.out.println(err.getMessage());
+			this.report = report;
 		} 
 	}
 	
 	//loops through files to test statically
 	public void runStaticAnalysis(String testFileName,LinkedList<String> fileNames) throws CheckstyleException, TestHarnessError {
 		for (String file : fileNames) {
-			StaticParser.test(dir + testFileName, dir + file, this.sReport);
+			StaticParser.test(testFileName, file, this.sReport);
 		}
+	}
+	
+	//temporary to get data to html file
+	public static Report getReport() {
+		Tester t = new Tester();
+		return t.report;
 	}
 }
