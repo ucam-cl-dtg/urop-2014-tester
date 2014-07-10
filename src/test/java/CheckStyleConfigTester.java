@@ -57,13 +57,13 @@ public class CheckStyleConfigTester {
 	public void testWhitespaceAroundOperators() throws IOException
 	{
 		runTest("TooLittleWhitespaceBeforeEquals", "should be preceded with whitespace",                               true,  "Should report not enough whitespace before '='");
-		runTest("TooLittleWhitespaceAfterEquals",  "should be followed with whitespace",                                 true,  "Should report not enough whitespace after '='");
+		runTest("TooLittleWhitespaceAfterEquals",  "should be followed with whitespace",                               true,  "Should report not enough whitespace after '='");
 		runTest("TooMuchWhitespaceBeforeEquals",   "Multiple spaces",                                                  true,  "Should report too much whitespace before '='");
 		runTest("TooMuchWhitespaceAfterEquals",    "Multiple spaces",                                                  true,  "Should report too much whitespace after '='");
 		runTest("TabBeforeEquals",                 "tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
 		runTest("NoWhitespacePlusPlus",            "should be preceded with whitespace",                               false, "Should not report not enough whitespace before ++");
-		runTest("NoWhitespacePlusPlus",            "should be followed with whitespace",                             false, "Should not report not enough whitespace after ++");
-		runTest("ExpectedWhitespacePlusEquals",    "should be preceded with whitespace",                           false, "Should not report error with +=");
+		runTest("NoWhitespacePlusPlus",            "should be followed with whitespace",                               false, "Should not report not enough whitespace after ++");
+		runTest("ExpectedWhitespacePlusEquals",    "should be preceded with whitespace",                               false, "Should not report error with +=");
 	}
 	
 	@Test
