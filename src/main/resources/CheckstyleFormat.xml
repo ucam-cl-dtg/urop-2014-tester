@@ -8,7 +8,8 @@ what the following rules do, please see the checkstyle configuration
 page at http://checkstyle.sourceforge.net/config.html.
  -->
  
- <!-- Note: default severity for each check is error -->
+ <!-- Notes: default severity for each check is error 
+ 			 the message displayed for each problem is of the format "general problem ~ advice/more detail" -->
 
 <module name="Checker">
 	<!-- check for presence of TODO or FIXME in comments -->
@@ -43,7 +44,7 @@ page at http://checkstyle.sourceforge.net/config.html.
 			<property name="severity" value="warning" />
 		</module>
 		
-		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in same package, or imports java.lang -->
+		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in the same package, or imports java.lang -->
 		<module name="RedundantImport">
 			<message key="import.duplicate" value="Duplicate import ~ ''{1}'' already imported in line ''{0}''" />
 			<message key="import.lang"      value="Unnecessary import ~ java.lang is imported automatically" />
@@ -138,23 +139,27 @@ page at http://checkstyle.sourceforge.net/config.html.
 			<property name="severity" value="warning" />
 		</module>
 		
+		<!-- checks that the catch default is last -->
+		<module name="DefaultComesLast">
+			<message key="default.comes.last" value="Switch default label is not last ~ putting the default label at the end of a switch statement is recommended practice" />
+			<property name="severity" value="warning" />
+		</module>		
+		
 		<!-- checks for Exception, RuntimeException, and Throwable being caught -->
 		<module name="IllegalCatch">
 			<message key="illegal.catch" value="Catching ''{0}'' is bad practice" />
 		</module>
 		
-		<!-- checks for Exception, RuntimeException, and Throwable being thrown -->
+		<!-- checks for Exception, RuntimeException, and Throwable, and Error being thrown -->
 		<module name="IllegalThrows">
 			<property name="illegalClassNames" value="java.lang.Throwable, java.lang.Error, java.lang.RuntimeException, java.lang.Exception" />
 			<message key="illegal.throw" value="Throwing ''{0}'' is bad practice" />
 		</module>
 		
-		<!-- @Override annotation check demo -->
+		<!-- @Override annotation check demo (doesn't work yet) -->
 		<!--<module name="Regexp">
 			<property name="format" value="@Override\s*public\s*void\s*overridingFunction" />
 			<property name="illegalPattern" value="false" /> 
 		</module>-->		
 	</module>
 </module>
-
-
