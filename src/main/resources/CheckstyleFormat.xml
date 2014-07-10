@@ -33,12 +33,12 @@ page at http://checkstyle.sourceforge.net/config.html.
 	
 	<module name="TreeWalker">
 		<!-- Check Indentation -->
-		<module name="Indentation">
-			<property name="caseIndent"      value="4"/>  <!-- Checks that case indents are 4 spaces -->
-			<property name="basicOffset"     value="4"/>  <!-- Number of spaces to take as equivalent to tab. Set to tab == 4 spaces -->
-			<property name="braceAdjustment" value="0"/>  <!-- Checks that open braces which are moved to next line are not indented-->
-			<property name="throwsIndent"    value="4"/>  <!-- Checks that throws statements which are moved to next line are exactly one indentation level in-->
-		</module>
+		<!--<module name="Indentation">
+			<property name="caseIndent"      value="4"/>  Checks that case indents are 4 spaces
+			<property name="basicOffset"     value="4"/>  Number of spaces to take as equivalent to tab. Set to tab == 4 spaces
+			<property name="braceAdjustment" value="0"/>  Checks that open braces which are moved to next line are not indented
+			<property name="throwsIndent"    value="4"/>  Checks that throws statements which are moved to next line are exactly one indentation level in
+		</module> -->
 		
 		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in same package, or imports java.lang -->
 		<module name="RedundantImport">

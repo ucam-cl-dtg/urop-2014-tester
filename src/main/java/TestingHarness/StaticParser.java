@@ -37,11 +37,16 @@ public class StaticParser {
 	    //test the java file and use the listener to add each line with an error
 	    //in it to the linked list of static report items
 	    
-	    Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
-	    AuditListener listener = new StaticLogger(sReport);
-		Checker c = createChecker(config, listener); 
-		int errs = c.process(fileList); 
-		c.destroy();
+	    try {
+		    Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
+		    AuditListener listener = new StaticLogger(sReport);
+			Checker c = createChecker(config, listener); 
+			int errs = c.process(fileList); 
+			c.destroy();
+	    }
+	    catch (CheckstyleException err) {
+	    	throw new TestHarnessError("Could not find test file: " + getName(test));
+	    }
 	}
 	
 	private static Checker createChecker(Configuration config, AuditListener listener) throws CheckstyleException {
