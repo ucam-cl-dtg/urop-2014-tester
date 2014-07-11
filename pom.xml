@@ -1,18 +1,19 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>UROP.project</groupId>
-  <artifactId>TestingSystem</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+<project    xmlns="http://maven.apache.org/POM/4.0.0" 
+			xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+			xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" >
+	<modelVersion>4.0.0</modelVersion>
+  	<groupId>UROP.project</groupId>
+  	<artifactId>TestingSystem</artifactId>
+  	<version>0.0.1-SNAPSHOT</version>
   
-  <repositories>
-	<repository>
-	<id>JBoss repository</id>
-	<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
-	</repository>
-  </repositories>
+ 	<repositories>
+		<repository>
+			<id>JBoss repository</id>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+		</repository>
+ 	 </repositories>
   
-  <dependencies>
-	
+  	<dependencies>
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
@@ -24,20 +25,23 @@
 			<artifactId>resteasy-jackson2-provider</artifactId>
 			<version>3.0.6.Final</version>
 		</dependency>
+		
+		<!-- CheckStyle -->
+		<dependency>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-checkstyle-plugin</artifactId>
+			<version>2.12.1</version>
+			<type>maven-plugin</type>
+		</dependency>
 
+		<!-- JQuery -->
 		<dependency>
 		     <groupId>org.webjars</groupId>
 		     <artifactId>jquery</artifactId>
 		     <version>2.1.1</version>
 		</dependency>
 		
-		<dependency>
-		<groupId>org.apache.maven.plugins</groupId>
-		<artifactId>maven-checkstyle-plugin</artifactId>
-		<version>2.12.1</version>
-		<type>maven-plugin</type>
-		</dependency>
-		
+		<!-- JUnit -->
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -45,9 +49,11 @@
 			<scope>test</scope>
 		</dependency>
 		
-		
-
-		
+		<!-- log4j -->
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		<version>1.2.17</version>
+		</dependency>
 	</dependencies>
-	
 </project>
