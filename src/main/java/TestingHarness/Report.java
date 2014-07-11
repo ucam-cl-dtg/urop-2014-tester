@@ -67,7 +67,7 @@ public class Report {
 		return this.dReport;
 	}
 	
-	public String getReportStatus() {
+	public String getStatus() {
 		return this.reportStatus;
 	}
 	

@@ -10,14 +10,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-
+/**
+ * Provides all API functions. 
+ * THE EXACT FUNCTION PARAMETERS AND RETURN VALUES ARE SUBJECT TO CHANGE
+ * @author as2388
+ */
+@Path("/API") //full path to here is /tester/API/
 public class TestService
 {
 	/* Maps the ID of a test to in-progress tests. 
-	 * TestService is responsible for generating unique ID's
-	 * Class user's are responsible for remembering the ID so that they can poll it's status and get it's report when done */
+	 * TestService is responsible for generating unique IDs
+	 * Class user's are responsible for remembering the ID so that they can poll its status and get its report when done */
 	private static Map<String, Tester> ticksInProgress;	//TODO: should we be keeping these in a DB instead?
-	private int notFoundCode = 404;
+	private int notFoundCode = 404;						//TODO: investigate whether this is the best status code to be returning
 	
 	private TestService()
 	{
@@ -27,6 +32,15 @@ public class TestService
 		}
 	}
 	
+	/**
+	 * Starts a new test
+	 * @param serializedTestData	A map containing paths to unit tests/test configs, 
+	 * 								and paths to the files on which to run the tests,
+	 * 								which we probably have to deserialize from JSON
+	 * @return						The ID of the test just started, to be used by the caller of this
+	 * 								function to access the status and result of the the test at a
+	 * 								later time
+	 */
 	@POST
 	@Path("/runNewTest")
 	public Response runNewTest(@QueryParam("testData") String serializedTestData)
@@ -47,15 +61,17 @@ public class TestService
 		//start the test
 		tester.runTests();
 		
-		//return ok		
+		//return status ok and the id of the 	
 		return Response.status(200).entity(id).build();
 	}
 	
 	
 	/**
 	 * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code
-	 * @param testID
-	 * @return			
+	 * @param testID	ID of the test to access
+	 * @return			If the test was found: HTTP status code 200, and a string containing the status,
+	 * 										     either TODO e.g. waiting, started, completed, error
+	 * 					  Else: 			   HTTP status code 404
 	 */
 	@POST
 	@Path("/pollStatus")
@@ -64,19 +80,18 @@ public class TestService
 	{
 		if (ticksInProgress.containsKey(testID))
 		{
-			return Response.status(200).entity(ticksInProgress.get(testID)).build();
+			return Response.status(200).entity(ticksInProgress.get(testID).getReport().getStatus()).build();
 		}
 		else
 		{
-			//TODO: investigate whether this is the best status code to be returning
 			return Response.status(notFoundCode).build();
 		}
 	}
 	
 	/**
-	 * 
-	 * @param testID
-	 * @return
+	 * Gets the report associated with the testID.
+	 * @param testID	ID of the test to access
+	 * @return			A report object in JSON format
 	 */
 	@POST
 	@Path("/getReport")

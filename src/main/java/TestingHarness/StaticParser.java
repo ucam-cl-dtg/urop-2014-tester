@@ -16,8 +16,7 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 public class StaticParser {
 	
-	public static void test(String test, String file, List<sReportItem> sReport) throws TestHarnessException, CheckstyleException{ 
-		
+	public static void test(String test, String file, List<sReportItem> sReport) throws TestHarnessException, CheckstyleException{ 		
 		String fileName = getName(file);
 		
 		//must be in list for .process to work
