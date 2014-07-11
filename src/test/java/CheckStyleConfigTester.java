@@ -149,7 +149,6 @@ public class CheckStyleConfigTester {
 				}
 			}
 		}
-	
 		br.close();
 		
 		//Run JUnit assert
