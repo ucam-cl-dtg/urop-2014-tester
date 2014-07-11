@@ -11,16 +11,16 @@
 		<url-pattern>/tester/*</url-pattern>
 	</servlet-mapping>
 
-	<!-- Auto scan REST service -->
-	<context-param>
-		<param-name>resteasy.scan</param-name>
-		<param-value>true</param-value>
-	</context-param>
-
 	<!-- this should be the same URL pattern as the servlet-mapping property -->
 	<context-param>
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
 		<param-value>/tester</param-value>
+	</context-param>
+
+	<!-- Auto scan REST service -->
+	<context-param>
+		<param-name>resteasy.scan</param-name>
+		<param-value>true</param-value>
 	</context-param>
 
 	<listener>
