@@ -41,6 +41,13 @@
 		     <version>2.1.1</version>
 		</dependency>
 		
+		<!-- Guice -->
+		<dependency>
+			<groupId>com.google.inject</groupId>
+			<artifactId>guice</artifactId>
+			<version>3.0</version>
+		</dependency>
+		
 		<!-- JUnit -->
 		<dependency>
 			<groupId>junit</groupId>

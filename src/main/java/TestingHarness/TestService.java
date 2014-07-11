@@ -5,30 +5,38 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
+
+import com.google.inject.Inject;
+
 /**
  * Provides all API functions. 
  * THE EXACT FUNCTION PARAMETERS AND RETURN VALUES ARE SUBJECT TO CHANGE
  * @author as2388
  */
-@Path("/API") //full path to here is /tester/API/
+@Path("/testerAPI") //full path to here is /tester/API/
 public class TestService
 {
+	static Logger log = Logger.getLogger(TestService.class.getName());	//initialise log4j logger
+	
 	/* Maps the ID of a test to in-progress tests. 
 	 * TestService is responsible for generating unique IDs
 	 * Class user's are responsible for remembering the ID so that they can poll its status and get its report when done */
 	private static Map<String, Tester> ticksInProgress;	//TODO: should we be keeping these in a DB instead?
 	private int notFoundCode = 404;						//TODO: investigate whether this is the best status code to be returning
 	
-	private TestService()
+	public TestService()
 	{
 		if (ticksInProgress == null)
 		{
+			log.info("ticksInProgress Initialised");
 			ticksInProgress = new HashMap<String, Tester>();
 		}
 	}
@@ -46,12 +54,13 @@ public class TestService
 	@Path("/runNewTest")
 	public Response runNewTest(@QueryParam("testData") String serializedTestData)
 	{
+		log.info("New test request received");
 		//TODO: deserialise the parameter to a Map.
 		//for now:
 		Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
 		
 		//create a new Tester object
-		Tester tester = new Tester(tests);
+		final Tester tester = new Tester(tests);
 		
 		//generate a UUID for the tester
 		String id=UUID.randomUUID().toString();
@@ -59,8 +68,14 @@ public class TestService
 		//add the object to the list of in-progress tests
 		ticksInProgress.put(id, tester);
 		
-		//start the test
-		tester.runTests();
+		//start the test in an asynchronous thread
+		new Thread(new Runnable() {
+	           public void run() {
+	               tester.runTests();			
+		}
+		}).start();
+		
+		log.info("runNewTest(): test started");
 		
 		//return status ok and the id of the tester object
 		return Response.status(200).entity(id).build();
@@ -78,12 +93,15 @@ public class TestService
 	@Produces("text/plain")
 	public Response pollStatus(@QueryParam("testID") String testID)
 	{
+		log.info("Poll request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
 		{
-			return Response.status(200).entity(ticksInProgress.get(testID).getReport().getStatus()).build();
+			log.info("Poll request returned" + ticksInProgress.get(testID).getStatus());
+			return Response.status(200).entity(ticksInProgress.get(testID).getStatus()).build();
 		}
 		else
 		{
+			log.info("ID of poll request could not be found");
 			return Response.status(notFoundCode).build();
 		}
 	}
@@ -98,6 +116,7 @@ public class TestService
 	@Produces("application/json")
 	public Response getReport(@QueryParam("testID") String testID)
 	{
+		log.info("Report get request received");
 		if (ticksInProgress.containsKey(testID))
 		{
 			Report toReturn = ticksInProgress.get(testID).getReport();

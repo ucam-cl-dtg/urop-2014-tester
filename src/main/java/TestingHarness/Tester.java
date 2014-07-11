@@ -24,6 +24,7 @@ public class Tester {
 	private List<sReportItem> sReport = new LinkedList<sReportItem>();	//list of static report items
 	private List<dReportItem> dReport = new LinkedList<dReportItem>();  //list of dynamic report items
 	private Report report;												//Report object into which all the report items will ultimately go
+	private String status = "running";
 	
 	//instantiated in constructor when joined with other project
 	private String crsid = "eg1";										//TODO: find out why we need this
@@ -31,7 +32,7 @@ public class Tester {
 	//Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
 	private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
 	
-	//temporary
+	//temporary. TODO: remove
 	/*public static void main(String[] args) {
 		//new Tester();
 	}*/
@@ -57,6 +58,11 @@ public class Tester {
 	public void runTests()
 	{
 		log.info("Tick analysis started");
+		try {
+		    Thread.sleep(15000);
+		} catch(InterruptedException ex) {
+		    Thread.currentThread().interrupt();
+		}
 				
 		try {
 			//loop through each test, decide what type of test it is and run it, adding the result to outputs
@@ -103,6 +109,8 @@ public class Tester {
 			log.error("Tick analysis failed. TestHarnessException message: " + err.getMessage());
 			this.report = report;
 		} 
+		
+		status="complete";
 	}
 	
 	private void printReport()
@@ -133,6 +141,11 @@ public class Tester {
 		for (String file : fileNames) {
 			StaticParser.test(configFileName, file, this.sReport);
 		}
+	}
+	
+	public String getStatus()
+	{
+		return this.status;
 	}
 	
 	//temporary to get data to html file
