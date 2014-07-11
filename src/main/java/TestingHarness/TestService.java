@@ -3,6 +3,7 @@ package TestingHarness;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -52,8 +53,8 @@ public class TestService
 		//create a new Tester object
 		Tester tester = new Tester(tests);
 		
-		//TODO: generate unique ID. For now, all tests have ID 0
-		String id="0";
+		//generate a UUID for the tester
+		String id=UUID.randomUUID().toString();
 		
 		//add the object to the list of in-progress tests
 		ticksInProgress.put(id, tester);
@@ -61,17 +62,16 @@ public class TestService
 		//start the test
 		tester.runTests();
 		
-		//return status ok and the id of the 	
+		//return status ok and the id of the tester object
 		return Response.status(200).entity(id).build();
-	}
-	
+	}	
 	
 	/**
 	 * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code
 	 * @param testID	ID of the test to access
 	 * @return			If the test was found: HTTP status code 200, and a string containing the status,
 	 * 										     either TODO e.g. waiting, started, completed, error
-	 * 					  Else: 			   HTTP status code 404
+	 * 					Else: HTTP status code 404
 	 */
 	@POST
 	@Path("/pollStatus")
