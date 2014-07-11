@@ -69,7 +69,7 @@ public class sReportItem implements Comparable<sReportItem>{
 	}
 
 	/**
-	 * Add 
+	 * Add the line of another occurrence of this error to this object
 	 * @param lineNo	the line at which the new instance was found
 	 */
 	public void addErrorAtLine(int lineNo) {

@@ -24,8 +24,10 @@ public class Report {
 	 * @param dReport	list of dynamic report items to be inserted into the report
 	 */
 	public Report(List<sReportItem> sReport, List<dReportItem> dReport) {
-		//Handle static reports
 		this.sReport = sReport;
+		this.dReport = dReport;
+		
+		//Handle static reports
 		Collections.sort(sReport);
 		//If the severity of any problem found by CheckStyle is an error, then fail the student
 		for (sReportItem s : sReport) {
@@ -34,8 +36,8 @@ public class Report {
 			}
 		}
 		
-		//Handle dynamic reports
-		this.dReport = dReport;
+		//TODO: Handle dynamic reports
+		
 
 		if(this.result == null) {
 			this.result = "PASS";	//TODO: is it ok to default to PASS?

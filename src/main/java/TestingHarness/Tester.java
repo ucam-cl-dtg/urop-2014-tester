@@ -23,49 +23,40 @@ public class Tester {
 	private List<sReportItem> sReport = new LinkedList<sReportItem>();	//list of static report items
 	private List<dReportItem> dReport = new LinkedList<dReportItem>();  //list of dynamic report items
 	private Report report;												//Report object into which all the report items will ultimately go
-	private final String dir = System.getProperty("user.dir");			//TODO: remove hard-coded path
 	
 	//instantiated in constructor when joined with other project
 	private String crsid = "eg1";										//TODO: find out why we need this
 	
-	//Maps a test (either static or dynamic) to a list of files on which that test should be run
+	//Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
 	private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
 	
 	//temporary
-	public static void main(String[] args) {
+	/*public static void main(String[] args) {
 		new Tester();
-	}
+	}*/
 	
 	/**
-	 * Creates a new Tester, then immediately starts running hard-coded tests
+	 * Creates a new Tester
 	 */
-	public Tester(/* some class */) {
+	public Tester(Map<String, LinkedList<String>> testingQueue) {
 		/*
 		 * WHEN WE RECIEVE CLASS:
+		 * 	TODO: Why don't we just ask for those two parameters?
 		 * this.crsid = class.getCrsid;
 		 * this.testingQueue = class.getTests();
 		 */
+		this.testingQueue = testingQueue;
 		
-		runTester();
+		//runTests();
 	}
 	
 	/**
 	 * Runs all tests required by the tick on all files required to be tested by the tick
 	 */
-	private void runTester()
+	public void runTests()
 	{
 		log.info("Tick analysis started");
-		
-		//temporary files used to test this works
-		LinkedList<String> ll = new LinkedList<String>();
-		// may need: /src/main/resources/
-		//ll.add("C:\\ResourcesForUROP/TestResource.java");
-		//ll.add("C:\\ResourcesForUROP/TestResource2.java");
-		
-		ll.add(dir + "\\src\\test\\resources\\PackedLong.java");
-		testingQueue.put(dir + "\\src\\main\\resources\\CheckstyleFormat.xml", ll);
-		//testingQueue.put("C:\\ResourcesForUROP/CheckstyleFormat.xml",ll);
-		
+				
 		try {
 			//loop through each test, decide what type of test it is and run it, adding the result to outputs
 			for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
@@ -144,8 +135,7 @@ public class Tester {
 	}
 	
 	//temporary to get data to html file
-	public static Report getReport() {
-		Tester t = new Tester();
-		return t.report;
+	public Report getReport() {
+		return report;
 	}
 }
