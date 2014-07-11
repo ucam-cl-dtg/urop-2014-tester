@@ -96,12 +96,12 @@ public class TestService
 		log.info("Poll request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
 		{
-			log.info("Poll request returned" + ticksInProgress.get(testID).getStatus());
+			log.info("Poll request returned: " + ticksInProgress.get(testID).getStatus());
 			return Response.status(200).entity(ticksInProgress.get(testID).getStatus()).build();
 		}
 		else
 		{
-			log.info("ID of poll request could not be found");
+			log.error("ID of poll request could not be found");
 			return Response.status(notFoundCode).build();
 		}
 	}
@@ -120,12 +120,14 @@ public class TestService
 		if (ticksInProgress.containsKey(testID))
 		{
 			Report toReturn = ticksInProgress.get(testID).getReport();
-			//Assuming we're not responsible for storing tests, we should remove the test at this point
+			//Assuming we're not responsible for storing tests, we should remove the test at this point. So I am.
 			ticksInProgress.remove(testID);
+			log.info("Report message found");
 			return Response.status(200).entity(toReturn).build();
 		}
 		else
 		{
+			log.error("Report message not found");
 			return Response.status(notFoundCode).build();
 		}	
 	}
