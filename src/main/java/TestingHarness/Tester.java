@@ -9,6 +9,14 @@ import org.apache.log4j.Logger;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
+/**
+ * Runs all the static and dynamic analysis tests for a given tick, and produces a report,
+ * stored in memory until the object is destroyed
+ * 
+ * @author as2388
+ * @author kls2510
+ *
+ */
 public class Tester {
 	static Logger log = Logger.getLogger(Tester.class.getName());		//initialise log4j logger
 	

@@ -6,6 +6,12 @@ import java.io.IOException;
 
 import org.junit.Test;
 
+/**
+ * JUnit tests for the default CheckStyle config file, CheckStyleFormat.xml 
+ * 
+ * @author as2388
+ *
+ */
 public class CheckStyleConfigTester {
 	
 	@Test
@@ -113,8 +119,16 @@ public class CheckStyleConfigTester {
 		runTest("SwitchDefaultNotLast", "Switch default label is not last", true, "Should report that a default label not last should come first");
 	}
 	
-	//worker function for running tests
-	public void runTest(String testCase, String desiredString, boolean desiredResponse, String message) throws IOException
+	/**
+	 * Worker function for running a unit test on a file
+	 * 
+	 * @param testCase			Name of the file (excluding .java extension) in src/test/resources which will be the test input data
+	 * @param testString		A substring of the message CheckStyle is expected to produce (or not, if checking for false positives). If any string other than this is found, the test will fail
+	 * @param desiredResponse	Set to true if testString is expected to be found CheckStyle's output, set to false otherwise
+	 * @param message			A short message describing the test and expected behaviour, which will be displayed by JUnit if the test fails
+	 * @throws IOException		if the file containing the test case was not found
+	 */
+	public void runTest(String testCase, String testString, boolean desiredResponse, String message) throws IOException
 	{
 		//set up the arguments for the StaticAnalyser
 		final String dir = System.getProperty("user.dir");
@@ -139,7 +153,7 @@ public class CheckStyleConfigTester {
 			else
 			{
 				System.out.println(line);
-				if(line.contains(desiredString))
+				if(line.contains(testString))
 				{
 					expectedFound = true;
 				}
