@@ -41,15 +41,7 @@ public class TestService implements TestServiceInterface
 			ticksInProgress = new HashMap<String, Tester>();
 		}
 	}
-	
-	/**
-	 * Starts a new test
-	 * @param repoAddress			The address of the git repository to examine for .java files to 
-	 * 								analyse
-	 * @return						The ID of the test just started, to be used by the caller of this
-	 * 								function to access the status and result of the the test at a
-	 * 								later time
-	 */
+
 	@Override
 	public String runNewTest(@QueryParam("repoAddress") String repoAddress)
 	{
@@ -87,13 +79,6 @@ public class TestService implements TestServiceInterface
 		return id;
 	}	
 	
-	/**
-	 * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code
-	 * @param testID	ID of the test to access
-	 * @return			If the test was found: HTTP status code 200, and a string containing the status,
-	 * 										     either TODO e.g. waiting, running, completed, error
-	 * 					Else: HTTP status code 410 (Gone)
-	 */
 	@Override
 	public Response pollStatus(@QueryParam("testID") String testID)
 	{
@@ -110,11 +95,6 @@ public class TestService implements TestServiceInterface
 		}
 	}
 	
-	/**
-	 * Gets the report associated with the testID.
-	 * @param testID	ID of the test to access
-	 * @return			A report object in JSON format if item found, otherwise HTTP code 410 (Gone)
-	 */
 	@Override
 	public Report getReport(@QueryParam("testID") String testID)
 	{
