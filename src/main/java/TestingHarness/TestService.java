@@ -28,7 +28,7 @@ public class TestService
 	
 	/* Maps the ID of a test to in-progress tests. 
 	 * TestService is responsible for generating unique IDs
-	 * Class user's are responsible for remembering the ID so that they can poll its status and get its report when done */
+	 * Class users are responsible for remembering the ID so that they can poll its status and get its report when done */
 	private static Map<String, Tester> ticksInProgress;	//TODO: should we be keeping these in a DB instead?
 	private int notFoundCode = 410;						//TODO: investigate whether this is the best status code to be returning
 	
@@ -43,20 +43,18 @@ public class TestService
 	
 	/**
 	 * Starts a new test
-	 * @param serializedTestData	A map containing paths to unit tests/test configs, 
-	 * 								and paths to the files on which to run the tests,
-	 * 								which we probably have to deserialize from JSON
+	 * @param repoAddress			The address of the git repository to examine for .java files to 
+	 * 								analyse
 	 * @return						The ID of the test just started, to be used by the caller of this
 	 * 								function to access the status and result of the the test at a
 	 * 								later time
 	 */
 	@GET
 	@Path("/runNewTest")
-	public Response runNewTest(@QueryParam("testData") String serializedTestData)
+	public Response runNewTest(@QueryParam("repoAddress") String repoAddress)
 	{
 		log.info("New test request received");
-		//TODO: deserialise the parameter to a Map.
-		//for now:
+		//TODO: use git team's API to get files to test
 		Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
 		
 		//TODO: add corresponding git files to tests
@@ -80,7 +78,7 @@ public class TestService
 		}
 		}).start();
 		
-		log.info("runNewTest(): test started");
+		log.info("New test started; assigned id: " + id);
 		
 		//return status ok and the id of the tester object
 		return Response.status(200).entity(id).build();
@@ -90,8 +88,8 @@ public class TestService
 	 * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code
 	 * @param testID	ID of the test to access
 	 * @return			If the test was found: HTTP status code 200, and a string containing the status,
-	 * 										     either TODO e.g. waiting, started, completed, error
-	 * 					Else: HTTP status code 404
+	 * 										     either TODO e.g. waiting, running, completed, error
+	 * 					Else: HTTP status code 410 (Gone)
 	 */
 	@GET
 	@Path("/pollStatus")
@@ -101,12 +99,12 @@ public class TestService
 		log.info("Poll request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
 		{
-			log.info("Poll request returned: " + ticksInProgress.get(testID).getStatus());
+			log.info("Poll request for id " + testID + " returned: " + ticksInProgress.get(testID).getStatus());
 			return Response.status(200).entity(ticksInProgress.get(testID).getStatus()).build();
 		}
 		else
 		{
-			log.error("ID of poll request could not be found");
+			log.error("ID " + testID + " of poll request could not be found");
 			return Response.status(notFoundCode).build();
 		}
 	}
@@ -114,25 +112,25 @@ public class TestService
 	/**
 	 * Gets the report associated with the testID.
 	 * @param testID	ID of the test to access
-	 * @return			A report object in JSON format
+	 * @return			A report object in JSON format if item found, otherwise HTTP code 410 (Gone)
 	 */
 	@GET
 	@Path("/getReport")
 	@Produces("application/json")
 	public Response getReport(@QueryParam("testID") String testID)
 	{
-		log.info("Report get request received");
+		log.info("Report get request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
 		{
 			Report toReturn = ticksInProgress.get(testID).getReport();
 			//Assuming we're not responsible for storing tests, we should remove the test at this point. So I am.
 			ticksInProgress.remove(testID);
-			log.info("Report message found");
+			log.info("Report message found for id: " + testID);
 			return Response.status(200).entity(toReturn).build();
 		}
 		else
 		{
-			log.error("Report message not found");
+			log.error("Report message not found for id: "+ testID);
 			return Response.status(notFoundCode).build();
 		}	
 	}
