@@ -6,23 +6,24 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
-import com.google.inject.Inject;
 
 /**
  * Provides all API functions. 
  * THE EXACT FUNCTION PARAMETERS AND RETURN VALUES ARE SUBJECT TO CHANGE
  * @author as2388
  */
-@Path("/testerAPI") //full path to here is /tester/API/
-public class TestService
+ //full path to here is /tester/API/
+public class TestService implements TestServiceInterface
 {
 	static Logger log = Logger.getLogger(TestService.class.getName());	//initialise log4j logger
 	
@@ -49,8 +50,7 @@ public class TestService
 	 * 								function to access the status and result of the the test at a
 	 * 								later time
 	 */
-	@GET
-	@Path("/runNewTest")
+	@Override
 	public Response runNewTest(@QueryParam("repoAddress") String repoAddress)
 	{
 		log.info("New test request received");
@@ -63,10 +63,11 @@ public class TestService
 		final Tester tester = new Tester(tests);
 		
 		//generate a UUID for the tester
-		String id=UUID.randomUUID().toString();
-		while (TestService.ticksInProgress.containsKey(id)) {
+		String id;
+		do
+		{
 			id=UUID.randomUUID().toString();
-		}
+		} while (TestService.ticksInProgress.containsKey(id));
 		
 		//add the object to the list of in-progress tests
 		ticksInProgress.put(id, tester);
@@ -91,9 +92,7 @@ public class TestService
 	 * 										     either TODO e.g. waiting, running, completed, error
 	 * 					Else: HTTP status code 410 (Gone)
 	 */
-	@GET
-	@Path("/pollStatus")
-	@Produces("text/plain")
+	@Override
 	public Response pollStatus(@QueryParam("testID") String testID)
 	{
 		log.info("Poll request received for id: " + testID);
@@ -114,9 +113,7 @@ public class TestService
 	 * @param testID	ID of the test to access
 	 * @return			A report object in JSON format if item found, otherwise HTTP code 410 (Gone)
 	 */
-	@GET
-	@Path("/getReport")
-	@Produces("application/json")
+	@Override
 	public Response getReport(@QueryParam("testID") String testID)
 	{
 		log.info("Report get request received for id: " + testID);
@@ -133,5 +130,17 @@ public class TestService
 			log.error("Report message not found for id: "+ testID);
 			return Response.status(notFoundCode).build();
 		}	
+	}
+	
+	@Override
+	public Response test()
+	{
+		ResteasyClient c = new ResteasyClientBuilder().build();
+		ResteasyWebTarget t = c
+				.target("http://localhost:8080/TestingSystem/");
+		TestServiceInterface proxy = t.proxy(TestServiceInterface.class);
+		Response r = proxy.runNewTest("");
+		
+        return r; //.entity(value).build();
 	}
 }
