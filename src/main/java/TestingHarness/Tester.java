@@ -32,24 +32,11 @@ public class Tester {
 	//Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
 	private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
 	
-	//temporary. TODO: remove
-	/*public static void main(String[] args) {
-		//new Tester();
-	}*/
-	
 	/**
 	 * Creates a new Tester
 	 */
 	public Tester(Map<String, LinkedList<String>> testingQueue) {
-		/*
-		 * WHEN WE RECIEVE CLASS:
-		 * 	TODO: Why don't we just ask for those two parameters?
-		 * this.crsid = class.getCrsid;
-		 * this.testingQueue = class.getTests();
-		 */
 		this.testingQueue = testingQueue;
-		
-		//runTests();
 	}
 	
 	/**
@@ -58,6 +45,7 @@ public class Tester {
 	public void runTests()
 	{
 		log.info("Tick analysis started");
+		//TODO: remove
 		try {
 		    Thread.sleep(15000);
 		} catch(InterruptedException ex) {
@@ -80,7 +68,7 @@ public class Tester {
 					//TODO: run dynamic analysis tests
 				}
 				else { 
-					throw new WrongFileTypeException(); //TODO: maybe change this to unexpected file type exception. Do even need to throw an exception?
+					throw new WrongFileTypeException();
 				} 
 			} 
 			//Once the for loop is complete, all tests to be run have finished
@@ -91,21 +79,23 @@ public class Tester {
 			
 			//TODO: remove this. For now, print result to the console
 			printReport();
-		}		
-		//TODO: change report status and return it such that the error encountered is obvious
+		}	
+		
 		catch (CheckstyleException err){
 			Report report = new Report(err.getMessage());
-			log.error("Tick analysis failed. CheckstyleaException message: " + err.getMessage());
+			this.status = "failed";
+			log.error("Tick analysis failed. CheckstyleException message: " + err.getMessage());
 			this.report = report;
 		}
 		catch (WrongFileTypeException err) {
 			Report report = new Report(err.getMessage());
+			this.status = "failed";
 			log.error("Tick analysis failed. WrongFileTypeException message: " + err.getMessage());
 			this.report = report;
 		} 
 		catch (TestHarnessException err) {
-			System.out.println();
 			Report report = new Report(err.getMessage());
+			this.status = "failed";
 			log.error("Tick analysis failed. TestHarnessException message: " + err.getMessage());
 			this.report = report;
 		} 

@@ -12,8 +12,6 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
-//TODO make these methods not static
-
 public class StaticParser {
 	
 	public static void test(String test, String file, List<sReportItem> sReport) throws TestHarnessException, CheckstyleException{ 		

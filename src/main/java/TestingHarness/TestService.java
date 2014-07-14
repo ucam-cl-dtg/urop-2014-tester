@@ -30,7 +30,7 @@ public class TestService
 	 * TestService is responsible for generating unique IDs
 	 * Class user's are responsible for remembering the ID so that they can poll its status and get its report when done */
 	private static Map<String, Tester> ticksInProgress;	//TODO: should we be keeping these in a DB instead?
-	private int notFoundCode = 404;						//TODO: investigate whether this is the best status code to be returning
+	private int notFoundCode = 410;						//TODO: investigate whether this is the best status code to be returning
 	
 	public TestService()
 	{

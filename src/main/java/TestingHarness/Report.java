@@ -15,8 +15,8 @@ import edu.emory.mathcs.backport.java.util.Collections;
 public class Report {
 	private List<sReportItem> sReport;	//list of static analysis report items
 	private List<dReportItem> dReport;	//list of dynamic analysis report items
-	private String reportStatus;		//TODO: should this be initialised to something?
-	private String result;				//Overall PASS/FAIL/ERROR
+	private String reportStatus = "Incomplete";		//status the report is in/if error occurs error details are stored here
+	private String result;				//Overall PASS/FAIL/UNDETERMINED
 	
 	/**
 	 * Constructor for a successfully completed report
@@ -38,9 +38,8 @@ public class Report {
 		
 		//TODO: Handle dynamic reports
 		
-
 		if(this.result == null) {
-			this.result = "PASS";	//TODO: is it ok to default to PASS?
+			this.result = "PASS";
 		}
 		
 		//Change the status to complete (so any object polling status knows the report is ready 
@@ -57,8 +56,7 @@ public class Report {
 		this.reportStatus = "error: " + error;
 		this.result = "UNDETERMINED";
 	}
-	
-	//TODO: should we check if the report is ready instead of blindly returning any of these things?	
+		
 	public List<sReportItem> getStaticResults() {
 		return this.sReport;
 	}
