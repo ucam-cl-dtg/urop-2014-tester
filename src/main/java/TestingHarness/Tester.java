@@ -53,8 +53,11 @@ public class Tester {
 		}
 				
 		try {
+			int counter = 1;
+			int noOfTests = testingQueue.size();
 			//loop through each test, decide what type of test it is and run it, adding the result to outputs
 			for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
+				this.status = "running test " + counter + " of " + noOfTests;
 				String testFileName = e.getKey();
 				LinkedList<String> fileNames = e.getValue();
 				
@@ -70,6 +73,7 @@ public class Tester {
 				else { 
 					throw new WrongFileTypeException();
 				} 
+				counter++;
 			} 
 			//Once the for loop is complete, all tests to be run have finished
 			log.info("Tick analysis finished successfully");
@@ -79,6 +83,8 @@ public class Tester {
 			
 			//TODO: remove this. For now, print result to the console
 			printReport();
+			
+			status="complete";
 		}	
 		
 		catch (CheckstyleException err){
@@ -99,8 +105,6 @@ public class Tester {
 			log.error("Tick analysis failed. TestHarnessException message: " + err.getMessage());
 			this.report = report;
 		} 
-		
-		status="complete";
 	}
 	
 	private void printReport()

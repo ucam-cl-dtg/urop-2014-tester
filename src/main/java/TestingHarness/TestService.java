@@ -50,7 +50,7 @@ public class TestService
 	 * 								function to access the status and result of the the test at a
 	 * 								later time
 	 */
-	@POST
+	@GET
 	@Path("/runNewTest")
 	public Response runNewTest(@QueryParam("testData") String serializedTestData)
 	{
@@ -59,11 +59,16 @@ public class TestService
 		//for now:
 		Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
 		
+		//TODO: add corresponding git files to tests
+		
 		//create a new Tester object
 		final Tester tester = new Tester(tests);
 		
 		//generate a UUID for the tester
 		String id=UUID.randomUUID().toString();
+		while (TestService.ticksInProgress.containsKey(id)) {
+			id=UUID.randomUUID().toString();
+		}
 		
 		//add the object to the list of in-progress tests
 		ticksInProgress.put(id, tester);
@@ -88,7 +93,7 @@ public class TestService
 	 * 										     either TODO e.g. waiting, started, completed, error
 	 * 					Else: HTTP status code 404
 	 */
-	@POST
+	@GET
 	@Path("/pollStatus")
 	@Produces("text/plain")
 	public Response pollStatus(@QueryParam("testID") String testID)
@@ -111,7 +116,7 @@ public class TestService
 	 * @param testID	ID of the test to access
 	 * @return			A report object in JSON format
 	 */
-	@POST
+	@GET
 	@Path("/getReport")
 	@Produces("application/json")
 	public Response getReport(@QueryParam("testID") String testID)
