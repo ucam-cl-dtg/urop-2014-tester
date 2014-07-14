@@ -43,20 +43,18 @@ public class TestService
 	
 	/**
 	 * Starts a new test
-	 * @param serializedTestData	A map containing paths to unit tests/test configs, 
-	 * 								and paths to the files on which to run the tests,
-	 * 								which we probably have to deserialize from JSON
+	 * @param repoAddress			The address of the git repository to examine for .java files to 
+	 * 								analyse
 	 * @return						The ID of the test just started, to be used by the caller of this
 	 * 								function to access the status and result of the the test at a
 	 * 								later time
 	 */
 	@GET
 	@Path("/runNewTest")
-	public Response runNewTest(@QueryParam("testData") String serializedTestData)
+	public Response runNewTest(@QueryParam("repoAddress") String repoAddress)
 	{
 		log.info("New test request received");
-		//TODO: deserialise the parameter to a Map.
-		//for now:
+		//TODO: use git team's API to get files to test
 		Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
 		
 		//create a new Tester object
