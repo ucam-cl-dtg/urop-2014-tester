@@ -14,6 +14,34 @@ import edu.emory.mathcs.backport.java.util.Collections;
  */
 public class Report {
 	private List<sReportItem> sReport;	//list of static analysis report items
+	public List<sReportItem> getsReport() {
+		return sReport;
+	}
+
+	public void setsReport(List<sReportItem> sReport) {
+		this.sReport = sReport;
+	}
+
+	public List<dReportItem> getdReport() {
+		return dReport;
+	}
+
+	public void setdReport(List<dReportItem> dReport) {
+		this.dReport = dReport;
+	}
+
+	public String getReportStatus() {
+		return reportStatus;
+	}
+
+	public void setReportStatus(String reportStatus) {
+		this.reportStatus = reportStatus;
+	}
+
+	public void setResult(String result) {
+		this.result = result;
+	}
+
 	private List<dReportItem> dReport;	//list of dynamic analysis report items
 	private String reportStatus = "Incomplete";		//status the report is in/if error occurs error details are stored here
 	private String result;				//Overall PASS/FAIL/UNDETERMINED
@@ -45,6 +73,8 @@ public class Report {
 		//Change the status to complete (so any object polling status knows the report is ready 
 		this.reportStatus = "complete";
 	}
+	
+	public Report(){};
 
 	/**
 	 * Constructor for a report which could not complete
@@ -56,20 +86,10 @@ public class Report {
 		this.reportStatus = "error: " + error;
 		this.result = "UNDETERMINED";
 	}
-		
-	public List<sReportItem> getStaticResults() {
-		return this.sReport;
-	}
-	
-	public List<dReportItem> getDynamicResults() {
-		return this.dReport;
-	}
-	
-	public String getStatus() {
-		return this.reportStatus;
-	}
 	
 	public String getResult() {
 		return this.result;
 	}
+	
+	
 }

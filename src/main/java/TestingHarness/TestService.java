@@ -51,7 +51,7 @@ public class TestService implements TestServiceInterface
 	 * 								later time
 	 */
 	@Override
-	public Response runNewTest(@QueryParam("repoAddress") String repoAddress)
+	public String runNewTest(@QueryParam("repoAddress") String repoAddress)
 	{
 		log.info("New test request received");
 		//TODO: use git team's API to get files to test
@@ -82,7 +82,9 @@ public class TestService implements TestServiceInterface
 		log.info("New test started; assigned id: " + id);
 		
 		//return status ok and the id of the tester object
-		return Response.status(200).entity(id).build();
+		//return Response.status(200).entity(id).build();
+		
+		return id;
 	}	
 	
 	/**
@@ -114,7 +116,7 @@ public class TestService implements TestServiceInterface
 	 * @return			A report object in JSON format if item found, otherwise HTTP code 410 (Gone)
 	 */
 	@Override
-	public Response getReport(@QueryParam("testID") String testID)
+	public Report getReport(@QueryParam("testID") String testID)
 	{
 		log.info("Report get request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
@@ -123,24 +125,33 @@ public class TestService implements TestServiceInterface
 			//Assuming we're not responsible for storing tests, we should remove the test at this point. So I am.
 			ticksInProgress.remove(testID);
 			log.info("Report message found for id: " + testID);
-			return Response.status(200).entity(toReturn).build();
+			//return Response.status(200).entity(toReturn).build();
+			System.out.println("h1");
+			return toReturn;
 		}
 		else
 		{
 			log.error("Report message not found for id: "+ testID);
-			return Response.status(notFoundCode).build();
+			//return Response.status(notFoundCode).build();
 		}	
+		return null;
 	}
 	
 	@Override
-	public Response test()
+	public Report test(@QueryParam("testID") String testID)
 	{
 		ResteasyClient c = new ResteasyClientBuilder().build();
 		ResteasyWebTarget t = c
 				.target("http://localhost:8080/TestingSystem/");
 		TestServiceInterface proxy = t.proxy(TestServiceInterface.class);
-		Response r = proxy.runNewTest("");
 		
-        return r; //.entity(value).build();
+		Report r = proxy.getReport(testID);
+		System.out.println("h2");
+		//System.out.println("test: " + r.getStatus());
+		
+		return r;//Response.status(200).entity(r).build();
+		
+		
+        //return r; //.entity(value).build();
 	}
 }

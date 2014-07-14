@@ -8,23 +8,21 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/testerAPI")
+@Produces("application/json")
 public interface TestServiceInterface {
 	@GET
 	@Path("/runNewTest")
-	public Response runNewTest(@QueryParam("repoAddress") String repoAddress);
+	public abstract String runNewTest(@QueryParam("repoAddress") String repoAddress);
 	
 	@GET
 	@Path("/pollStatus")
-	@Produces("text/plain")
-	public Response pollStatus(@QueryParam("testID") String testID);
+	public abstract Response pollStatus(@QueryParam("testID") String testID);
 	
 	@GET
 	@Path("/getReport")
-	@Produces("application/json")
-	public Response getReport(@QueryParam("testID") String testID);
+	public abstract Report getReport(@QueryParam("testID") String testID);
 	
 	@GET
 	@Path("/test")
-	@Produces("text/plain")
-	public Response test();
+	public abstract Report test(@QueryParam("testID") String testID);
 }

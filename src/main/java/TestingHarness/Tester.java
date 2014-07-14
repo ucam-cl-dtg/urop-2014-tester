@@ -47,7 +47,7 @@ public class Tester {
 		log.info("Tick analysis started");
 		//TODO: remove
 		try {
-		    Thread.sleep(15000);
+		    Thread.sleep(15);
 		} catch(InterruptedException ex) {
 		    Thread.currentThread().interrupt();
 		}
@@ -114,7 +114,7 @@ public class Tester {
 		System.out.println();
 		
 		//Print each error
-		for(sReportItem i : report.getStaticResults()){
+		for(sReportItem i : report.getsReport()){
 			System.out.print(i.getSeverity() + ": file " + i.getFileName() + "  at line(s) "); 
 			for(int l : i.getLineNumbers()) {
 				System.out.print(l + ", ");		//print the line numbers of ass the instances on which this particular error was found
