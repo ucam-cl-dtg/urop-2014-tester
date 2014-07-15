@@ -7,6 +7,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
 /**
  * Provides all API functions. 
  * THE EXACT FUNCTION PARAMETERS AND RETURN VALUES ARE SUBJECT TO CHANGE
@@ -46,7 +48,10 @@ public interface TestServiceInterface {
 	 */
 	@GET
 	@Path("/getReport")
-	public abstract Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException;
+	public Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException, 
+																		CheckstyleException, 
+																		WrongFileTypeException, 
+																		TestHarnessException;
 	
 	//TODO: remove
 	@GET

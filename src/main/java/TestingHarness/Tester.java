@@ -25,6 +25,8 @@ public class Tester {
 	private List<dReportItem> dReport = new LinkedList<dReportItem>();  //list of dynamic report items
 	private Report report;												//Report object into which all the report items will ultimately go
 	private String status = "running";
+	private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
+																		//  the report is 
 	
 	//instantiated in constructor when joined with other project
 	private String crsid = "eg1";										//TODO: find out why we need this
@@ -86,25 +88,13 @@ public class Tester {
 			
 			status="complete";
 		}	
-		
-		catch (CheckstyleException err){
-			Report report = new Report(err.getMessage());
-			this.status = "failed";
-			log.error("Tick analysis failed. CheckstyleException message: " + err.getMessage());
-			this.report = report;
+		catch (CheckstyleException | WrongFileTypeException | TestHarnessException  e)
+		{
+			report = new Report(e.getMessage());
+			this.status="error";
+			log.error("Tick analysis failed. Exception message: " + e.getMessage());
+			failCause=e;
 		}
-		catch (WrongFileTypeException err) {
-			Report report = new Report(err.getMessage());
-			this.status = "failed";
-			log.error("Tick analysis failed. WrongFileTypeException message: " + err.getMessage());
-			this.report = report;
-		} 
-		catch (TestHarnessException err) {
-			Report report = new Report(err.getMessage());
-			this.status = "failed";
-			log.error("Tick analysis failed. TestHarnessException message: " + err.getMessage());
-			this.report = report;
-		} 
 	}
 	
 	private void printReport()
@@ -135,6 +125,11 @@ public class Tester {
 		for (String file : fileNames) {
 			StaticParser.test(configFileName, file, this.sReport);
 		}
+	}
+	
+	public Exception getFailCause()
+	{
+		return failCause;
 	}
 	
 	public String getStatus()

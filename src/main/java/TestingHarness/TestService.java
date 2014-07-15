@@ -16,8 +16,11 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
 
 /**
+ * @see TestServiceInterface for JavaDoc
  * @author as2388
  */
  //full path to here is /tester/API/
@@ -93,16 +96,41 @@ public class TestService implements TestServiceInterface
 	}
 	
 	@Override
-	public Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException
+	public Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException,
+																		CheckstyleException, 
+																		WrongFileTypeException, 
+																		TestHarnessException
 	{
 		log.info("Report get request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
 		{
-			Report toReturn = ticksInProgress.get(testID).getReport();
+			Tester tester= ticksInProgress.get(testID);
 			//Assuming we're not responsible for storing tests, we should remove the test at this point. So I am.
 			ticksInProgress.remove(testID);
 			log.info("Report message found for id: " + testID);
-			return toReturn;
+			if (!(tester.getStatus().equals("error")))
+			{
+				//test completed normally; return the report
+				return tester.getReport();
+			}
+			else
+			{
+				//test failed, throw the exception causing the problem.
+				Exception failCause = tester.getFailCause();
+				if (failCause instanceof CheckstyleException)
+				{
+					throw (CheckstyleException) failCause;
+				}
+				else if (failCause instanceof WrongFileTypeException)
+				{
+					throw (WrongFileTypeException) failCause;
+				}
+				else
+				{
+					throw (TestHarnessException) failCause;
+				}
+			}
+			
 		}
 		else
 		{
