@@ -104,9 +104,6 @@ public class TestService implements TestServiceInterface {
 
 		log.info("New test started; assigned id: " + id);
 
-		// return status ok and the id of the tester object
-		// return Response.status(200).entity(id).build();
-
 		return id;
 	}
 

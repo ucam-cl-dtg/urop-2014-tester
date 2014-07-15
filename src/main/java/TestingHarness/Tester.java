@@ -25,7 +25,7 @@ public class Tester {
 	private Report report;												//Report object into which all the report items will ultimately go
 	private String status = "running";
 	private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
-																		//  the report is 
+																		//  the report is requested
 	
 	//Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
 	private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
@@ -86,7 +86,6 @@ public class Tester {
 		}	
 		catch (CheckstyleException | WrongFileTypeException | TestHarnessException  e)
 		{
-			report = new Report(e.getMessage());
 			this.status="error";
 			log.error("Tick analysis failed. Exception message: " + e.getMessage());
 			failCause=e;

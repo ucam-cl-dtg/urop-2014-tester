@@ -14,36 +14,7 @@ import edu.emory.mathcs.backport.java.util.Collections;
  */
 public class Report {
 	private List<sReportItem> sReport;	//list of static analysis report items
-	public List<sReportItem> getsReport() {
-		return sReport;
-	}
-
-	public void setsReport(List<sReportItem> sReport) {
-		this.sReport = sReport;
-	}
-
-	public List<dReportItem> getdReport() {
-		return dReport;
-	}
-
-	public void setdReport(List<dReportItem> dReport) {
-		this.dReport = dReport;
-	}
-
-	public String getReportStatus() {
-		return reportStatus;
-	}
-
-	public void setReportStatus(String reportStatus) {
-		this.reportStatus = reportStatus;
-	}
-
-	public void setResult(String result) {
-		this.result = result;
-	}
-
 	private List<dReportItem> dReport;	//list of dynamic analysis report items
-	private String reportStatus = "Incomplete";		//status the report is in/if error occurs error details are stored here
 	private String result;				//Overall PASS/FAIL/UNDETERMINED
 	
 	/**
@@ -69,27 +40,35 @@ public class Report {
 		if(this.result == null) {
 			this.result = "PASS";
 		}
-		
-		//Change the status to complete (so any object polling status knows the report is ready 
-		this.reportStatus = "complete";
 	}
 	
 	public Report(){};
+	
+	//GETTERS AND SETTERS
+	public List<sReportItem> getsReport() {
+		return sReport;
+	}
 
-	/**
-	 * Constructor for a report which could not complete
-	 * <p>
-	 * This is most likely due to an error with the static analysis config file or due to a problem with the fail system
-	 * @param error
-	 */
-	public Report(String error) {
-		this.reportStatus = "error: " + error;
-		this.result = "UNDETERMINED";
+	public void setsReport(List<sReportItem> sReport) {
+		this.sReport = sReport;
+	}
+
+	public List<dReportItem> getdReport() {
+		return dReport;
+	}
+
+	public void setdReport(List<dReportItem> dReport) {
+		this.dReport = dReport;
 	}
 	
 	public String getResult() {
 		return this.result;
 	}
+	
+	public void setResult(String result) {
+		this.result = result;
+	}
+
 	
 	
 }
