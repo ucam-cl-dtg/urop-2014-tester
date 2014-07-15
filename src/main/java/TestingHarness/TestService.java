@@ -16,6 +16,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
+import com.google.inject.Inject;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 
@@ -41,8 +42,12 @@ public class TestService implements TestServiceInterface
 			ticksInProgress = new HashMap<String, Tester>();
 		}
 	}
+	
+	public TestService(Map<String, Tester> ticksInProgress)
+	{
+		this.ticksInProgress = ticksInProgress;
+	}
 
-	@Override
 	public String runNewTest(@QueryParam("repoAddress") String repoAddress)
 	{
 		log.info("New test request received");
@@ -79,14 +84,14 @@ public class TestService implements TestServiceInterface
 		return id;
 	}	
 	
-	@Override
 	public String pollStatus(@QueryParam("testID") String testID) throws TestIDNotFoundException
 	{
 		log.info("Poll request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
 		{
-			log.info("Poll request for id " + testID + " returned: " + ticksInProgress.get(testID).getStatus());
-			return ticksInProgress.get(testID).getStatus();
+			String status = ticksInProgress.get(testID).getStatus();
+			log.info("Poll request for id " + testID + " returned: " + status);
+			return status;
 		}
 		else
 		{
@@ -95,7 +100,6 @@ public class TestService implements TestServiceInterface
 		}
 	}
 	
-	@Override
 	public Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException,
 																		CheckstyleException, 
 																		WrongFileTypeException, 
@@ -139,7 +143,6 @@ public class TestService implements TestServiceInterface
 		}
 	}
 	
-	@Override
 	public String test(@QueryParam("testID") String testID) throws TestIDNotFoundException
 	{
 		ResteasyClient c = new ResteasyClientBuilder().build();
