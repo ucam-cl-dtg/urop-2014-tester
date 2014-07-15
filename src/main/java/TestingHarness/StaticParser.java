@@ -22,6 +22,7 @@ public class StaticParser {
 	     
 	    File javaFile = new File(file);
 	    if (javaFile.exists()){
+	    	//TODO: make this a call to the git API to recieve the file
 	    	fileList.add(javaFile);
 	    }
 	    else {
@@ -35,6 +36,7 @@ public class StaticParser {
 	    //in it to the linked list of static report items
 	    
 	    try {
+	    	//TODO: instead of just passing in test we'll probably need to get the file reference from the git API
 		    Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
 		    AuditListener listener = new StaticLogger(sReport);
 			Checker c = createChecker(config, listener); 

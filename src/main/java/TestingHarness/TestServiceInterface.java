@@ -1,11 +1,11 @@
 package TestingHarness;
 
+import java.io.IOException;
+
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
@@ -28,7 +28,7 @@ public interface TestServiceInterface {
 	 */
 	@GET
 	@Path("/runNewTest")
-	public abstract String runNewTest(@QueryParam("repoAddress") String repoAddress);
+	public abstract String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException;
 	
 	/**
 	 * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code

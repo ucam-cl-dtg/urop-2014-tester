@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedList;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 
@@ -28,9 +27,6 @@ public class Tester {
 	private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
 																		//  the report is 
 	
-	//instantiated in constructor when joined with other project
-	private String crsid = "eg1";										//TODO: find out why we need this
-	
 	//Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
 	private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
 	
@@ -49,7 +45,7 @@ public class Tester {
 		log.info("Tick analysis started");
 		//TODO: remove
 		try {
-		    Thread.sleep(15);
+		    Thread.sleep(10000);
 		} catch(InterruptedException ex) {
 		    Thread.currentThread().interrupt();
 		}
