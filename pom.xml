@@ -68,6 +68,7 @@
 		<version>1.2.17</version>
 		</dependency>
 		
+		<!-- Andy's Exception Serializer -->
 		<dependency>
 			<groupId>uk.ac.cam.cl.dtg.web</groupId>
 			<artifactId>resteasy-exception-chains</artifactId>
