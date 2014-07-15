@@ -136,8 +136,15 @@ public class TestService implements TestServiceInterface {
 			if (!(tester.getStatus().equals("error"))) {
 				// test completed normally; return the report
 				return tester.getReport();
-			} else {
-				// test failed, throw the exception causing the problem.
+			}
+			else
+			{
+				/*test failed, throw the exception causing the problem.
+				Exceptions are thrown lazily because we need to run Tester instances in separate threads,
+				/so that we can return their ID to the UI team, which they need to poll its status.
+				To do this, exceptions are stored in a variable of type Exception, but to provide better 
+				error information to the ticking team, the Exception is casted back to its original type
+				before being lazily thrown, hence why this bit is so yucky*/
 				Exception failCause = tester.getFailCause();
 				if (failCause instanceof CheckstyleException) {
 					throw (CheckstyleException) failCause;

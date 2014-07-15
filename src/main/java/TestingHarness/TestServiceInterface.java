@@ -41,10 +41,13 @@ public interface TestServiceInterface {
 	public abstract String pollStatus(@QueryParam("testID") String testID) throws TestIDNotFoundException;
 	
 	/**
-	 * Gets the report associated with the testID.
+	 * Gets the report associated with the testID, or throws an exception if the report couldn't be generated
+	 * IMPORTANT SIDE EFFECT: removes report from this servlet
 	 * @param testID					ID of the test to access
 	 * @return							A report object in JSON format.
 	 * @throws TestIDNotFoundException	
+	 * @throws CheckstyleException		Something went wrong with CheckStyle, probably due to a bad config file
+	 * @throws WrongFileTypeException	A test 
 	 */
 	@GET
 	@Path("/getReport")
