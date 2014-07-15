@@ -18,8 +18,6 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
 
 /**
- * Provides all API functions. 
- * THE EXACT FUNCTION PARAMETERS AND RETURN VALUES ARE SUBJECT TO CHANGE
  * @author as2388
  */
  //full path to here is /tester/API/
@@ -31,7 +29,6 @@ public class TestService implements TestServiceInterface
 	 * TestService is responsible for generating unique IDs
 	 * Class users are responsible for remembering the ID so that they can poll its status and get its report when done */
 	private static Map<String, Tester> ticksInProgress;	//TODO: should we be keeping these in a DB instead?
-	private int notFoundCode = 410;						//TODO: investigate whether this is the best status code to be returning
 	
 	public TestService()
 	{
@@ -80,23 +77,23 @@ public class TestService implements TestServiceInterface
 	}	
 	
 	@Override
-	public Response pollStatus(@QueryParam("testID") String testID)
+	public String pollStatus(@QueryParam("testID") String testID) throws TestIDNotFoundException
 	{
 		log.info("Poll request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
 		{
 			log.info("Poll request for id " + testID + " returned: " + ticksInProgress.get(testID).getStatus());
-			return Response.status(200).entity(ticksInProgress.get(testID).getStatus()).build();
+			return ticksInProgress.get(testID).getStatus();
 		}
 		else
 		{
 			log.error("ID " + testID + " of poll request could not be found");
-			return Response.status(notFoundCode).build();
+			throw new TestIDNotFoundException(testID);
 		}
 	}
 	
 	@Override
-	public Report getReport(@QueryParam("testID") String testID)
+	public Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException
 	{
 		log.info("Report get request received for id: " + testID);
 		if (ticksInProgress.containsKey(testID))
@@ -105,33 +102,21 @@ public class TestService implements TestServiceInterface
 			//Assuming we're not responsible for storing tests, we should remove the test at this point. So I am.
 			ticksInProgress.remove(testID);
 			log.info("Report message found for id: " + testID);
-			//return Response.status(200).entity(toReturn).build();
-			System.out.println("h1");
 			return toReturn;
 		}
 		else
 		{
 			log.error("Report message not found for id: "+ testID);
-			//return Response.status(notFoundCode).build();
-		}	
-		return null;
+			throw new TestIDNotFoundException(testID);
+		}
 	}
 	
 	@Override
-	public Report test(@QueryParam("testID") String testID)
+	public String test(@QueryParam("testID") String testID) throws TestIDNotFoundException
 	{
 		ResteasyClient c = new ResteasyClientBuilder().build();
-		ResteasyWebTarget t = c
-				.target("http://localhost:8080/TestingSystem/");
-		TestServiceInterface proxy = t.proxy(TestServiceInterface.class);
-		
-		Report r = proxy.getReport(testID);
-		System.out.println("h2");
-		//System.out.println("test: " + r.getStatus());
-		
-		return r;//Response.status(200).entity(r).build();
-		
-		
-        //return r; //.entity(value).build();
+		ResteasyWebTarget t = c.target("http://localhost:8080/TestingSystem/");
+		TestServiceInterface proxy = t.proxy(TestServiceInterface.class);	
+		return proxy.pollStatus(testID);
 	}
 }

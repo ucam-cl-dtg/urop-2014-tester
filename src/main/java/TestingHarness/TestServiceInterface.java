@@ -7,6 +7,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
+/**
+ * Provides all API functions. 
+ * THE EXACT FUNCTION PARAMETERS AND RETURN VALUES ARE SUBJECT TO CHANGE
+ * @author as2388
+ */
 @Path("/testerAPI")
 @Produces("application/json")
 public interface TestServiceInterface {
@@ -25,26 +30,26 @@ public interface TestServiceInterface {
 	
 	/**
 	 * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code
-	 * @param testID	ID of the test to access
-	 * @return			If the test was found: HTTP status code 200, and a string containing the status,
-	 * 										     either TODO e.g. waiting, running, completed, error
-	 * 					Else: HTTP status code 410 (Gone)
+	 * @param testID					ID of the test to access
+	 * @return							The test status of the given ID. Options are: running, complete, TODO
+	 * @throws TestIDNotFoundException	
 	 */
 	@GET
 	@Path("/pollStatus")
-	public abstract Response pollStatus(@QueryParam("testID") String testID);
+	public abstract String pollStatus(@QueryParam("testID") String testID) throws TestIDNotFoundException;
 	
 	/**
 	 * Gets the report associated with the testID.
-	 * @param testID	ID of the test to access
-	 * @return			A report object in JSON format if item found, otherwise HTTP code 410 (Gone)
+	 * @param testID					ID of the test to access
+	 * @return							A report object in JSON format.
+	 * @throws TestIDNotFoundException	
 	 */
 	@GET
 	@Path("/getReport")
-	public abstract Report getReport(@QueryParam("testID") String testID);
+	public abstract Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException;
 	
 	//TODO: remove
 	@GET
 	@Path("/test")
-	public abstract Report test(@QueryParam("testID") String testID);
+	public abstract String test(@QueryParam("testID") String testID) throws TestIDNotFoundException;
 }
