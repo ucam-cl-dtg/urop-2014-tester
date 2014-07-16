@@ -26,7 +26,7 @@ public class CheckStyleConfigTester {
 		runTest("IndentationBadChild",      indentationString, true,  "Should report a badly indented child of another block");
 		runTest("IndentationBadChild2",     indentationString, true,  "Should report a badly indented child of another block");
 	}
-	
+
 	@Test
 	public void testUnusedImport() throws IOException
 	{
@@ -118,6 +118,13 @@ public class CheckStyleConfigTester {
 	{
 		runTest("SwitchDefaultNotLast", "Switch default label is not last", true, "Should report that a default label not last should come first");
 	}
+	
+	@Test
+	public void testErrorInFile() throws IOException
+	{
+		runTest("uncompilableJava" , "" , false, "Unknown");
+	}
+	
 	
 	/**
 	 * Worker function for running a unit test on a file
