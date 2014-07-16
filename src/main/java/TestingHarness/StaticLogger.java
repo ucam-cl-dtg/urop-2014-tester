@@ -81,10 +81,11 @@ public class StaticLogger implements AuditListener
 
 	public void addException(AuditEvent arg0, Throwable arg1)
 	{
-        //System.out.println("Exception " + arg0.getFileName() + "@" + arg0.getLine() + ": " + arg0.getMessage());
 		String fileName = getName(arg0.getFileName());
 		String problem = "Malformed .java";
 		String detail = "";
+		
+		System.out.println("ERR MSG: " + arg0.getMessage());
 		
 		//search to see if the message has already been found. If it has, add the line number to the existing sReportItem
 		boolean exists = false;
@@ -94,7 +95,8 @@ public class StaticLogger implements AuditListener
 				i.addErrorAtLine(arg0.getLine());
 			}
 		}
-				//if the message has not been found, create a new report item
+		
+		//if the message has not been found, create a new report item
 		if (!exists) {
 			sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),fileName,arg0.getLine(),problem,detail);							
 			//add the item to the linked list in the report
