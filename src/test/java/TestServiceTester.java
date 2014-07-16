@@ -1,6 +1,7 @@
 import static org.junit.Assert.*;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +32,7 @@ import TestingHarness.WrongFileTypeException;
 public class TestServiceTester
 {
 	@Test
-	public void testRunNewTestNormal() throws IOException
+	public void testRunNewTestNormal() throws IOException, URISyntaxException
 	{
 		//mock proxy
 		String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
@@ -49,7 +50,7 @@ public class TestServiceTester
 		Tester mockedTester = EasyMock.createMock(Tester.class);
 		mockedTester.runTests();
 		EasyMock.replay(mockedTester);
-		EasyMock.expect(mockedTesterFactory.createNewTester(testMap)).andReturn(mockedTester);
+		EasyMock.expect(mockedTesterFactory.createNewTester(testMap, "")).andReturn(mockedTester);
 		EasyMock.replay(mockedTesterFactory);
 		TestService ts = new TestService(proxy, mockedTesterFactory);
 		
@@ -80,9 +81,9 @@ public class TestServiceTester
 		//mock tester factory and the tester runNewTest() would normally create
 		TesterFactory mockedTesterFactory = EasyMock.createMock(TesterFactory.class);
 		Tester mockedTester = EasyMock.createMock(Tester.class);
-		mockedTester.runTests();
+		//mockedTester.runTests();
 		EasyMock.replay(mockedTester);
-		EasyMock.expect(mockedTesterFactory.createNewTester(testMap)).andReturn(mockedTester);
+		//EasyMock.expect(mockedTesterFactory.createNewTester(testMap)).andReturn(mockedTester);
 		EasyMock.replay(mockedTesterFactory);
 		TestService ts = new TestService(proxy, mockedTesterFactory);
 		
