@@ -50,20 +50,27 @@ public class TestService implements TestServiceInterface {
 	@Override
 	public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException{
 		log.info("New test request received");
+		// generate a UUID for the tester
+		String id;
+		do {
+			id = UUID.randomUUID().toString();
+		} while (TestService.ticksInProgress.containsKey(id));
+		log.info(id + ": runNewTest: test creation started");
 
+		
 		Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
 
 		// add corresponding git file to tests
-		log.info("Creating new client");
+		log.info(id + ": runNewTest: Creating new client for accessing git API");
 		ResteasyClient c = new ResteasyClientBuilder().build();
 		ResteasyWebTarget t = c.target("http://localhost:8080/TestingSystem/");
 		// to be provided as dependency by git team
 		WebInterface proxy = t.proxy(WebInterface.class);
 
-		log.info("Connecting to git API");
+		log.info(id + ": runNewTest: Connecting to git API to obtain list of files in repo");
 		LinkedList<String> filesInRepo = proxy
 				.listFiles("removeThisExampleString" + repoAddress);
-		log.info("Files obtained");
+		log.info(id + ": runNewTest: List of files obtained");
 		LinkedList<String> filesToTest = new LinkedList<String>();
 		LinkedList<String> staticTests = new LinkedList<String>();
 		for (String file : filesInRepo) {
@@ -76,24 +83,20 @@ public class TestService implements TestServiceInterface {
 			} else if (ext.equals("xml")) {
 				staticTests.add(file);
 			} else {
-				System.out.println("File not recognised");
+				System.out.println("File not recognised");	//TODO: is printing this in anyway useful?
 			}
 		}
 
+		log.info(id + ": runNewTest: creating Tester object");
+		
 		for (String test : staticTests) {
 			tests.put(test, filesToTest);
 		}
 
 		c.close();
-
+		
 		// create a new Tester object
 		final Tester tester = new Tester(tests);
-
-		// generate a UUID for the tester
-		String id;
-		do {
-			id = UUID.randomUUID().toString();
-		} while (TestService.ticksInProgress.containsKey(id));
 
 		// add the object to the list of in-progress tests
 		ticksInProgress.put(id, tester);
@@ -105,7 +108,7 @@ public class TestService implements TestServiceInterface {
 			}
 		}).start();
 
-		log.info("New test started; assigned id: " + id);
+		log.info(id + ": runNewTest: Test started");
 
 		return id;
 	}
@@ -113,13 +116,13 @@ public class TestService implements TestServiceInterface {
 	@Override
 	public String pollStatus(@QueryParam("testID") String testID)
 			throws TestIDNotFoundException {
-		log.info("Poll request received for id: " + testID);
+		log.info(testID + ": pollStatus: request received");
 		if (ticksInProgress.containsKey(testID)) {
 			String status = ticksInProgress.get(testID).getStatus();
-			log.info("Poll request for id " + testID + " returned: " + status);
+			log.info(testID + ": pollStatus: returning " + status);
 			return status;
 		} else {
-			log.error("ID " + testID + " of poll request could not be found");
+			log.error(testID + ": pollStatus: testID not found");
 			throw new TestIDNotFoundException(testID);
 		}
 	}
@@ -128,15 +131,15 @@ public class TestService implements TestServiceInterface {
 	public Report getReport(@QueryParam("testID") String testID)
 			throws TestIDNotFoundException, CheckstyleException,
 			WrongFileTypeException, TestHarnessException {
-		log.info("Report get request received for id: " + testID);
+		log.info(testID + ": getReport: request received");
 		if (ticksInProgress.containsKey(testID)) {
 			Tester tester = ticksInProgress.get(testID);
 			// Assuming we're not responsible for storing tests, we should
 			// remove the test at this point. So I am.
 			ticksInProgress.remove(testID);
-			log.info("Report message found for id: " + testID);
 			if (!(tester.getStatus().equals("error"))) {
 				// test completed normally; return the report
+				log.info(testID + ": getReport: report found; returning it");
 				return tester.getReport();
 			}
 			else
@@ -148,6 +151,7 @@ public class TestService implements TestServiceInterface {
 				  To do this, exceptions are stored in a variable of type Exception, but to provide better 
 				error information to the ticking team, the Exception is casted back to its original type
 				before being lazily thrown, hence why this bit is so yucky*/
+				log.error(testID + ": getReport: Report didn't complete successfully, lazily throwing the exception it generated");
 				Exception failCause = tester.getFailCause();
 				if (failCause instanceof CheckstyleException) {
 					throw (CheckstyleException) failCause;
@@ -158,7 +162,7 @@ public class TestService implements TestServiceInterface {
 				}
 			}
 		} else {
-			log.error("Report message not found for id: " + testID);
+			log.error(testID + ": getReport: testID not found");
 			throw new TestIDNotFoundException(testID);
 		}
 	}
@@ -166,7 +170,11 @@ public class TestService implements TestServiceInterface {
 	@Override
 	public String getException()
 	{
+		log.info("getException: accessing get exception method on git API");
 		//TODO: query git API for an exception
+		
+		
+		log.error("getException: Didn't get an exception back :(");
 		return "Exception not generated by git team";
 	}
 	
