@@ -48,7 +48,6 @@ public class StaticLogger implements AuditListener
 	 */
 	public void addError(AuditEvent arg0)
 	{
-		
 		String fileName = getName(arg0.getFileName());
 		
 		//split the message into the problem and detail components (by splitting the message about the tilde symbol)
@@ -82,7 +81,25 @@ public class StaticLogger implements AuditListener
 
 	public void addException(AuditEvent arg0, Throwable arg1)
 	{
-        System.out.println("Exception " + arg0.getFileName() + "@" + arg0.getLine() + ": " + arg0.getMessage());
+        //System.out.println("Exception " + arg0.getFileName() + "@" + arg0.getLine() + ": " + arg0.getMessage());
+		String fileName = getName(arg0.getFileName());
+		String problem = "Malformed .java";
+		String detail = "";
+		
+		//search to see if the message has already been found. If it has, add the line number to the existing sReportItem
+		boolean exists = false;
+		for(sReportItem i : output) {
+			if (i.getFileName().equals(fileName) & i.getProblem().equals(problem) & i.getDetail().equals(detail)) {
+				exists = true;
+				i.addErrorAtLine(arg0.getLine());
+			}
+		}
+				//if the message has not been found, create a new report item
+		if (!exists) {
+			sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),fileName,arg0.getLine(),problem,detail);							
+			//add the item to the linked list in the report
+			output.add(newItem);
+		}
 	}
 
 	
