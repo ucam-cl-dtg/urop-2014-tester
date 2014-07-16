@@ -25,7 +25,7 @@ public class Tester {
 	private Report report;												//Report object into which all the report items will ultimately go
 	private String status = "running";
 	private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
-																		//  the report is requested
+																		//   the report is requested
 	
 	//Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
 	private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
@@ -42,14 +42,7 @@ public class Tester {
 	 */
 	public void runTests()
 	{
-		log.info("Tick analysis started");
-		//TODO: remove
-		try {
-		    Thread.sleep(10000);
-		} catch(InterruptedException ex) {
-		    Thread.currentThread().interrupt();
-		}
-				
+		log.info("Tick analysis started");				
 		try {
 			int counter = 1;
 			int noOfTests = testingQueue.size();
@@ -122,9 +115,10 @@ public class Tester {
 		}
 	}
 	
+	//GETTERS
 	public Exception getFailCause()
 	{
-		return failCause;
+		return this.failCause;
 	}
 	
 	public String getStatus()
@@ -132,7 +126,6 @@ public class Tester {
 		return this.status;
 	}
 	
-	//temporary to get data to html file
 	public Report getReport() {
 		return report;
 	}
