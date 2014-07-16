@@ -47,6 +47,7 @@ public class TestService implements TestServiceInterface {
 		TestService.ticksInProgress = ticksInProgress;
 	}
 	
+    /** {@inheritDoc} */
 	@Override
 	public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException{
 		log.info("New test request received");
@@ -112,6 +113,7 @@ public class TestService implements TestServiceInterface {
 		return id;
 	}
 
+    /** {@inheritDoc} */
 	@Override
 	public String pollStatus(@QueryParam("testID") String testID)
 			throws TestIDNotFoundException {
@@ -126,6 +128,7 @@ public class TestService implements TestServiceInterface {
 		}
 	}
 
+    /** {@inheritDoc} */
 	@Override
 	public Report getReport(@QueryParam("testID") String testID)
 			throws TestIDNotFoundException, CheckstyleException,
@@ -166,6 +169,7 @@ public class TestService implements TestServiceInterface {
 		}
 	}
 	
+    /** {@inheritDoc} */
 	@Override
 	public String getException()
 	{
