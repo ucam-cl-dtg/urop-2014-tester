@@ -1,18 +1,27 @@
 import static org.junit.Assert.*;
 
+import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import org.easymock.EasyMock;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.junit.Test;
 
+import com.google.inject.Guice;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 import TestingHarness.Report;
 import TestingHarness.TestHarnessException;
 import TestingHarness.TestIDNotFoundException;
+import TestingHarness.TestModule;
 import TestingHarness.TestService;
 import TestingHarness.Tester;
+import TestingHarness.TesterFactory;
+import TestingHarness.WebInterface;
 import TestingHarness.WrongFileTypeException;
 
 /**
@@ -21,9 +30,79 @@ import TestingHarness.WrongFileTypeException;
  */
 public class TestServiceTester
 {
+	@Test
+	public void testRunNewTestNormal() throws IOException
+	{
+		//mock proxy
+		String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
+		WebInterface proxy = buildMockedProxy(filePaths);
+		
+		//build map which runNewTest() should create
+		Map<String, LinkedList<String>> testMap = new HashMap<String, LinkedList<String>>();
+		LinkedList<String> ll = new LinkedList<String>();
+		ll.add("testfile1.java");
+		ll.add("testfile2.java");
+		testMap.put("config.xml", ll);
+		
+		//mock tester factory and the tester runNewTest() should create
+		TesterFactory mockedTesterFactory = EasyMock.createMock(TesterFactory.class);
+		Tester mockedTester = EasyMock.createMock(Tester.class);
+		mockedTester.runTests();
+		EasyMock.replay(mockedTester);
+		EasyMock.expect(mockedTesterFactory.createNewTester(testMap)).andReturn(mockedTester);
+		EasyMock.replay(mockedTesterFactory);
+		TestService ts = new TestService(proxy, mockedTesterFactory);
+		
+		//Test that TestService returns a non-empty string
+		String result = ts.runNewTest("");
+		assertNotEquals("", result, null);
+		assertNotEquals("", result, "");
+		//Test that a new tester was created with the expected arguments
+		EasyMock.verify(mockedTesterFactory);
+		//Test that the created tester was run (i.e. check that mockedTester.runTests() was called)
+		EasyMock.verify(mockedTester);
+	}
 	
+	//@Test(expected = IOException.class)
+	public void testRunNewTestRepoNotFound() throws IOException
+	{
+		//mock proxy
+		String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
+		WebInterface proxy = buildMockedProxy(filePaths);
+			
+		//build map which runNewTest() should create
+		Map<String, LinkedList<String>> testMap = new HashMap<String, LinkedList<String>>();
+		LinkedList<String> ll = new LinkedList<String>();
+		ll.add("testfile1.java");
+		ll.add("testfile2.java");
+		testMap.put("config.xml", ll);
+		
+		//mock tester factory and the tester runNewTest() would normally create
+		TesterFactory mockedTesterFactory = EasyMock.createMock(TesterFactory.class);
+		Tester mockedTester = EasyMock.createMock(Tester.class);
+		mockedTester.runTests();
+		EasyMock.replay(mockedTester);
+		EasyMock.expect(mockedTesterFactory.createNewTester(testMap)).andReturn(mockedTester);
+		EasyMock.replay(mockedTesterFactory);
+		TestService ts = new TestService(proxy, mockedTesterFactory);
+		
+		//
+	}
 	
-	
+	private WebInterface buildMockedProxy(String[] filePaths) throws IOException
+	{
+		WebInterface proxy = EasyMock.createMock(WebInterface.class);			
+		LinkedList<String> files = new LinkedList<String>();
+		
+		for (int i = 0; i < filePaths.length; i++)
+		{
+			files.add(filePaths[i]);
+		}
+		
+		EasyMock.expect(proxy.listFiles("")).andReturn(files);
+		EasyMock.replay(proxy);	
+		return proxy;
+	}
 	
 	@Test
 	public void testPollStatusNormal() throws TestIDNotFoundException 
@@ -96,7 +175,7 @@ public class TestServiceTester
 		
 		TestService ts = new TestService(ticksInProgress);
 
-		//test - this should throw a TestIDNotFoundException
+		//test - this should throw a WrongFileTypeException
 		ts.getReport("testID");
 	}
 

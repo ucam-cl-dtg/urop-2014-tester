@@ -40,7 +40,7 @@ public class StaticParser {
 		    Configuration config = ConfigurationLoader.loadConfiguration(test, new PropertiesExpander(properties));
 		    AuditListener listener = new StaticLogger(sReport);
 			Checker c = createChecker(config, listener); 
-			int errs = c.process(fileList); 
+			c.process(fileList); 
 			c.destroy();
 	    }
 	    catch (CheckstyleException err) {

@@ -20,7 +20,6 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /**
- * For JavaDoc, see TestServiceInterface
  * @author as2388
  * @author kls2510
  */
@@ -35,8 +34,12 @@ public class TestService implements TestServiceInterface {
 	 * ID so that they can poll its status and get its report when done
 	 * TODO: should we be keeping these in a DB instead?*/
 	private static Map<String, Tester> ticksInProgress; 
+	private WebInterface gitProxy;
+	private TesterFactory testerFactory = new TesterFactory();
 
-	public TestService() {
+	public TestService() 
+	{
+		buildGitProxy();
 		if (ticksInProgress == null) {
 			log.info("ticksInProgress Initialised");
 			ticksInProgress = new HashMap<String, Tester>();
@@ -47,6 +50,25 @@ public class TestService implements TestServiceInterface {
 		TestService.ticksInProgress = ticksInProgress;
 	}
 	
+	public TestService(WebInterface gitProxy, TesterFactory testerFactory)
+	{
+		this.gitProxy = gitProxy;
+		this.testerFactory = testerFactory;
+		if (ticksInProgress == null) {
+			log.info("ticksInProgress Initialised");
+			ticksInProgress = new HashMap<String, Tester>();
+		}
+	}
+	
+	private void buildGitProxy()
+	{
+		log.info("Creating new client for accessing git API");
+		ResteasyClient c = new ResteasyClientBuilder().build();
+		ResteasyWebTarget t = c.target("http://localhost:8080/TestingSystem/");
+		// to be provided as dependency by git team
+		gitProxy = t.proxy(WebInterface.class);
+	}
+	
     /** {@inheritDoc} */
 	@Override
 	public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException{
@@ -55,21 +77,15 @@ public class TestService implements TestServiceInterface {
 		String id;
 		do {
 			id = UUID.randomUUID().toString();
-		} while (TestService.ticksInProgress.containsKey(id));
+		} while (ticksInProgress.containsKey(id));
 		log.info(id + ": runNewTest: test creation started");
 
 		Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
 
 		// add corresponding git file to tests
-		log.info(id + ": runNewTest: Creating new client for accessing git API");
-		ResteasyClient c = new ResteasyClientBuilder().build();
-		ResteasyWebTarget t = c.target("http://localhost:8080/TestingSystem/");
-		// to be provided as dependency by git team
-		WebInterface proxy = t.proxy(WebInterface.class);
-
 		log.info(id + ": runNewTest: Connecting to git API to obtain list of files in repo");
-		LinkedList<String> filesInRepo = proxy
-				.listFiles("removeThisExampleString" + repoAddress);
+		LinkedList<String> filesInRepo = gitProxy
+				.listFiles(repoAddress);
 		log.info(id + ": runNewTest: List of files obtained");
 		LinkedList<String> filesToTest = new LinkedList<String>();
 		LinkedList<String> staticTests = new LinkedList<String>();
@@ -92,11 +108,9 @@ public class TestService implements TestServiceInterface {
 		for (String test : staticTests) {
 			tests.put(test, filesToTest);
 		}
-
-		c.close();
 		
 		// create a new Tester object
-		final Tester tester = new Tester(tests);
+		final Tester tester = testerFactory.createNewTester(tests);
 
 		// add the object to the list of in-progress tests
 		ticksInProgress.put(id, tester);
