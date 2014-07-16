@@ -8,8 +8,13 @@ what the following rules do, please see the checkstyle configuration
 page at http://checkstyle.sourceforge.net/config.html.
  -->
  
- <!-- Notes: default severity for each check is error 
- 			 the message displayed for each problem is of the format "general problem ~ advice/more detail" -->
+ <!-- Notes: Default severity for each check is error; change to warning by including <property name="severity" value="warning" />
+ 			 The message displayed for each problem is of the format "general problem ~ advice/more detail" 
+ 			 Each message needs to override a key which is different for each Checker Module.
+ 			    A list of these keys can be found on this website:
+ 			    http://grepcode.com/file/repo1.maven.org/maven2/com.puppycrawl.tools/checkstyle/5.2/com/puppycrawl/tools/checkstyle/checks/coding/messages.properties?av=f
+ 			 For a full list of built-in checks: http://checkstyle.sourceforge.net/availablechecks.html
+ 			 -->
 
 <module name="Checker">
 	<!-- check for presence of TODO or FIXME in comments -->
