@@ -8,6 +8,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
 
 import org.apache.log4j.Logger;
@@ -31,7 +33,7 @@ public class TestService implements TestServiceInterface {
 	 * Maps the ID of a test to in-progress tests. TestService is responsible
 	 * for generating unique IDs Class users are responsible for remembering the
 	 * ID so that they can poll its status and get its report when done
-	 * TODO: should we be keeping these in a DB instead? */
+	 * TODO: should we be keeping these in a DB instead?*/
 	private static Map<String, Tester> ticksInProgress; 
 
 	public TestService() {
@@ -44,7 +46,7 @@ public class TestService implements TestServiceInterface {
 	public TestService(Map<String, Tester> ticksInProgress) {
 		TestService.ticksInProgress = ticksInProgress;
 	}
-
+	
 	@Override
 	public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException{
 		log.info("New test request received");
@@ -55,7 +57,6 @@ public class TestService implements TestServiceInterface {
 		} while (TestService.ticksInProgress.containsKey(id));
 		log.info(id + ": runNewTest: test creation started");
 
-		
 		Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
 
 		// add corresponding git file to tests
