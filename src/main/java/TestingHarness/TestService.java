@@ -1,6 +1,7 @@
 package TestingHarness;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class TestService implements TestServiceInterface {
 	}
 	
 	@Override
-	public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException{
+	public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException, URISyntaxException{
 		log.info("New test request received");
 		// generate a UUID for the tester
 		String id;
@@ -68,7 +69,7 @@ public class TestService implements TestServiceInterface {
 
 		log.info(id + ": runNewTest: Connecting to git API to obtain list of files in repo");
 		LinkedList<String> filesInRepo = proxy
-				.listFiles("removeThisExampleString" + repoAddress);
+				.listFiles(repoAddress);
 		log.info(id + ": runNewTest: List of files obtained");
 		LinkedList<String> filesToTest = new LinkedList<String>();
 		LinkedList<String> staticTests = new LinkedList<String>();
@@ -79,8 +80,10 @@ public class TestService implements TestServiceInterface {
 			// do? as2388: the dynamic tests should be in a different repository
 			if (ext.equals("java")) {
 				filesToTest.add(file);
+				log.info("added java file to test : " + file);
 			} else if (ext.equals("xml")) {
 				staticTests.add(file);
+				log.info("added test file: " + file);
 			} else {
 				System.out.println("File not recognised");	//TODO: is printing this in anyway useful?
 			}
@@ -90,12 +93,13 @@ public class TestService implements TestServiceInterface {
 		
 		for (String test : staticTests) {
 			tests.put(test, filesToTest);
+			log.info("test added");
 		}
 
 		c.close();
 		
 		// create a new Tester object
-		final Tester tester = new Tester(tests);
+		final Tester tester = new Tester(tests,repoAddress);
 
 		// add the object to the list of in-progress tests
 		ticksInProgress.put(id, tester);
@@ -103,7 +107,14 @@ public class TestService implements TestServiceInterface {
 		// start the test in an asynchronous thread
 		new Thread(new Runnable() {
 			public void run() {
-				tester.runTests();
+				try {
+					tester.runTests();
+				//TODO: temporary
+				} catch (URISyntaxException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}).start();
 

@@ -1,6 +1,7 @@
 package TestingHarness;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,10 +26,11 @@ public interface TestServiceInterface {
 	 * @return						The ID of the test just started, to be used by the caller of this
 	 * 								function to access the status and result of the the test at a
 	 * 								later time
+	 * @throws URISyntaxException 
 	 */
 	@GET
 	@Path("/runNewTest")
-	public abstract String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException;
+	public abstract String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException, URISyntaxException;
 	
 	/**
 	 * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code

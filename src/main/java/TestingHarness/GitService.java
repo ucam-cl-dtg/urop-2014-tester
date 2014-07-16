@@ -1,9 +1,12 @@
 package TestingHarness;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.ws.rs.core.Response;
+import javax.xml.bind.annotation.XmlElement;
 
 public class GitService implements WebInterface {
 
@@ -20,8 +23,14 @@ public class GitService implements WebInterface {
 
 	public Response getFile(String fileName, String repoName)
 			throws IOException {
-		// TODO Auto-generated method stub
-		return null;
+		BufferedReader br = new BufferedReader(new FileReader(/* add path */ fileName));
+		String output = "";
+		String line;
+		while ((line = br.readLine()) != null) {
+			output += line + "\n";
+		}
+		br.close();
+		return Response.status(200).entity(output).build();
 	}
 
 }

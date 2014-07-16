@@ -1,5 +1,7 @@
 package TestingHarness;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,21 +28,28 @@ public class Tester {
 	private String status = "loading";
 	private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
 																		//   the report is requested
-	
+	private String repoAddress;
 	//Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
 	private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
 	
 	/**
 	 * Creates a new Tester
 	 */
-	public Tester(Map<String, LinkedList<String>> testingQueue) {
+	public Tester(Map<String, LinkedList<String>> testingQueue, String repoAddress) {
 		this.testingQueue = testingQueue;
+		this.repoAddress = repoAddress;
+		System.out.println("testing Queue contains:");
+		for (Map.Entry<String, LinkedList<String>> entry : testingQueue.entrySet()) {
+			System.out.println(entry.getKey());
+		}
 	}
 	
 	/**
 	 * Runs all tests required by the tick on all files required to be tested by the tick
+	 * @throws URISyntaxException 
+	 * @throws IOException 
 	 */
-	public void runTests()
+	public void runTests() throws URISyntaxException, IOException
 	{
 		log.info("Tick analysis started");				
 		try {
@@ -109,10 +118,12 @@ public class Tester {
 	 * @param fileNames				A list of paths to the files on which the static analyses tests are to be performed
 	 * @throws CheckstyleException	
 	 * @throws TestHarnessException	
+	 * @throws URISyntaxException 
+	 * @throws IOException 
 	 */
-	public void runStaticAnalysis(String configFileName, List<String> fileNames) throws CheckstyleException, TestHarnessException {
+	public void runStaticAnalysis(String configFileName, List<String> fileNames) throws CheckstyleException, TestHarnessException, URISyntaxException, IOException {
 		for (String file : fileNames) {
-			StaticParser.test(configFileName, file, this.sReport);
+			StaticParser.test(configFileName, file, this.sReport, repoAddress);
 		}
 	}
 	
