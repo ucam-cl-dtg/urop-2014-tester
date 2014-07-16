@@ -33,7 +33,8 @@ public interface TestServiceInterface {
 	/**
 	 * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code
 	 * @param testID					ID of the test to access
-	 * @return							The test status of the given ID. Options are: running, complete, TODO
+	 * @return							The test status of the given ID. Options are: 'loading', 'running test k of n', 'complete'
+	 * 										(note that 'complete' does not imply the test ran successfully)
 	 * @throws TestIDNotFoundException	No test exists for the given testID
 	 */
 	@GET

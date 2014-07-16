@@ -23,7 +23,7 @@ public class Tester {
 	private List<sReportItem> sReport = new LinkedList<sReportItem>();	//list of static report items
 	private List<dReportItem> dReport = new LinkedList<dReportItem>();  //list of dynamic report items
 	private Report report;												//Report object into which all the report items will ultimately go
-	private String status = "running";
+	private String status = "loading";
 	private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
 																		//   the report is requested
 	
@@ -74,14 +74,15 @@ public class Tester {
 			
 			//TODO: remove this. For now, print result to the console
 			printReport();
-			
-			status="complete";
 		}	
 		catch (CheckstyleException | WrongFileTypeException | TestHarnessException  e)
 		{
-			this.status="error";
 			log.error("Tick analysis failed. Exception message: " + e.getMessage());
-			failCause=e;
+			failCause = e;
+		}
+		finally
+		{
+			this.status = "complete";
 		}
 	}
 	
