@@ -1,6 +1,5 @@
 import static org.junit.Assert.*;
 
-
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -19,6 +18,7 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import TestingHarness.Report;
 import TestingHarness.TestIDNotFoundException;
 import TestingHarness.TestService;
+import TestingHarness.TestStillRunningException;
 import TestingHarness.Tester;
 import TestingHarness.TesterFactory;
 import TestingHarness.WebInterface;
@@ -31,7 +31,7 @@ import TestingHarness.WrongFileTypeException;
 public class TestServiceTester
 {
     @Test
-    public void testRunNewTestNormal() throws IOException, URISyntaxException
+    public void testRunNewTestNormal() throws IOException, WrongFileTypeException
     {
         //mock proxy
         String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
@@ -64,7 +64,7 @@ public class TestServiceTester
     }
 
     @Test(expected = IOException.class)
-    public void testRunNewTestRepoNotFound() throws IOException
+    public void testRunNewTestRepoNotFound() throws IOException, WrongFileTypeException
     {
         //mock proxy
         String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
@@ -127,7 +127,7 @@ public class TestServiceTester
     }
 
     @Test
-    public void testGetReportNormal() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException
+    public void testGetReportNormal() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException, TestStillRunningException
     {
         //set up
         Report r = EasyMock.createMock(Report.class);
@@ -135,6 +135,7 @@ public class TestServiceTester
 
         Tester t = EasyMock.createMock(Tester.class);
         EasyMock.expect(t.getStatus()).andReturn("complete");
+        EasyMock.expect(t.getFailCause()).andReturn(null);
         EasyMock.expect(t.getReport()).andReturn(r);
         EasyMock.replay(t);
 
@@ -149,7 +150,7 @@ public class TestServiceTester
     }
 
     @Test(expected = TestIDNotFoundException.class)
-    public void testGetReportNotFound() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException
+    public void testGetReportNotFound() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException, TestStillRunningException
     {
         //set up
         Report r = EasyMock.createMock(Report.class);
@@ -170,11 +171,12 @@ public class TestServiceTester
     }	
 
     @Test(expected = WrongFileTypeException.class)
-    public void testGetReportFailedToRun() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException
+    public void testGetReportFailedToRun() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException, TestStillRunningException
     {
         //set up
         Tester t = EasyMock.createMock(Tester.class);
-        EasyMock.expect(t.getStatus()).andReturn("error");
+        EasyMock.expect(t.getStatus()).andReturn("complete");
+        EasyMock.expect(t.getFailCause()).andReturn((Exception) new WrongFileTypeException());
         EasyMock.expect(t.getFailCause()).andReturn((Exception) new WrongFileTypeException());
         EasyMock.replay(t);
 

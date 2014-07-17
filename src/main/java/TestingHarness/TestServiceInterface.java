@@ -46,21 +46,23 @@ public interface TestServiceInterface {
 
     /**
      * Gets the report associated with the testID, or throws an exception if the report couldn't be generated
-     * IMPORTANT SIDE EFFECT: removes report from this servlet
-     * @param testID					ID of the test to access
-     * @return							A report object in JSON format.
-     * @throws TestIDNotFoundException	No test exists for the given testID
-     * @throws CheckstyleException		Something went wrong with CheckStyle, probably due to a bad config file, but
-     *                                  could be a missing file; check the exception's message
-     * @throws WrongFileTypeException	A given test file is not a .xml or .java file
-     * @throws IOException              Git API threw IOException when getting a file or TestService couldn't create and
-     *                                  use temporary files
+     * IMPORTANT SIDE EFFECT: Unless TestStillRunningException is thrown, removes report from this servlet
+     * @param testID					    ID of the test to access
+     * @return							    A report object in JSON format.
+     * @throws TestIDNotFoundException      No test exists for the given testID
+     * @throws CheckstyleException		    Something went wrong with CheckStyle, probably due to a bad config file, but
+     *                                      could be a missing file; check the exception's message
+     * @throws WrongFileTypeException	    A given test file is not a .xml or .java file
+     * @throws TestStillRunningException    The test isn't complete, so there is no report to remove
+     * @throws IOException                  Git API threw IOException when getting a file or TestService couldn't create and
+     *                                      use temporary files
      */
     @GET
     @Path("/getReport")
     public Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException, 
                                                                         CheckstyleException, 
                                                                         WrongFileTypeException, 
+                                                                        TestStillRunningException,
                                                                         IOException;
         
 
