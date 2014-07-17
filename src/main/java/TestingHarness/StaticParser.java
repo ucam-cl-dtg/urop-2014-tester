@@ -20,6 +20,7 @@ import java.util.Properties;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -33,63 +34,65 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 public class StaticParser {
-
-    public static void test(String test, String file, List<sReportItem> sReport, String repoAddress) throws TestHarnessException, CheckstyleException, URISyntaxException, IOException{ 		
-        //must be in list for .process to work
-        LinkedList<File> fileList = new LinkedList<File>();
-
-        String filex = "x";
-        File javaFile = new File(filex);
-        //read contents of file from git and store in a temporary file
-        ResteasyClient rc = new ResteasyClientBuilder().build();
-        ResteasyWebTarget t = rc.target("http://localhost:8080/TestingSystem/");
-        WebInterface proxy = t.proxy(WebInterface.class);
-        Response response = proxy.getFile(file, repoAddress);
+	static Logger log = Logger.getLogger(StaticParser.class.getName());
+	
+	public static void test(String test, String file, List<sReportItem> sReport, String repoAddress) throws TestHarnessException, CheckstyleException, URISyntaxException, IOException{ 		
+		//must be in list for .process to work
+	    LinkedList<File> fileList = new LinkedList<File>();
+	    
+	    //read contents of file from git and store in a temporary file
+	    ResteasyClient rc = new ResteasyClientBuilder().build();
+		ResteasyWebTarget t = rc.target("http://localhost:8080/TestingSystem/");
+		WebInterface proxy = t.proxy(WebInterface.class);
+		Response response = proxy.getFile(file, repoAddress);
         String contents = response.readEntity(String.class);
         System.out.println(contents);
         response.close();  
-
-        /*
-        File temp = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
- 	    System.out.println("Temp file : " + temp.getAbsolutePath());
-
-        final OutputStream output = new FileOutputStream("/tmp/out/" + repoAddress + "/" + file);
-        final PrintStream printStream = new PrintStream(output);
-        printStream.print(contents);
-        printStream.close();
-
-        File file = new File("/tmp/out/" + repoAddress + "/" + file); 
-         */
-        if (javaFile.exists()){
-            //TODO: make this a call to the git API to recieve the file
-            fileList.add(javaFile);
-        }
-        else {
-            throw new TestHarnessException("Could not find file: " + file);
-        }
-
-        //get system properties
-        Properties properties = System.getProperties();
-
-        //test the java file and use the listener to add each line with an error
-        //in it to the linked list of static report items
-
-        try {
-            //TODO: instead of just passing in test we'll probably need to get the file reference from the git API
-            Configuration config = ConfigurationLoader.loadConfiguration("http://localhost:8080/TestingSystem/git/" + repoAddress + "/" + test, new PropertiesExpander(properties));
-            AuditListener listener = new StaticLogger(sReport);
-            Checker c = createChecker(config, listener); 
-            c.process(fileList); 
-            c.destroy();
-        }
-        catch (CheckstyleException err) {
-            throw new TestHarnessException("Could not find test file: " + getName(test));
-        }
-    }
-
-    private static Checker createChecker(Configuration config, AuditListener listener) throws CheckstyleException {
-        Checker c = null; 
-
+		
+        //tmp file seems to add random unique number to end - TODO double check!
+        System.out.println(file.substring(0,file.lastIndexOf(".")));
+        File javaFile = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
+ 	    log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
+ 	    
+ 	    //write string to temp file
+        FileOutputStream output = new FileOutputStream(javaFile.getAbsolutePath());
+        byte[] bytes = contents.getBytes();
+        output.write(bytes);
+        output.flush();
+ 	    output.close();
+ 	    
+	    if (javaFile.exists()){
+	    	fileList.add(javaFile);
+	    }
+	    else {
+	    	throw new TestHarnessException("Could not find file: " + file);
+	    }
+	     
+	    //get system properties
+	    Properties properties = System.getProperties();
+	     
+	    //test the java file and use the listener to add each line with an error
+	    //in it to the linked list of static report items
+	    
+	    try {
+	    	//TODO: instead of just passing in test we'll probably need to get the file reference from the git API
+		    Configuration config = ConfigurationLoader.loadConfiguration("http://localhost:8080/TestingSystem/git/" + repoAddress + "/" + test, new PropertiesExpander(properties));
+		    AuditListener listener = new StaticLogger(sReport);
+			Checker c = createChecker(config, listener); 
+			c.process(fileList); 
+			c.destroy();
+	    }
+	    catch (CheckstyleException err) {
+	    	throw new TestHarnessException("Could not find test file: " + getName(test));
+	    }
+	    finally {
+	    	javaFile.delete();
+	    }
+	}
+	
+	private static Checker createChecker(Configuration config, AuditListener listener) throws CheckstyleException {
+		Checker c = null; 
+         
         try {
             c = new Checker();
         } 

@@ -21,16 +21,15 @@ public class GitService implements WebInterface {
         return files;
     }
 
-    public Response getFile(String fileName, String repoName)
-            throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(/* add path */ fileName));
-        String output = "";
-        String line;
-        while ((line = br.readLine()) != null) {
-            output += line + "\n";
-        }
-        br.close();
-        return Response.status(200).entity(output).build();
-    }
-
+	public Response getFile(String fileName, String repoName)
+			throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(/* add path here! */  fileName));
+		String output = "";
+		String line;
+		while ((line = br.readLine()) != null) {
+			output += line + "\n";
+		}
+		br.close();
+		return Response.status(200).entity(output).build();
+	}
 }
