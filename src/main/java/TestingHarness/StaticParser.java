@@ -30,7 +30,7 @@ public class StaticParser {
 
         //read contents of file from git and store in a temporary file
         ResteasyClient rc = new ResteasyClientBuilder().build();
-        ResteasyWebTarget t = rc.target("http://localhost:8080/TestingSystem/");
+        ResteasyWebTarget t = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
         WebInterface proxy = t.proxy(WebInterface.class);
         Response response = proxy.getFile(file, repoAddress);
         String contents = response.readEntity(String.class);
@@ -63,7 +63,7 @@ public class StaticParser {
 
         try {
             log.info("Testing: " + javaFile.getAbsolutePath());
-            Configuration config = ConfigurationLoader.loadConfiguration("http://localhost:8080/TestingSystem/git/" + repoAddress + "/" + test, new PropertiesExpander(properties));
+            Configuration config = ConfigurationLoader.loadConfiguration(configuration.ConfigurationLoader.getConfig().getGitAPIPath() + "/git/" + repoAddress + "/" + test, new PropertiesExpander(properties));
             AuditListener listener = new StaticLogger(sReport,file);
             Checker c = createChecker(config, listener); 
             c.process(fileList); 

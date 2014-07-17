@@ -15,6 +15,8 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
+import configuration.ConfigurationLoader;
+
 /**
  * @author as2388
  * @author kls82
@@ -56,7 +58,7 @@ public class TestService implements TestServiceInterface {
     private void buildGitProxy() {
         log.info("Creating new client for accessing git API");
         ResteasyClient c = new ResteasyClientBuilder().build();
-        ResteasyWebTarget t = c.target("http://localhost:8080/TestingSystem/");
+        ResteasyWebTarget t = c.target(ConfigurationLoader.getConfig().getGitAPIPath());
         // to be provided as dependency by git team
         gitProxy = t.proxy(WebInterface.class);
     }
@@ -123,7 +125,7 @@ public class TestService implements TestServiceInterface {
         }).start();
 
         log.info(id + ": runNewTest: Test started");
-
+        
         return id;
     }
 
