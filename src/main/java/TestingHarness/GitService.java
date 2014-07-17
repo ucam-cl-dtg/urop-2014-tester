@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import javax.ws.rs.core.Response;
-import javax.xml.bind.annotation.XmlElement;
 
 public class GitService implements WebInterface {
 
@@ -23,7 +22,7 @@ public class GitService implements WebInterface {
 
 	public Response getFile(String fileName, String repoName)
 			throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(/* add path here! */  fileName));
+		BufferedReader br = new BufferedReader(new FileReader(/* add path here! */ fileName));
 		String output = "";
 		String line;
 		while ((line = br.readLine()) != null) {
