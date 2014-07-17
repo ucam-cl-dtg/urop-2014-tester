@@ -7,7 +7,7 @@ package TestingHarness;
  * @author kls2510
  */
 public class WrongFileTypeException extends Exception {	
-	public WrongFileTypeException() {
-		super("Error: Test files must end in .xml or .java only");
-	}
+    public WrongFileTypeException() {
+        super("Error: Test files must end in .xml or .java only");
+    }
 }
