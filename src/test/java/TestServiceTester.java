@@ -31,7 +31,7 @@ import TestingHarness.WrongFileTypeException;
 public class TestServiceTester
 {
     @Test
-    public void testRunNewTestNormal() throws IOException, URISyntaxException
+    public void testRunNewTestNormal() throws IOException, WrongFileTypeException
     {
         //mock proxy
         String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
@@ -64,7 +64,7 @@ public class TestServiceTester
     }
 
     @Test(expected = IOException.class)
-    public void testRunNewTestRepoNotFound() throws IOException
+    public void testRunNewTestRepoNotFound() throws IOException, WrongFileTypeException
     {
         //mock proxy
         String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
