@@ -51,18 +51,19 @@ public interface TestServiceInterface {
      * @param testID					ID of the test to access
      * @return							A report object in JSON format.
      * @throws TestIDNotFoundException	No test exists for the given testID
-     * @throws CheckstyleException		Something went wrong with CheckStyle, probably due to a bad config file
+     * @throws CheckstyleException		Something went wrong with CheckStyle, probably due to a bad config file, but
+     *                                  could be a missing file; check the exception's message
      * @throws WrongFileTypeException	A given test file is not a .xml or .java file
-     * @throws TestHarnessException		TODO Will probably be replaced with a git team exception
-     * 									(TestHarnessException is currently only thrown when we fail to find a file on
-     * 									 the file system. We ultimately not be looking at the file system)
+     * @throws IOException              Git API threw IOException when getting a file or TestService couldn't create and
+     *                                  use temporary files
      */
     @GET
     @Path("/getReport")
     public Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException, 
-    CheckstyleException, 
-    WrongFileTypeException, 
-    TestHarnessException;
+                                                                        CheckstyleException, 
+                                                                        WrongFileTypeException, 
+                                                                        IOException;
+        
 
     /**
      * Test function for serialised exceptions
