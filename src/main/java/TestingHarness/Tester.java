@@ -27,7 +27,7 @@ public class Tester {
     private Report report;												//Report object into which all the report items will ultimately go
     private String status = "loading";
     private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
-    //   the report is requested
+                                                                        //the report is requested
     private String repoAddress;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
     private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
@@ -49,7 +49,7 @@ public class Tester {
      * @throws URISyntaxException 
      * @throws IOException 
      */
-    public void runTests() throws URISyntaxException, IOException
+    public void runTests() 
     {
         log.info("Tick analysis started");				
         try {
@@ -84,7 +84,7 @@ public class Tester {
             //TODO: remove this. For now, print result to the console
             printReport();
         }	
-        catch (CheckstyleException | WrongFileTypeException | TestHarnessException  e)
+        catch (CheckstyleException | WrongFileTypeException | IOException e)
         {
             log.error("Tick analysis failed. Exception message: " + e.getMessage());
             failCause = e;
@@ -117,11 +117,9 @@ public class Tester {
      * @param configFileName		Path to the config file needed by CheckStyle
      * @param fileNames				A list of paths to the files on which the static analyses tests are to be performed
      * @throws CheckstyleException	
-     * @throws TestHarnessException	
-     * @throws URISyntaxException 
      * @throws IOException 
      */
-    public void runStaticAnalysis(String configFileName, List<String> fileNames) throws CheckstyleException, TestHarnessException, URISyntaxException, IOException {
+    public void runStaticAnalysis(String configFileName, List<String> fileNames) throws CheckstyleException, IOException {
         for (String file : fileNames) {
             StaticParser.test(configFileName, file, this.sReport, repoAddress);
         }

@@ -67,8 +67,7 @@ public class TestService implements TestServiceInterface {
         TestService.ticksInProgress = ticksInProgress;
     }
 
-    /** {@inheritDoc} 
-     * @throws IOException */
+    /** {@inheritDoc} */
     @Override
     public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException {
         log.info("New test request received");
@@ -122,14 +121,7 @@ public class TestService implements TestServiceInterface {
         // start the test in an asynchronous thread
         new Thread(new Runnable() {
             public void run() {
-                try {
-                    tester.runTests();
-                    // TODO: temporary
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                tester.runTests();
             }
         }).start();
 
@@ -157,7 +149,7 @@ public class TestService implements TestServiceInterface {
     @Override
     public Report getReport(@QueryParam("testID") String testID)
             throws TestIDNotFoundException, CheckstyleException,
-            WrongFileTypeException, TestHarnessException {
+            WrongFileTypeException, IOException {
         log.info(testID + ": getReport: request received");
         if (ticksInProgress.containsKey(testID)) {
             Tester tester = ticksInProgress.get(testID);
@@ -188,7 +180,7 @@ public class TestService implements TestServiceInterface {
                 } else if (failCause instanceof WrongFileTypeException) {
                     throw (WrongFileTypeException) failCause;
                 } else {
-                    throw (TestHarnessException) failCause;
+                    throw (IOException) failCause;
                 }
             }
         } else {

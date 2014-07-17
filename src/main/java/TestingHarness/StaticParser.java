@@ -25,7 +25,7 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 public class StaticParser {
 	static Logger log = Logger.getLogger(StaticParser.class.getName());
 	
-	public static void test(String test, String file, List<sReportItem> sReport, String repoAddress) throws TestHarnessException, CheckstyleException, URISyntaxException, IOException{ 		
+	public static void test(String test, String file, List<sReportItem> sReport, String repoAddress) throws CheckstyleException, IOException{ 		
 		//must be in list for .process to work
 	    LinkedList<File> fileList = new LinkedList<File>();
 	    
@@ -54,7 +54,7 @@ public class StaticParser {
 	    	fileList.add(javaFile);
 	    }
 	    else {
-	    	throw new TestHarnessException("Could not find file: " + file);
+	    	throw new IOException("Could not find file: " + file);
 	    }
 	     
 	    //get system properties
@@ -70,9 +70,6 @@ public class StaticParser {
 			Checker c = createChecker(config, listener); 
 			c.process(fileList); 
 			c.destroy();
-	    }
-	    catch (CheckstyleException err) {
-	    	throw new TestHarnessException("Could not find test file: " + getName(test));
 	    }
 	    finally {
 	    	javaFile.delete();

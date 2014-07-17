@@ -17,7 +17,6 @@ import com.google.inject.Guice;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 import TestingHarness.Report;
-import TestingHarness.TestHarnessException;
 import TestingHarness.TestIDNotFoundException;
 import TestingHarness.TestService;
 import TestingHarness.Tester;
@@ -128,7 +127,7 @@ public class TestServiceTester
     }
 
     @Test
-    public void testGetReportNormal() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, TestHarnessException
+    public void testGetReportNormal() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException
     {
         //set up
         Report r = EasyMock.createMock(Report.class);
@@ -150,7 +149,7 @@ public class TestServiceTester
     }
 
     @Test(expected = TestIDNotFoundException.class)
-    public void testGetReportNotFound() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, TestHarnessException
+    public void testGetReportNotFound() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException
     {
         //set up
         Report r = EasyMock.createMock(Report.class);
@@ -171,7 +170,7 @@ public class TestServiceTester
     }	
 
     @Test(expected = WrongFileTypeException.class)
-    public void testGetReportFailedToRun() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, TestHarnessException
+    public void testGetReportFailedToRun() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException
     {
         //set up
         Tester t = EasyMock.createMock(Tester.class);
