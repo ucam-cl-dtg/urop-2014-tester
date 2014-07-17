@@ -13,8 +13,8 @@ import edu.emory.mathcs.backport.java.util.Collections;
  *
  */
 public class Report {
-    private List<sReportItem> sReport;	//list of static analysis report items
-    private List<dReportItem> dReport;	//list of dynamic analysis report items
+    private List<StaticReportItem> sReport;	//list of static analysis report items
+    private List<DynamicReportItem> dReport;	//list of dynamic analysis report items
     private String result;				//Overall PASS/FAIL/UNDETERMINED
 
     /**
@@ -22,14 +22,14 @@ public class Report {
      * @param sReport	list of static report items to be inserted into the report
      * @param dReport	list of dynamic report items to be inserted into the report
      */
-    public Report(List<sReportItem> sReport, List<dReportItem> dReport) {
+    public Report(List<StaticReportItem> sReport, List<DynamicReportItem> dReport) {
         this.sReport = sReport;
         this.dReport = dReport;
 
         //Handle static reports
         Collections.sort(sReport);
         //If the severity of any problem found by CheckStyle is an error, then fail the student
-        for (sReportItem s : sReport) {
+        for (StaticReportItem s : sReport) {
             if (s.getSeverity().equals("error")) {
                 this.result = "FAIL";
             }
@@ -45,19 +45,19 @@ public class Report {
     public Report(){};
 
     //GETTERS AND SETTERS
-    public List<sReportItem> getsReport() {
+    public List<StaticReportItem> getsReport() {
         return sReport;
     }
 
-    public void setsReport(List<sReportItem> sReport) {
+    public void setsReport(List<StaticReportItem> sReport) {
         this.sReport = sReport;
     }
 
-    public List<dReportItem> getdReport() {
+    public List<DynamicReportItem> getdReport() {
         return dReport;
     }
 
-    public void setdReport(List<dReportItem> dReport) {
+    public void setdReport(List<DynamicReportItem> dReport) {
         this.dReport = dReport;
     }
 

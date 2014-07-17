@@ -10,7 +10,7 @@ import edu.emory.mathcs.backport.java.util.Collections;
  * @author as2388
  * @author kls82
  */
-public class sReportItem implements Comparable<sReportItem>{
+public class StaticReportItem implements Comparable<StaticReportItem>{
     private String severity;
     private String fileName;
     private List<Integer> lineNumberList = new LinkedList<Integer>();	//list of lines on which the problem was found
@@ -25,7 +25,7 @@ public class sReportItem implements Comparable<sReportItem>{
      * @param problem	more general problem description
      * @param detail	detail giving advice and/or more specific detail about the problem 
      */
-    public sReportItem(String severity, String fileName, int lineNo, String problem, String detail) {
+    public StaticReportItem(String severity, String fileName, int lineNo, String problem, String detail) {
         this.severity = severity;
         this.fileName = fileName;
         this.lineNumberList.add(lineNo);
@@ -44,7 +44,7 @@ public class sReportItem implements Comparable<sReportItem>{
      * </ol>
      * The function also sorts all the lines at which the problem was found into ascending order
      */
-    public int compareTo(sReportItem reportItem2) {
+    public int compareTo(StaticReportItem reportItem2) {
         Collections.sort(this.getLineNumbers());
         Collections.sort(reportItem2.getLineNumbers());
         if (this.getFileName().compareTo(reportItem2.getFileName()) == 0) {

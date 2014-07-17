@@ -27,8 +27,8 @@ public class TestService implements TestServiceInterface {
     /*
      * Maps the ID of a test to in-progress tests. TestService is responsible
      * for generating unique IDs Class users are responsible for remembering the
-     * ID so that they can poll its status and get its report when done TODO:
-     * should we be keeping these in a DB instead?
+     * ID so that they can poll its status and get its report when done
+     * TODO: should we be keeping these in a DB instead?
      */
     private static Map<String, Tester> ticksInProgress;
     private WebInterface gitProxy;

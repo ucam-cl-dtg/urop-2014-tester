@@ -15,13 +15,13 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
  */
 public class StaticLogger implements AuditListener
 {
-    List<sReportItem> output;	//reference to the list in the report containing the static report items
+    List<StaticReportItem> output;	//reference to the list in the report containing the static report items
     String fileName;
     /**
      * Constructor for StaticLogger
      * @param output List where generated report items will go.
      */
-    public StaticLogger(List<sReportItem> output, String file)
+    public StaticLogger(List<StaticReportItem> output, String file)
     {
         this.output = output;
         this.fileName = file;
@@ -50,7 +50,7 @@ public class StaticLogger implements AuditListener
 
         //search to see if the message has already been found. If it has, add the line number to the existing sReportItem
         boolean exists = false;
-        for (sReportItem i : output) {
+        for (StaticReportItem i : output) {
             if (i.getFileName().equals(fileName) & i.getProblem().equals(problem) & i.getDetail().equals(detail)) {
                 exists = true;
                 i.addErrorAtLine(event.getLine());
@@ -59,7 +59,7 @@ public class StaticLogger implements AuditListener
 
         //if the message has not been found, create a new report item
         if (!exists) {
-            sReportItem newItem = new sReportItem(event.getSeverityLevel().toString(),fileName,event.getLine(),problem,detail);							
+            StaticReportItem newItem = new StaticReportItem(event.getSeverityLevel().toString(),fileName,event.getLine(),problem,detail);							
             //add the item to the linked list in the report
             output.add(newItem);
         }
@@ -75,7 +75,7 @@ public class StaticLogger implements AuditListener
 
         //search to see if the message has already been found. If it has, add the line number to the existing sReportItem
         boolean exists = false;
-        for (sReportItem i : output) {
+        for (StaticReportItem i : output) {
             if (i.getFileName().equals(fileName) & i.getProblem().equals(problem) & i.getDetail().equals(detail)) {
                 exists = true;
                 i.addErrorAtLine(arg0.getLine());
@@ -84,7 +84,7 @@ public class StaticLogger implements AuditListener
 
         //if the message has not been found, create a new report item
         if (!exists) {
-            sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),fileName,arg0.getLine(),problem,detail);							
+            StaticReportItem newItem = new StaticReportItem(arg0.getSeverityLevel().toString(),fileName,arg0.getLine(),problem,detail);							
             //add the item to the linked list in the report
             output.add(newItem);
         }
