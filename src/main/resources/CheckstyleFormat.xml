@@ -110,7 +110,7 @@ page at http://checkstyle.sourceforge.net/config.html.
 		</module>
 		<module name="ConstantName"> <!-- ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
 			<property name="severity" value="warning" /> 
-			<message key="name.invalidPattern" value="Naming convention violation ~ the constant name ''{0}'' should contain only upper case letters and numbers" />
+			<message key="name.invalidPattern" value="Naming convention violation ~ the constant name ''{0}'' should contain only upper case letters and number, with words separated by underscores" />
 		</module>
 		<module name="LocalFinalVariableName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->	
 			<property name="severity" value="warning" /> 
