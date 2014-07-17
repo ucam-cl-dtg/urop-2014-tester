@@ -20,6 +20,7 @@ import java.util.Properties;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Response;
 
+import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -33,13 +34,12 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 public class StaticParser {
+	static Logger log = Logger.getLogger(StaticParser.class.getName());
 	
 	public static void test(String test, String file, List<sReportItem> sReport, String repoAddress) throws TestHarnessException, CheckstyleException, URISyntaxException, IOException{ 		
 		//must be in list for .process to work
 	    LinkedList<File> fileList = new LinkedList<File>();
 	    
-	    String filex = "x";
-	    File javaFile = new File(filex);
 	    //read contents of file from git and store in a temporary file
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 		ResteasyWebTarget t = rc.target("http://localhost:8080/TestingSystem/");
@@ -49,19 +49,19 @@ public class StaticParser {
         System.out.println(contents);
         response.close();  
 		
-        /*
-        File temp = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
- 	    System.out.println("Temp file : " + temp.getAbsolutePath());
+        //tmp file seems to add random unique number to end - TODO double check!
+        System.out.println(file.substring(0,file.lastIndexOf(".")));
+        File javaFile = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
+ 	    log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
  	    
-        final OutputStream output = new FileOutputStream("/tmp/out/" + repoAddress + "/" + file);
-        final PrintStream printStream = new PrintStream(output);
-        printStream.print(contents);
-        printStream.close();
-        
-        File file = new File("/tmp/out/" + repoAddress + "/" + file); 
-         */
+ 	    //write string to temp file
+        FileOutputStream output = new FileOutputStream(javaFile.getAbsolutePath());
+        byte[] bytes = contents.getBytes();
+        output.write(bytes);
+        output.flush();
+ 	    output.close();
+ 	    
 	    if (javaFile.exists()){
-	    	//TODO: make this a call to the git API to recieve the file
 	    	fileList.add(javaFile);
 	    }
 	    else {
@@ -84,6 +84,9 @@ public class StaticParser {
 	    }
 	    catch (CheckstyleException err) {
 	    	throw new TestHarnessException("Could not find test file: " + getName(test));
+	    }
+	    finally {
+	    	javaFile.delete();
 	    }
 	}
 	

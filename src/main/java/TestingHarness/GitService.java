@@ -23,7 +23,7 @@ public class GitService implements WebInterface {
 
 	public Response getFile(String fileName, String repoName)
 			throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(/* add path */ fileName));
+		BufferedReader br = new BufferedReader(new FileReader(/* add path here! */ + fileName));
 		String output = "";
 		String line;
 		while ((line = br.readLine()) != null) {
