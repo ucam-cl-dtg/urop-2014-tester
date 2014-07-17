@@ -83,24 +83,24 @@ public class StaticParser {
 		Checker c = null; 
          
         try {
-			c = new Checker();
-		} 
+            c = new Checker();
+        } 
         catch (CheckstyleException e) {
-        	System.out.println(e.getMessage());
-		} 
+            System.out.println(e.getMessage());
+        } 
         final ClassLoader moduleClassLoader = Checker.class.getClassLoader(); 
         c.setModuleClassLoader(moduleClassLoader); 
         c.configure(config);
         c.addListener(listener); 
-        
+
         return c; 
-	}
-	
-	private static String getName(String filePath) {
-		String name = "";
-		for(int i = filePath.lastIndexOf("/") + 1; i<filePath.length();i++) {
-			name += filePath.charAt(i);
-		}
-		return name;
-	}
+    }
+
+    private static String getName(String filePath) {
+        String name = "";
+        for (int i = filePath.lastIndexOf("/") + 1; i < filePath.length(); i++) {
+            name += filePath.charAt(i);
+        }
+        return name;
+    }
 } 

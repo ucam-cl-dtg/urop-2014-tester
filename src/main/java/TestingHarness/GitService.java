@@ -9,16 +9,16 @@ import javax.ws.rs.core.Response;
 
 public class GitService implements WebInterface {
 
-	public Response listRepositories() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    public Response listRepositories() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	public LinkedList<String> listFiles(String repoName) throws IOException {
-		LinkedList<String> files = new LinkedList<String>();
-		//add files here!
-		return files;
-	}
+    public LinkedList<String> listFiles(String repoName) throws IOException {
+        LinkedList<String> files = new LinkedList<String>();
+        //add files here!
+        return files;
+    }
 
 	public Response getFile(String fileName, String repoName)
 			throws IOException {
@@ -31,5 +31,4 @@ public class GitService implements WebInterface {
 		br.close();
 		return Response.status(200).entity(output).build();
 	}
-
 }
