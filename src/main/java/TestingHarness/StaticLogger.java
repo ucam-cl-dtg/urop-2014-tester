@@ -9,51 +9,37 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
  * Listener class for problems found by CheckStyle
  * 
  * @author as2388
- * @author kls2510
+ * @author kls82
  * @author kr2
  *
  */
 public class StaticLogger implements AuditListener
 {
 	List<sReportItem> output;	//reference to the list in the report containing the static report items
-	
+	String fileName;
 	/**
 	 * Constructor for StaticLogger
 	 * @param output List where generated report items will go.
 	 */
-	public StaticLogger(List<sReportItem> output)
+	public StaticLogger(List<sReportItem> output, String file)
 	{
 		this.output=output;
+		this.fileName = file;
 	}
 	
-	
-	/**
-	 * Extracts the file name from a path. 
-	 * e.g. input of "C:\Users\...\File.ext" returns "File.ext" 
-	 * @param filePath	The path from which to extract the file name
-	 * @return			The file name extracted from the given path
-	 */
-	private String getName(String filePath) {
-		String name = "";
-		for(int i = filePath.lastIndexOf("\\") + 1; i<filePath.length();i++) {
-			name += filePath.charAt(i);
-		}
-		return name;
-	}
-
 	/**
 	 * Processes an AuditEvent (raised when CheckStyle finds a problem).
 	 * If an sReportItem with the same message has already been found, add the line number of the problem to that sReportItem,
 	 * otherwise create a new sReportItem
 	 */
-	public void addError(AuditEvent arg0)
+	public void addError(AuditEvent event)
 	{
-		String fileName = getName(arg0.getFileName());
+		String fileName = this.fileName;
 		
 		//split the message into the problem and detail components (by splitting the message about the tilde symbol)
 		//At the moment, remove the apostrophes (which CheckStyle insists on putting around parameters).
 		//	TODO: these could ultimately be left in and replaced with <em> tags by the UI team
-		String[] messages = arg0.getMessage().replaceAll("\'", "").split(" ~ ");
+		String[] messages = event.getMessage().replaceAll("\'", "").split(" ~ ");
 		
 		//extract the problem and, if it exists, the detail
 		String problem = messages[0];
@@ -67,13 +53,13 @@ public class StaticLogger implements AuditListener
 		for(sReportItem i : output) {
 			if (i.getFileName().equals(fileName) & i.getProblem().equals(problem) & i.getDetail().equals(detail)) {
 				exists = true;
-				i.addErrorAtLine(arg0.getLine());
+				i.addErrorAtLine(event.getLine());
 			}
 		}
 	
 		//if the message has not been found, create a new report item
 		if (!exists) {
-			sReportItem newItem = new sReportItem(arg0.getSeverityLevel().toString(),fileName,arg0.getLine(),problem,detail);							
+			sReportItem newItem = new sReportItem(event.getSeverityLevel().toString(),fileName,event.getLine(),problem,detail);							
 			//add the item to the linked list in the report
 			output.add(newItem);
 		}
@@ -81,8 +67,8 @@ public class StaticLogger implements AuditListener
 
 	public void addException(AuditEvent arg0, Throwable arg1)
 	{
-		String fileName = getName(arg0.getFileName());
-		String problem = "Malformed .java";
+		String fileName = this.fileName;
+		String problem = "Malformed java";
 		String detail = "";
 		
 		System.out.println("ERR MSG: " + arg0.getMessage());

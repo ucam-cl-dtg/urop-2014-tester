@@ -16,7 +16,7 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
  * stored in memory until the object is destroyed
  * 
  * @author as2388
- * @author kls2510
+ * @author kls82
  *
  */
 public class Tester {

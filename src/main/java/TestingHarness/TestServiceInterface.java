@@ -14,6 +14,7 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
  * Provides all API functions. 
  * THE EXACT FUNCTION PARAMETERS AND RETURN VALUES ARE SUBJECT TO CHANGE
  * @author as2388
+ * @author kls82
  */
 @Path("/testerAPI")
 @Produces("application/json")
@@ -21,16 +22,17 @@ public interface TestServiceInterface {
 
     /**
      * Starts a new test
-     * @param repoAddress			The address of the git repository to examine for .java files to 
-     * 								analyse
-     * @return						The ID of the test just started, to be used by the caller of this
-     * 								function to access the status and result of the the test at a
-     * 								later time
-     * @throws URISyntaxException 
+     * @param repoAddress				The address of the git repository to examine for .java files to 
+     * 									analyse
+     * @return							The ID of the test just started, to be used by the caller of this
+     * 									function to access the status and result of the the test at a
+     * 									later time
+     * @throws IOException    			if git team can't get files in given repoAddress
+     * @throws WrongFileTypeException   if file in repo is not of java or xml type
      */
     @GET
     @Path("/runNewTest")
-    public abstract String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException;
+    public abstract String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException, WrongFileTypeException;
 
     /**
      * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code
