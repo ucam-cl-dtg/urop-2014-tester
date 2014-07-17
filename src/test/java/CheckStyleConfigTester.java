@@ -25,6 +25,7 @@ public class CheckStyleConfigTester {
 		runTest("IndentationExpected",      indentationString, false, "Should not report any indentation issues");
 		runTest("IndentationBadChild",      indentationString, true,  "Should report a badly indented child of another block");
 		runTest("IndentationBadChild2",     indentationString, true,  "Should report a badly indented child of another block");
+		runTest("IndentationBlankLine",     indentationString, false,  "Should report badly indented blank line");
 	}
 
 	@Test
