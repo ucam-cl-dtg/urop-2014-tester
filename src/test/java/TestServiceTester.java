@@ -86,6 +86,9 @@ public class TestServiceTester
         //EasyMock.expect(mockedTesterFactory.createNewTester(testMap)).andReturn(mockedTester);
         EasyMock.replay(mockedTesterFactory);
         TestService ts = new TestService(proxy, mockedTesterFactory);
+        
+        //run test
+        ts.runNewTest("");
     }
 
     private WebInterface buildMockedProxy(String[] filePaths, boolean throwIOException) throws IOException
