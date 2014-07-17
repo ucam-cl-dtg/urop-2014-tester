@@ -62,7 +62,7 @@ public class ConfigurationLoader
             }
             catch (IOException e)
             {
-                System.err.println("Unable to load new configuration file!\n"
+                log.error("Unable to load new configuration file!\n Message: "
                         + e.getMessage());
             }
         }
