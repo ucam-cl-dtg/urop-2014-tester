@@ -1,7 +1,6 @@
 package TestingHarness;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
