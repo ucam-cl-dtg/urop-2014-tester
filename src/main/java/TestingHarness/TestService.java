@@ -18,7 +18,7 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /**
  * @author as2388
- * @author kls2510
+ * @author kls82
  */
 // full path to here is /tester/API/
 public class TestService implements TestServiceInterface {
@@ -67,10 +67,9 @@ public class TestService implements TestServiceInterface {
         TestService.ticksInProgress = ticksInProgress;
     }
 
-    /** {@inheritDoc} 
-     * @throws IOException */
+    /** {@inheritDoc} */
     @Override
-    public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException {
+    public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException, WrongFileTypeException {
         log.info("New test request received");
         // generate a UUID for the tester
         String id;
@@ -100,9 +99,7 @@ public class TestService implements TestServiceInterface {
                 staticTests.add(file);
                 log.info("added test file: " + file);
             } else {
-                System.out.println("File not recognised"); // TODO: is printing
-                                                           // this in anyway
-                                                           // useful?
+                throw new WrongFileTypeException();
             }
         }
 

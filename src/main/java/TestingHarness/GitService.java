@@ -10,7 +10,6 @@ import javax.ws.rs.core.Response;
 public class GitService implements WebInterface {
 
     public Response listRepositories() {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -22,7 +21,7 @@ public class GitService implements WebInterface {
 
 	public Response getFile(String fileName, String repoName)
 			throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(/* add path here! */ fileName));
+		BufferedReader br = new BufferedReader(new FileReader(/* add path */ fileName));
 		String output = "";
 		String line;
 		while ((line = br.readLine()) != null) {

@@ -9,7 +9,7 @@ import edu.emory.mathcs.backport.java.util.Collections;
  * <p>
  * Users of this class should poll status to check when the report is complete
  * 
- * @author kls2510
+ * @author kls82
  *
  */
 public class Report {

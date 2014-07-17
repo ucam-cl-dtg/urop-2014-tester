@@ -3,7 +3,6 @@ package TestingHarness;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
@@ -25,7 +24,7 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 public class StaticParser {
 	static Logger log = Logger.getLogger(StaticParser.class.getName());
 	
-	public static void test(String test, String file, List<sReportItem> sReport, String repoAddress) throws TestHarnessException, CheckstyleException, URISyntaxException, IOException{ 		
+	public static void test(String test, String file, List<sReportItem> sReport, String repoAddress) throws TestHarnessException, CheckstyleException, IOException{ 		
 		//must be in list for .process to work
 	    LinkedList<File> fileList = new LinkedList<File>();
 	    
@@ -35,15 +34,14 @@ public class StaticParser {
 		WebInterface proxy = t.proxy(WebInterface.class);
 		Response response = proxy.getFile(file, repoAddress);
         String contents = response.readEntity(String.class);
-        System.out.println(contents);
         response.close();  
 		
         //tmp file seems to add random unique number to end - TODO double check!
-        System.out.println(file.substring(0,file.lastIndexOf(".")));
         File javaFile = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
  	    log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
  	    
  	    //write string to temp file
+ 	    log.info("writing data to " + javaFile.getAbsolutePath());
         FileOutputStream output = new FileOutputStream(javaFile.getAbsolutePath());
         byte[] bytes = contents.getBytes();
         output.write(bytes);
@@ -64,18 +62,20 @@ public class StaticParser {
 	    //in it to the linked list of static report items
 	    
 	    try {
-	    	//TODO: instead of just passing in test we'll probably need to get the file reference from the git API
+	    	log.info("Testing: " + javaFile.getAbsolutePath());
 		    Configuration config = ConfigurationLoader.loadConfiguration("http://localhost:8080/TestingSystem/git/" + repoAddress + "/" + test, new PropertiesExpander(properties));
-		    AuditListener listener = new StaticLogger(sReport);
+		    AuditListener listener = new StaticLogger(sReport,file);
 			Checker c = createChecker(config, listener); 
 			c.process(fileList); 
 			c.destroy();
+			log.info("Finished");
 	    }
 	    catch (CheckstyleException err) {
-	    	throw new TestHarnessException("Could not find test file: " + getName(test));
+	    	throw new TestHarnessException("Could not find test file: " + test);
 	    }
 	    finally {
 	    	javaFile.delete();
+	    	log.info("Deleted: " + javaFile.getAbsolutePath() + " = " + !(javaFile.exists()));
 	    }
 	}
 	
@@ -94,13 +94,5 @@ public class StaticParser {
         c.addListener(listener); 
 
         return c; 
-    }
-
-    private static String getName(String filePath) {
-        String name = "";
-        for (int i = filePath.lastIndexOf("/") + 1; i < filePath.length(); i++) {
-            name += filePath.charAt(i);
-        }
-        return name;
-    }
+	}
 } 
