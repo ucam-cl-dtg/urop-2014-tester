@@ -147,40 +147,49 @@ public class TestService implements TestServiceInterface {
     @Override
     public Report getReport(@QueryParam("testID") String testID)
             throws TestIDNotFoundException, CheckstyleException,
-            WrongFileTypeException, IOException {
+            WrongFileTypeException, IOException, TestStillRunningException {
         log.info(testID + ": getReport: request received");
         if (ticksInProgress.containsKey(testID)) {
-            Tester tester = ticksInProgress.get(testID);
-            // Assuming we're not responsible for storing tests, we should
-            // remove the test at this point. So I am.
-            ticksInProgress.remove(testID);
-            if (!(tester.getStatus().equals("error"))) {
-                // test completed normally; return the report
-                log.info(testID + ": getReport: report found; returning it");
-                return tester.getReport();
-            } else {
-                /*
-                 * test failed, throw the exception causing the problem.
-                 * Exceptions are thrown lazily because we need to run Tester
-                 * instances in separate threads, so that we can return the ID
-                 * of the test to the UI team when they call runNewTest. The UI
-                 * team needs this ID to poll the status of this test. To do
-                 * this, exceptions are stored in a variable of type Exception,
-                 * but to provide better error information to the ticking team,
-                 * the Exception is casted back to its original type before
-                 * being lazily thrown, hence why this bit is so yucky
-                 */
-                log.error(testID
-                        + ": getReport: Report didn't complete successfully, lazily throwing the exception it generated");
-                Exception failCause = tester.getFailCause();
-                if (failCause instanceof CheckstyleException) {
-                    throw (CheckstyleException) failCause;
-                } else if (failCause instanceof WrongFileTypeException) {
-                    throw (WrongFileTypeException) failCause;
+            //if the test finished
+            if (ticksInProgress.get(testID).getStatus().equals("complete"))
+            {
+                Tester tester = ticksInProgress.get(testID);
+                // Assuming we're not responsible for storing tests, we should
+                // remove the test at this point. So I am.
+                ticksInProgress.remove(testID);
+                if (tester.getFailCause() == null) {
+                    // test completed normally; return the report
+                    log.info(testID + ": getReport: report found; returning it");
+                    return tester.getReport();
                 } else {
-                    throw (IOException) failCause;
+                    /*
+                     * test failed, throw the exception causing the problem.
+                     * Exceptions are thrown lazily because we need to run Tester
+                     * instances in separate threads, so that we can return the ID
+                     * of the test to the UI team when they call runNewTest. The UI
+                     * team needs this ID to poll the status of this test. To do
+                     * this, exceptions are stored in a variable of type Exception,
+                     * but to provide better error information to the ticking team,
+                     * the Exception is casted back to its original type before
+                     * being lazily thrown, hence why this bit is so yucky
+                     */
+                    log.error(testID
+                            + ": getReport: Report didn't complete successfully, lazily throwing the exception it generated");
+                    Exception failCause = tester.getFailCause();
+                    if (failCause instanceof CheckstyleException) {
+                        throw (CheckstyleException) failCause;
+                    } else if (failCause instanceof WrongFileTypeException) {
+                        throw (WrongFileTypeException) failCause;
+                    } else {
+                        throw (IOException) failCause;
+                    }
                 }
             }
+            else
+            {
+                throw new TestStillRunningException();
+            }
+
         } else {
             log.error(testID + ": getReport: testID not found");
             throw new TestIDNotFoundException(testID);
