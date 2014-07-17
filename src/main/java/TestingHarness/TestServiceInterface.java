@@ -1,5 +1,7 @@
 package TestingHarness;
 
+import gitAPIDependencies.HereIsYourException;
+
 import java.io.IOException;
 
 import javax.ws.rs.GET;
@@ -72,5 +74,9 @@ public interface TestServiceInterface {
      */
     @GET
     @Path("/getException")
-    public String getException() /*TODO: find out what exception will be thrown by the git team*/;
+    public String getException() throws HereIsYourException;
+    
+    @GET
+    @Path("/test")
+    public String test(@QueryParam("testID") String testID) throws TestIDNotFoundException, HereIsYourException;
 }

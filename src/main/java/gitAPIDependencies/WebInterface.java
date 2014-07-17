@@ -1,4 +1,4 @@
-package TestingHarness;
+package gitAPIDependencies;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -28,6 +28,11 @@ public interface WebInterface {
     @Produces("text/plain")
     public Response getFile(@PathParam("fileName") String fileName
             , @PathParam("repoName") String repoName) throws IOException;
+    
+    @GET
+    @Path("/exception-please")
+    public Double getMeAnException() throws HereIsYourException;
+    
     /*
 	 @POST
 	 @Path("/fork")

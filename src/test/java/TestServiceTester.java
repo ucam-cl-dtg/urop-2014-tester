@@ -1,4 +1,5 @@
 import static org.junit.Assert.*;
+import gitAPIDependencies.WebInterface;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -16,7 +17,6 @@ import TestingHarness.TestService;
 import TestingHarness.TestStillRunningException;
 import TestingHarness.Tester;
 import TestingHarness.TesterFactory;
-import TestingHarness.WebInterface;
 import TestingHarness.WrongFileTypeException;
 
 /**

@@ -1,4 +1,4 @@
-package TestingHarness;
+package gitAPIDependencies;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,6 +16,7 @@ public class GitService implements WebInterface {
     public LinkedList<String> listFiles(String repoName) throws IOException {
         LinkedList<String> files = new LinkedList<String>();
         //add files here!
+        System.out.println("list files!");
         return files;
     }
 
@@ -29,5 +30,18 @@ public class GitService implements WebInterface {
         }
         br.close();
         return Response.status(200).entity(output).build();
+    }
+    
+    @Override
+    public Double getMeAnException() throws HereIsYourException {
+        System.out.println("Get exception!");
+        
+        int x = 42;
+        if (x == 42)
+        {  
+            System.out.println("throwing!");
+            throw new HereIsYourException();
+        }
+        return new Double(x);
     }
 }
