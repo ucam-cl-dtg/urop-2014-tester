@@ -8,11 +8,11 @@ package TestingHarness;
  *
  */
 public class TestIDNotFoundException extends Exception {
-	/**
-	 * @param message	should contain the id of the test not found
-	 */
-	public TestIDNotFoundException(String message)
-	{
-		super(message);
-	}
+    /**
+     * @param message	should contain the id of the test not found
+     */
+    public TestIDNotFoundException(String message)
+    {
+        super(message);
+    }
 }

@@ -102,9 +102,9 @@ public class Tester {
         System.out.println();
 
         //Print each error
-        for(sReportItem i : report.getsReport()){
+        for (sReportItem i : report.getsReport()){
             System.out.print(i.getSeverity() + ": file " + i.getFileName() + "  at line(s) "); 
-            for(int l : i.getLineNumbers()) {
+            for (int l : i.getLineNumbers()) {
                 System.out.print(l + ", ");		//print the line numbers of ass the instances on which this particular error was found
             }
             System.out.println(i.getMessage());
