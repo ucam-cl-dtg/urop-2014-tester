@@ -153,11 +153,11 @@ public class CheckStyleConfigTester {
         boolean expectedFound = false;		//was a string containing the substring we were looking for found?
         boolean unexpectedFound = false;	//was a string not containing the desired substring found? In which case, checkstyle is giving an unexpected error
         String line;
-        while((line = br.readLine()) != null){
+        while ((line = br.readLine()) != null){
             if (!(line.equals("Starting audit...") || line.equals("Audit done.")))
             {
                 System.out.println(line);
-                if(line.contains(testString))
+                if (line.contains(testString))
                 {
                     expectedFound = true;
                 }

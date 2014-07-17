@@ -1,18 +1,13 @@
 import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.easymock.EasyMock;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.junit.Test;
 
-import com.google.inject.Guice;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 import TestingHarness.Report;
