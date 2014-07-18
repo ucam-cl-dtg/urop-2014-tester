@@ -3,11 +3,6 @@
     "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
     "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
-<!-- This is a checkstyle configuration file. For descriptions of
-what the following rules do, please see the checkstyle configuration
-page at http://checkstyle.sourceforge.net/config.html.
- -->
- 
  <!-- Notes: Default severity for each check is error; change to warning by including <property name="severity" value="warning" />
  			 The message displayed for each problem is of the format "general problem ~ advice/more detail" 
  			 Each message needs to override a key which is different for each Checker Module.
@@ -52,7 +47,7 @@ page at http://checkstyle.sourceforge.net/config.html.
 		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in the same package, or imports java.lang -->
 		<module name="RedundantImport">
 			<message key="import.duplicate" value="Duplicate import ~ ''{1}'' already imported in line ''{0}''" />
-			<message key="import.lang"      value="Unnecessary import ~ java.lang is imported automatically" />
+			<message key="import.lang"      value="Unnecessary import ~ 'java.lang' is imported automatically" />
 			<message key="import.same"      value="Unnecessary import ~ ''{0}'' is imported automatically because it is in the same package"/>
 			<property name="severity" value="warning" />
 		</module>
@@ -100,43 +95,55 @@ page at http://checkstyle.sourceforge.net/config.html.
 		
 		<!-- Checks that strings are not compared with == or != -->
 		<module name="StringLiteralEquality">
-			<message key="string.literal.equality" value="String comparison with ''{0}'' ~ in Java, .equals() should be used" />
+			<message key="string.literal.equality" value="String comparison with ''{0}'' ~ in Java, '.equals()' should be used" />
 		</module>
 		
 		<!-- Check that Java naming conventions are observed -->
 		<module name="AbstractClassName"> <!-- ^Abstract.*$|^.*Factory$ -->
 			<property name="severity" value="warning" /> 
-		</module>
-		<module name="ClassTypeParameterName"> <!-- ^[A-Z]$ -->
-			<property name="severity" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the abstract class name ''{0}'' should start with 'Abstract' or end with 'Factory'" />
 		</module>
 		<module name="ConstantName"> <!-- ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
 			<property name="severity" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the constant name ''{0}'' should contain only upper case letters and number, with words separated by underscores" />
 		</module>
 		<module name="LocalFinalVariableName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->	
 			<property name="severity" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the variable name ''{0}'' should contain only alphanumeric characters and start with a lower case letter" />
 		</module>
 		<module name="LocalVariableName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->
 			<property name="severity" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the variable name ''{0}'' should contain only alphanumeric characters and start with a lower case letter" />
 		</module>
 		<module name="MemberName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->	
 			<property name="severity" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the member name ''{0}'' should contain only alphanumeric characters and start with a lower case letter" />
 		</module>				
 		<module name="MethodName" > <!-- ^[a-z][a-zA-Z0-9]*$ -->	
-			<property name="severity" value="warning" /> 
+			<property name="severty" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the method name ''{0}'' should contain only alphanumeric characters and start with a lower case letter" />
 		</module>		
-		<module name="MethodTypeParameterName" > <!-- ^[A-Z]$-->
+		<module name="ParameterName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->	
 			<property name="severity" value="warning" /> 
-		</module>
-		<module name="ParameterName" > <!-- ^[a-z][a-zA-Z0-9]*$ -->	
-			<property name="severity" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the parameter name ''{0}'' should contain only alphanumeric characters and start with a lower case letter" />
 		</module>	
-		<module name="StaticVariableName" >	<!-- ^[a-z][a-zA-Z0-9]*$ -->	
+		<module name="StaticVariableName">	<!-- ^[a-z][a-zA-Z0-9]*$ -->	
 			<property name="severity" value="warning" /> 
-		</module>		
-		<module name="TypeName" ><!-- ^[A-Z][a-zA-Z0-9]*$ -->
+			<message key="name.invalidPattern" value="Naming convention violation ~ the variable name ''{0}'' should contain only alphanumeric characters and start with a lower case letter" />
+		</module>	
+		<module name="ClassTypeParameterName"> <!-- ^[A-Z]$ -->
 			<property name="severity" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the parametised type name ''{0}'' should contain only upper case letters" />
 		</module>
+		<module name="MethodTypeParameterName"> <!-- ^[A-Z]$-->
+			<property name="severity" value="warning" />
+			<message key="name.invalidPattern" value="Naming convention violation ~ the parametised type name ''{0}'' should contain only upper case letters" /> 
+		</module>	
+		<!-- Check style also provides this an option, but I'm not sure what it actually does
+		<module name="TypeName"> <!- ^[A-Z][a-zA-Z0-9]*$ ->
+			<property name="severity" value="warning" /> 
+			<message key="name.invalidPattern" value="Naming convention violation ~ the parametised type name ''{0}'' should contain only upper case letters" />
+		</module> -->
 			
 		<!-- checks that long variables are declared with an upper case L instead of a lower case l -->
 		<module name="UpperEll">

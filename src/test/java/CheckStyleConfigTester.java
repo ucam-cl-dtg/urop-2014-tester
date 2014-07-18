@@ -65,9 +65,9 @@ public class CheckStyleConfigTester {
     {
         runTest("TooLittleWhitespaceBeforeEquals", "should be preceded with whitespace",                               true,  "Should report not enough whitespace before '='");
         runTest("TooLittleWhitespaceAfterEquals",  "should be followed with whitespace",                               true,  "Should report not enough whitespace after '='");
-        runTest("TooMuchWhitespaceBeforeEquals",   "Multiple spaces",                                                  true,  "Should report too much whitespace before '='");
-        runTest("TooMuchWhitespaceAfterEquals",    "Multiple spaces",                                                  true,  "Should report too much whitespace after '='");
-        runTest("TabBeforeEquals",                 "tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
+        //runTest("TooMuchWhitespaceBeforeEquals",   "Multiple spaces",                                                  true,  "Should report too much whitespace before '='");
+        //runTest("TooMuchWhitespaceAfterEquals",    "Multiple spaces",                                                  true,  "Should report too much whitespace after '='");
+        //runTest("TabBeforeEquals",                 "tabs should only be used as whitespace at the beginning of lines", true,  "Should report wrong whitespace before '='");
         runTest("NoWhitespacePlusPlus",            "should be preceded with whitespace",                               false, "Should not report not enough whitespace before ++");
         runTest("NoWhitespacePlusPlus",            "should be followed with whitespace",                               false, "Should not report not enough whitespace after ++");
         runTest("ExpectedWhitespacePlusEquals",    "should be preceded with whitespace",                               false, "Should not report error with +=");
@@ -91,7 +91,8 @@ public class CheckStyleConfigTester {
     @Test
     public void testNamingConventions() throws IOException
     {
-
+        runTest("NamingInvalidConstant",   "Naming convention violation ~ the constant", true, "Should get an error message if a constant name is not of form [A-Z]([A-Z]|[0-9])*");
+        runTest("NamingInvalidMember",     "Naming convention violation ~ the member",   true, "Should get an error message if a member name is not of the form ^[a-z][a-zA-Z0-9]*$");
     }
 
     @Test

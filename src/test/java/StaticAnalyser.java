@@ -122,7 +122,7 @@ public final class StaticAnalyser
         final AuditListener listener = createListener(line, out, closeOut);
         final List<File> files = getFilesToProcess(line);
         final Checker c = createChecker(config, listener);
-        final int numErrs = c.process(files);
+        c.process(files);
         c.destroy();
         //System.exit(numErrs);
     }

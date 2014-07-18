@@ -1,5 +1,7 @@
 package TestingHarness;
 
+import gitAPIDependencies.HereIsYourException;
+
 import java.io.IOException;
 
 import javax.ws.rs.GET;
@@ -11,7 +13,6 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /**
  * Provides all API functions. 
- * THE EXACT FUNCTION PARAMETERS AND RETURN VALUES ARE SUBJECT TO CHANGE
  * @author as2388
  * @author kls82
  */
@@ -64,7 +65,6 @@ public interface TestServiceInterface {
                                                                         WrongFileTypeException, 
                                                                         TestStillRunningException,
                                                                         IOException;
-        
 
     /**
      * Test function for serialised exceptions
@@ -72,5 +72,12 @@ public interface TestServiceInterface {
      */
     @GET
     @Path("/getException")
-    public String getException() /*TODO: find out what exception will be thrown by the git team*/;
+    public String getException() throws HereIsYourException;
+    
+    
+    /**Used by interface authors for occasional manual testing. May change behaviour seemingly at random, do not use */
+    @Deprecated
+    @GET
+    @Path("/test")
+    public String test(@QueryParam("testID") String testID) throws TestIDNotFoundException, HereIsYourException;
 }
