@@ -40,7 +40,7 @@ public class StaticReportItem implements Comparable<StaticReportItem>{
      * <ol>
      * <li>File</li>
      * <li>Severity</li>
-     * <li>line number of first occurrence</li>
+     * <li>line number of first occurrence</li>\
      * </ol>
      * The function also sorts all the lines at which the problem was found into ascending order
      */

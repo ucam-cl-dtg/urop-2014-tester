@@ -17,27 +17,24 @@ public class GitService implements WebInterface {
         LinkedList<String> files = new LinkedList<String>();
         //add files here!
         files.add("testfile.java");
-        files.add("CheckstyleFormat.xml"
-                
-                );
-
+        files.add("CheckstyleFormat.xml");
         
         System.out.println("list files!");
         return files;
-    }
-
-    
+    }   
     
     public Response getFile(String fileName, String repoName)
             throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(/* add path */ fileName));
-        String output = "";
+        /*String output = "";
         String line;
         while ((line = br.readLine()) != null) {
             output += line + "\n";
         }
         br.close();
-        return Response.status(200).entity(output).build();
+        return Response.status(200).entity(output).build();*/
+        return Response.status(200).entity("").build();
+        
     }
     
     @Override

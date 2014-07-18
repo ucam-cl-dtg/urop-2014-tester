@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -17,10 +19,9 @@ import TestingHarness.TestService;
 import TestingHarness.TestStillRunningException;
 import TestingHarness.Tester;
 import TestingHarness.TesterFactory;
-<<<<<<< HEAD
-import uk.ac.cam.cl.git.public_interfaces.WebInterface;
-=======
->>>>>>> f8903c4a347c595ef60812b2dc53dddc74004570
+
+//import uk.ac.cam.cl.git.public_interfaces.WebInterface;
+
 import TestingHarness.WrongFileTypeException;
 
 /**
@@ -37,7 +38,7 @@ public class TestServiceTester
         WebInterface proxy = buildMockedProxy(filePaths, false);
 
         //build map which runNewTest() should create
-        Map<String, LinkedList<String>> testMap = new HashMap<String, LinkedList<String>>();
+        SortedMap<String, LinkedList<String>> testMap = new TreeMap<String, LinkedList<String>>();
         LinkedList<String> ll = new LinkedList<String>();
         ll.add("testfile1.java");
         ll.add("testfile2.java");
@@ -105,7 +106,8 @@ public class TestServiceTester
         }
         else
         {
-            EasyMock.expect(proxy.listFiles("")).andReturn(javax.ws.rs.core.Response.status(200).entity(files));
+            //TODO: fix
+            //EasyMock.expect(proxy.listFiles("")).andReturn(javax.ws.rs.core.Response.status(200).entity(files));
         }
         EasyMock.replay(proxy);	
         return proxy;

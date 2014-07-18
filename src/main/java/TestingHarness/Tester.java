@@ -5,10 +5,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedList;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
+import javassist.bytecode.Descriptor.Iterator;
+
+import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
+import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
  * Runs all the static and dynamic analysis tests for a given tick, and produces a report,
@@ -19,30 +26,60 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
  *
  */
 public class Tester {
-    static Logger log = Logger.getLogger(Tester.class.getName());		//initialise log4j logger
+    static Logger log = Logger.getLogger(Tester.class.getName()); //initialise log4j logger
 
-    private List<StaticReportItem> sReport = new LinkedList<StaticReportItem>();	//list of static report items
+    private List<StaticReportItem> sReport = new LinkedList<StaticReportItem>();    //list of static report items
     private List<DynamicReportItem> dReport = new LinkedList<DynamicReportItem>();  //list of dynamic report items
-    private Report report;												//Report object into which all the report items will ultimately go
+    private Report report;              //Report object into which all the report items will ultimately go
     private String status = "loading";
-    private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
-                                                                        //the report is requested
+    private Exception failCause;        //if the report fails, save it here, so that it can be thrown when
+                                        //the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
-    private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
+    private SortedMap<String, LinkedList<String>> testingQueue = new TreeMap<String, LinkedList<String>>();
 
     /**
      * Creates a new Tester
      */
-    public Tester(Map<String, LinkedList<String>> testingQueue, String repoName) {
+    public Tester(SortedMap<String, LinkedList<String>> testingQueue, String repoName) {
         this.testingQueue = testingQueue;
         this.repoName = repoName;
         System.out.println("testing Queue contains:");
         for (Map.Entry<String, LinkedList<String>> entry : testingQueue.entrySet()) {
             System.out.println(entry.getKey());
         }
+        validateTestingQueueIsSorted();
     }
 
+    /**
+     * Ensures that the testing queue contains .java files first,
+     * then .xml files
+     */
+    private void validateTestingQueueIsSorted()
+    {
+        boolean foundXML = false;
+        for (String key : testingQueue.keySet())
+        {
+            String ext = FilenameUtils.getExtension(key);
+            if (foundXML)
+            {
+                if (ext.equals("java"))
+                {
+                    log.error("testingQueue files are not ordered java then xml");
+                    throw new 
+                }
+            }
+            else
+            {
+                if (ext.equals("xml"))
+                {
+                    foundXML = true;
+                }
+            }
+        }
+        
+    }
+    
     /**
      * Runs all tests required by the tick on all files required to be tested by the tick
      * @throws URISyntaxException 
@@ -50,8 +87,8 @@ public class Tester {
      */
     public void runTests() 
     {
-        log.info("Tick analysis started");	
-        
+        log.info("Tick analysis started");	     
+                
         try {
             int counter = 1;
             int noOfTests = testingQueue.size();

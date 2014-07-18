@@ -8,12 +8,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 import java.util.UUID;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -23,6 +22,8 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
+
+
 
 import configuration.ConfigurationLoader;
 
@@ -46,14 +47,15 @@ public class TestService implements TestServiceInterface {
     private TesterFactory testerFactory = new TesterFactory();
 
     /** Expected constructor */
-    public TestService() {
+    public TestService() {    
         buildGitProxy();
         if (ticksInProgress == null) {
             log.info("ticksInProgress Initialised");
             ticksInProgress = new HashMap<String, Tester>();
         }
     }
-
+    
+    /** Constructor used for testing */
     public TestService(WebInterface gitProxy, TesterFactory testerFactory) {
         this.gitProxy = gitProxy;
         this.testerFactory = testerFactory;
@@ -88,7 +90,7 @@ public class TestService implements TestServiceInterface {
         } while (ticksInProgress.containsKey(id));
         log.info(id + ": runNewTest: test creation started");
 
-        Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
+        SortedMap<String, LinkedList<String>> tests = new TreeMap<String, LinkedList<String>>(new FileTypeComparator());
 
         // add corresponding git file to tests
         log.info(id
@@ -97,34 +99,29 @@ public class TestService implements TestServiceInterface {
         
         LinkedList<String> filesToTest = new LinkedList<String>();
         LinkedList<String> staticTests = new LinkedList<String>();
-        //request succeeded
-       /*  if (response.getStatus() == 200) { */
-        	log.info(id + ": request successful");
-        	List<String> filesInRepo = gitProxy.listFiles(repoName);
-        	/* List<String> filesInRepo = gitProxy.listFiles(repoName).readEntity(List.class); */
-        	log.info(id + ": runNewTest: List of files obtained");
-             
-             for (String file : filesInRepo) {
-                 String ext = file.substring(file.lastIndexOf('.') + 1,
-                         file.length());
-                 // TODO: note that dynamic tests will also be java files! - what to
-                 // do? as2388: the dynamic tests should be in a different repository
-                 if (ext.equals("java")) {
-                     filesToTest.add(file);
-                     log.info("added java file to test : " + file);
-                 } else if (ext.equals("xml")) {
-                     staticTests.add(file);
-                     log.info("added test file: " + file);
-                 } else {
-                     throw new WrongFileTypeException();
-                 }
-             }
-       /* }
-        //request failed
-        else {
-        	log.info(id + ": request failed");
-        } */
-       
+        log.info(id + ": request successful");
+        List<String> filesInRepo = gitProxy.listFiles(repoName);
+        /* List<String> filesInRepo = gitProxy.listFiles(repoName).readEntity(List.class); */
+        log.info(id + ": runNewTest: List of files obtained");
+
+        //add files from filesInRepo to filesToTest or static tests.
+        //At the moment, we assume .xml and .java are in the same repo, 
+        // and all .java files are files to be tested
+        //TODO: look in a different repo for the test files. This 
+        //      will require lots of collaboration with the git team
+        for (String file : filesInRepo) {
+            String ext = file.substring(file.lastIndexOf('.') + 1,
+                    file.length());
+            if (ext.equals("java")) {
+                filesToTest.add(file);
+                log.info("added java file to test : " + file);
+            } else if (ext.equals("xml")) {
+                staticTests.add(file);
+                log.info("added test file: " + file);
+            } else {
+                throw new WrongFileTypeException();
+            }
+        }
 
         log.info(id + ": runNewTest: creating Tester object");
 
