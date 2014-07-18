@@ -3,10 +3,12 @@ package TestingHarness;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -14,6 +16,8 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
+/* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
 
 /**
  * @author as2388
@@ -34,6 +38,7 @@ public class TestService implements TestServiceInterface {
     private WebInterface gitProxy;
     private TesterFactory testerFactory = new TesterFactory();
 
+    /** Expected constructor */
     public TestService() {
         buildGitProxy();
         if (ticksInProgress == null) {
@@ -42,7 +47,6 @@ public class TestService implements TestServiceInterface {
         }
     }
 
-    /** Expected constructor */
     public TestService(WebInterface gitProxy, TesterFactory testerFactory) {
         this.gitProxy = gitProxy;
         this.testerFactory = testerFactory;
@@ -68,7 +72,7 @@ public class TestService implements TestServiceInterface {
 
     /** {@inheritDoc} */
     @Override
-    public String runNewTest(@QueryParam("repoAddress") String repoAddress) throws IOException, WrongFileTypeException {
+    public String runNewTest(@QueryParam("repoName") String repoName) throws IOException, WrongFileTypeException {
         log.info("New test request received");
         // generate a UUID for the tester
         String id;
@@ -82,25 +86,38 @@ public class TestService implements TestServiceInterface {
         // add corresponding git file to tests
         log.info(id
                 + ": runNewTest: Connecting to git API to obtain list of files in repo");
-        LinkedList<String> filesInRepo = gitProxy.listFiles(repoAddress);
-        log.info(id + ": runNewTest: List of files obtained");
+        /* Response response = gitProxy.listFiles(repoName); */
+        
         LinkedList<String> filesToTest = new LinkedList<String>();
         LinkedList<String> staticTests = new LinkedList<String>();
-        for (String file : filesInRepo) {
-            String ext = file.substring(file.lastIndexOf('.') + 1,
-                    file.length());
-            // TODO: note that dynamic tests will also be java files! - what to
-            // do? as2388: the dynamic tests should be in a different repository
-            if (ext.equals("java")) {
-                filesToTest.add(file);
-                log.info("added java file to test : " + file);
-            } else if (ext.equals("xml")) {
-                staticTests.add(file);
-                log.info("added test file: " + file);
-            } else {
-                throw new WrongFileTypeException();
-            }
-        }
+        //request succeeded
+       /*  if (response.getStatus() == 200) { */
+        	log.info(id + ": request successful");
+        	List<String> filesInRepo = gitProxy.listFiles(repoName);
+        	/* List<String> filesInRepo = gitProxy.listFiles(repoName).readEntity(List.class); */
+        	log.info(id + ": runNewTest: List of files obtained");
+             
+             for (String file : filesInRepo) {
+                 String ext = file.substring(file.lastIndexOf('.') + 1,
+                         file.length());
+                 // TODO: note that dynamic tests will also be java files! - what to
+                 // do? as2388: the dynamic tests should be in a different repository
+                 if (ext.equals("java")) {
+                     filesToTest.add(file);
+                     log.info("added java file to test : " + file);
+                 } else if (ext.equals("xml")) {
+                     staticTests.add(file);
+                     log.info("added test file: " + file);
+                 } else {
+                     throw new WrongFileTypeException();
+                 }
+             }
+       /* }
+        //request failed
+        else {
+        	log.info(id + ": request failed");
+        } */
+       
 
         log.info(id + ": runNewTest: creating Tester object");
 
@@ -110,7 +127,7 @@ public class TestService implements TestServiceInterface {
         }
 
         // create a new Tester object
-        final Tester tester = testerFactory.createNewTester(tests, repoAddress);
+        final Tester tester = testerFactory.createNewTester(tests, repoName);
 
         // add the object to the list of in-progress tests
         ticksInProgress.put(id, tester);

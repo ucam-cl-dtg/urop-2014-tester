@@ -2,6 +2,7 @@ package TestingHarness;
 
 import java.io.IOException;
 import java.util.LinkedList;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -21,7 +22,7 @@ public interface WebInterface {
 	 @GET
 	 @Path("/git/{repoName:.*}.git")
 	 @Produces("application/json")
-	 public LinkedList<String> listFiles(@PathParam("repoName") String repoName) throws IOException;
+	 public List<String> listFiles(@PathParam("repoName") String repoName) throws IOException;
 
 	 @GET
 	 @Path("/git/{repoName:.*}.git/{fileName:.*}")

@@ -27,16 +27,16 @@ public class Tester {
     private String status = "loading";
     private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
                                                                         //the report is requested
-    private String repoAddress;
+    private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
     private Map<String, LinkedList<String>> testingQueue = new HashMap<String, LinkedList<String>>();
 
     /**
      * Creates a new Tester
      */
-    public Tester(Map<String, LinkedList<String>> testingQueue, String repoAddress) {
+    public Tester(Map<String, LinkedList<String>> testingQueue, String repoName) {
         this.testingQueue = testingQueue;
-        this.repoAddress = repoAddress;
+        this.repoName = repoName;
         System.out.println("testing Queue contains:");
         for (Map.Entry<String, LinkedList<String>> entry : testingQueue.entrySet()) {
             System.out.println(entry.getKey());
@@ -50,7 +50,8 @@ public class Tester {
      */
     public void runTests() 
     {
-        log.info("Tick analysis started");				
+        log.info("Tick analysis started");	
+        
         try {
             int counter = 1;
             int noOfTests = testingQueue.size();
@@ -72,6 +73,14 @@ public class Tester {
                 else { 
                     throw new WrongFileTypeException();
                 } 
+                //tempoarary for testing purposes
+                try  {
+                	Thread.sleep(7000);
+                }
+                catch (InterruptedException err) {
+                	err.printStackTrace();
+                }
+                
                 counter++;
             } 
             //Once the for loop is complete, all tests to be run have finished
@@ -120,7 +129,7 @@ public class Tester {
      */
     public void runStaticAnalysis(String configFileName, List<String> fileNames) throws CheckstyleException, IOException {
         for (String file : fileNames) {
-            StaticParser.test(configFileName, file, this.sReport, repoAddress);
+            StaticParser.test(configFileName, file, this.sReport, repoName);
         }
     }
 
