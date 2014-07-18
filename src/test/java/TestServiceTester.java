@@ -17,6 +17,10 @@ import TestingHarness.TestService;
 import TestingHarness.TestStillRunningException;
 import TestingHarness.Tester;
 import TestingHarness.TesterFactory;
+<<<<<<< HEAD
+import uk.ac.cam.cl.git.public_interfaces.WebInterface;
+=======
+>>>>>>> f8903c4a347c595ef60812b2dc53dddc74004570
 import TestingHarness.WrongFileTypeException;
 
 /**
@@ -101,7 +105,7 @@ public class TestServiceTester
         }
         else
         {
-            EasyMock.expect(proxy.listFiles("")).andReturn(files);
+            EasyMock.expect(proxy.listFiles("")).andReturn(javax.ws.rs.core.Response.status(200).entity(files));
         }
         EasyMock.replay(proxy);	
         return proxy;

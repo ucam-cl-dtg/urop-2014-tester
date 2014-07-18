@@ -23,18 +23,21 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
+/* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
+
 public class StaticParser {
     static Logger log = Logger.getLogger(StaticParser.class.getName());
 
-    public static void test(String test, String file, List<StaticReportItem> sReport, String repoAddress) throws CheckstyleException, IOException{ 		
+    public static void test(String test, String file, List<StaticReportItem> sReport, String repoName) throws CheckstyleException, IOException{ 		
         //must be in list for .process to work
         LinkedList<File> fileList = new LinkedList<File>();
 
         //read contents of file from git and store in a temporary file
         ResteasyClient rc = new ResteasyClientBuilder().build();
+        		
         ResteasyWebTarget t = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
         WebInterface proxy = t.proxy(WebInterface.class);
-        Response response = proxy.getFile(file, repoAddress);
+        Response response = proxy.getFile(file, repoName);
         String contents = response.readEntity(String.class);
         response.close();  
 
@@ -65,7 +68,7 @@ public class StaticParser {
 
         try {
             log.info("Testing: " + javaFile.getAbsolutePath());
-            Configuration config = ConfigurationLoader.loadConfiguration(configuration.ConfigurationLoader.getConfig().getGitAPIPath() + "/git/" + repoAddress + "/" + test, new PropertiesExpander(properties));
+            Configuration config = ConfigurationLoader.loadConfiguration(configuration.ConfigurationLoader.getConfig().getGitAPIPath() + "/git/" + repoName + "/" + test, new PropertiesExpander(properties));
             AuditListener listener = new StaticLogger(sReport,file);
             Checker c = createChecker(config, listener); 
             c.process(fileList); 
