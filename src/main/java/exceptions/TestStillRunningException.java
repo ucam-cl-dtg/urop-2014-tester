@@ -1,4 +1,4 @@
-package TestingHarness;
+package exceptions;
 
 public class TestStillRunningException extends Exception{
 

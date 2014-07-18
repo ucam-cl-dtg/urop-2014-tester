@@ -1,4 +1,4 @@
-package TestingHarness;
+package reportelements;
 
 public class DynamicReportItem {
 

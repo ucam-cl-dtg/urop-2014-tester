@@ -1,6 +1,6 @@
-package TestingHarness;
+package reportelements;
 
-class Status {
+public class Status {
 	private int progress;
 	private int maxProgress;
 	private String info;

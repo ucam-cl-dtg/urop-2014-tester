@@ -1,4 +1,4 @@
-package TestingHarness;
+package testingharness;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -8,7 +8,14 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 
+import reportelements.DynamicReportItem;
+import reportelements.Report;
+import reportelements.StaticReportItem;
+import reportelements.Status;
+
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
+import exceptions.WrongFileTypeException;
 
 /**
  * Runs all the static and dynamic analysis tests for a given tick, and produces a report,
@@ -140,5 +147,10 @@ public class Tester {
 
     public Report getReport() {
         return report;
+    }
+    
+    //TODO: temporary, delete
+    public void setStatus(Status s) {
+    	this.status = s;
     }
 }

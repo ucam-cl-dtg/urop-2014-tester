@@ -1,7 +1,10 @@
-package TestingHarness;
+package testingharness;
 
-import gitAPIDependencies.HereIsYourException;
-import gitAPIDependencies.WebInterface;
+import exceptions.TestIDNotFoundException;
+import exceptions.TestStillRunningException;
+import exceptions.WrongFileTypeException;
+import gitapidependencies.HereIsYourException;
+import gitapidependencies.WebInterface;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -10,19 +13,27 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
+import publicinterfaces.TestServiceInterface;
+import reportelements.Report;
+import reportelements.Status;
+
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
+
+
+
+
+
+
+
 
 import configuration.ConfigurationLoader;
 
@@ -99,6 +110,7 @@ public class TestService implements TestServiceInterface {
         //request succeeded
        /*  if (response.getStatus() == 200) { */
         	log.info(id + ": request successful");
+        	
         	List<String> filesInRepo = gitProxy.listFiles(repoName);
         	/* List<String> filesInRepo = gitProxy.listFiles(repoName).readEntity(List.class); */
         	log.info(id + ": runNewTest: List of files obtained");

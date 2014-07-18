@@ -1,6 +1,9 @@
-package TestingHarness;
+package publicinterfaces;
 
-import gitAPIDependencies.HereIsYourException;
+import exceptions.TestIDNotFoundException;
+import exceptions.TestStillRunningException;
+import exceptions.WrongFileTypeException;
+import gitapidependencies.HereIsYourException;
 
 import java.io.IOException;
 
@@ -8,10 +11,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
+
+import reportelements.Report;
+import reportelements.Status;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-
 /**
  * Provides all API functions. 
  * @author as2388
