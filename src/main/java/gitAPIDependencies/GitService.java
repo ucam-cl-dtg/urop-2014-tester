@@ -16,13 +16,7 @@ public class GitService implements WebInterface {
     public LinkedList<String> listFiles(String repoName) throws IOException {
         LinkedList<String> files = new LinkedList<String>();
         //add files here!
-        files.add("testfile.java");
-        files.add("CheckstyleFormat.xml"
-                
-                );
-
         
-        System.out.println("list files!");
         return files;
     }
 
@@ -30,7 +24,7 @@ public class GitService implements WebInterface {
     
     public Response getFile(String fileName, String repoName)
             throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(/* add path */ fileName));
+        BufferedReader br = new BufferedReader(new FileReader(/*path here */ fileName));
         String output = "";
         String line;
         while ((line = br.readLine()) != null) {

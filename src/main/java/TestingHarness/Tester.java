@@ -24,7 +24,8 @@ public class Tester {
     private List<StaticReportItem> sReport = new LinkedList<StaticReportItem>();	//list of static report items
     private List<DynamicReportItem> dReport = new LinkedList<DynamicReportItem>();  //list of dynamic report items
     private Report report;												//Report object into which all the report items will ultimately go
-    private String status = "loading";
+    private Status status; 
+    
     private Exception failCause;								     	//if the report fails, save it here, so that it can be thrown when
                                                                         //the report is requested
     private String repoName;
@@ -37,15 +38,10 @@ public class Tester {
     public Tester(Map<String, LinkedList<String>> testingQueue, String repoName) {
         this.testingQueue = testingQueue;
         this.repoName = repoName;
-        System.out.println("testing Queue contains:");
-        for (Map.Entry<String, LinkedList<String>> entry : testingQueue.entrySet()) {
-            System.out.println(entry.getKey());
-        }
     }
 
     /**
      * Runs all tests required by the tick on all files required to be tested by the tick
-     * @throws URISyntaxException 
      * @throws IOException 
      */
     public void runTests() 
@@ -53,11 +49,11 @@ public class Tester {
         log.info("Tick analysis started");	
         
         try {
-            int counter = 1;
             int noOfTests = testingQueue.size();
+            this.status = new Status("loading tests",noOfTests + 1);
             //loop through each test, decide what type of test it is and run it, adding the result to outputs
             for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
-                this.status = "running test " + counter + " of " + noOfTests;
+                this.status.addProgress();
                 String testFileName = e.getKey();
                 LinkedList<String> fileNames = e.getValue();
 
@@ -80,8 +76,6 @@ public class Tester {
                 catch (InterruptedException err) {
                 	err.printStackTrace();
                 }
-                
-                counter++;
             } 
             //Once the for loop is complete, all tests to be run have finished
             log.info("Tick analysis finished successfully");
@@ -99,7 +93,7 @@ public class Tester {
         }
         finally
         {
-            this.status = "complete";
+            this.status.complete();
         }
     }
 
@@ -139,7 +133,7 @@ public class Tester {
         return this.failCause;
     }
 
-    public String getStatus()
+    public Status getStatus()
     {
         return this.status;
     }
