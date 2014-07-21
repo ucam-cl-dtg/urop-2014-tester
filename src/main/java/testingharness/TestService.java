@@ -171,18 +171,19 @@ public class TestService implements TestServiceInterface {
             WrongFileTypeException, IOException, TestStillRunningException {
         log.info(testID + ": getReport: request received");
         if (ticksInProgress.containsKey(testID)) {
-            //if the test finished
+            //check if the test if finished
             if (ticksInProgress.get(testID).getStatus().getInfo().equals("complete"))
             {
                 Tester tester = ticksInProgress.get(testID);
-                // Assuming we're not responsible for storing tests, we should
-                // remove the test at this point. So I am.
+                //API users are responsible for managing storage of reports, so delete the report from the
+                //map of reports in progress
                 ticksInProgress.remove(testID);
                 if (tester.getFailCause() == null) {
                     // test completed normally; return the report
                     log.info(testID + ": getReport: report found; returning it");
                     return tester.getReport();
-                } else {
+                }
+                else {
                     /*
                      * test failed, throw the exception causing the problem.
                      * Exceptions are thrown lazily because we need to run Tester
@@ -210,8 +211,8 @@ public class TestService implements TestServiceInterface {
             {
                 throw new TestStillRunningException(testID);
             }
-
-        } else {
+        }
+        else {
             log.error(testID + ": getReport: testID not found");
             throw new TestIDNotFoundException(testID);
         }
