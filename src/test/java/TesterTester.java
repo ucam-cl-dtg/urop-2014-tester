@@ -6,7 +6,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import TestingHarness.Tester;
+import testingharness.Tester;
 
 
 public class TesterTester {
