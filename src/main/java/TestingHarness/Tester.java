@@ -75,8 +75,7 @@ public class Tester {
         finally
         {
             this.status.complete();
-        }
-        
+        }   
     }
     
     /**
