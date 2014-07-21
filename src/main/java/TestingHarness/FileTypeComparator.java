@@ -1,6 +1,8 @@
 package TestingHarness;
 
 import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.Map;
 
 import org.apache.commons.io.FilenameUtils;
 
@@ -10,6 +12,12 @@ import org.apache.commons.io.FilenameUtils;
  * @author as2388
  */
 public class FileTypeComparator implements Comparator<String> {    
+   Map<String, LinkedList<String>> base;
+   public FileTypeComparator(Map<String, LinkedList<String>> base)
+   {
+       this.base = base;
+   }
+    
     @Override
     public int compare(String a, String b)
     {
@@ -24,10 +32,10 @@ public class FileTypeComparator implements Comparator<String> {
         {
             return -1;
         }
-        else
-        {
-            return 0;
-        }
+        
+        //keys are equal so return 1
+        //(returning 0 would merge keys)
+        return 1;
     }
     
     public String getFileExt(String fileName)

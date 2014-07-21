@@ -1,5 +1,6 @@
 package TestingHarness;
 
+import static org.junit.Assert.assertEquals;
 import gitAPIDependencies.HereIsYourException;
 import gitAPIDependencies.WebInterface;
 
@@ -22,6 +23,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
+
 
 
 
@@ -89,7 +91,7 @@ public class TestService implements TestServiceInterface {
         } while (ticksInProgress.containsKey(id));
         log.info(id + ": runNewTest: test creation started");
 
-        SortedMap<String, LinkedList<String>> tests = new TreeMap<String, LinkedList<String>>(new FileTypeComparator());
+        Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
 
         // add corresponding git file to tests
         log.info(id
@@ -215,20 +217,13 @@ public class TestService implements TestServiceInterface {
     }
 
     /** {@inheritDoc} */
-    public String getException() 
+    public String getException() throws HereIsYourException 
     {
         log.info("getException: accessing get exception method on git API");
         
         //this call should throw an exception!
-        try
-        {
-            gitProxy.getMeAnException();
-        }
-        catch (HereIsYourException e)
-        {
-            System.out.println("exception caught!");
-            return "Exception caught";
-        }     
+        //Don't bother catching it, handling exceptions is the UI team's problem
+        gitProxy.getMeAnException();    
         
         //if we get to here, gitProxy.getMeAnException didn't actually throw an exception
         log.error("getException: Didn't get an exception back :(");

@@ -2,6 +2,7 @@ package TestingHarness;
 
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedList;
@@ -32,29 +33,34 @@ public class Tester {
                                         //the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
-    private SortedMap<String, LinkedList<String>> testingQueue = new TreeMap<String, LinkedList<String>>();
+    private Map<String, LinkedList<String>> testingQueue;// = new TreeMap<String, LinkedList<String>>();
 
     /**
      * Creates a new Tester
      */
-    public Tester(SortedMap<String, LinkedList<String>> testingQueue, String repoName)  {
-        this.testingQueue = testingQueue;
+    public Tester(Map<String, LinkedList<String>> testingQueue, String repoName)  {
+        //sort the testing queue
+        FileTypeComparator comparator = new FileTypeComparator(testingQueue);
+        this.testingQueue = new TreeMap<String, LinkedList<String>>(comparator);
+        assert validateTestingQueueIsSorted(testingQueue);
+
         this.repoName = repoName;
+        
+        //TODO: remove or use log4j for this
         System.out.println("testing Queue contains:");
         for (Map.Entry<String, LinkedList<String>> entry : testingQueue.entrySet()) {
             System.out.println(entry.getKey());
-        }
-        assert validateTestingQueueIsSorted();
+        }   
     }
-
+    
     /**
      * Ensures that the testing queue contains .java files first,
      * then .xml files
      */
-    private boolean validateTestingQueueIsSorted() 
+    public boolean validateTestingQueueIsSorted(Map<String, LinkedList<String>> map) 
     {
         boolean foundXML = false;
-        for (String key : testingQueue.keySet())
+        for (String key : map.keySet())
         {
             String ext = FilenameUtils.getExtension(key);
             if (foundXML)
