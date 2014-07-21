@@ -1,4 +1,4 @@
-package TestingHarness;
+package exceptions;
 
 /**
  * Thrown when users of TestServiceInterface poll or get a report

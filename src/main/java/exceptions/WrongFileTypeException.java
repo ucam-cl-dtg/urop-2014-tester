@@ -1,4 +1,4 @@
-package TestingHarness;
+package exceptions;
 
 /**
  * Should be thrown when the provided list of files containing the tests to be 

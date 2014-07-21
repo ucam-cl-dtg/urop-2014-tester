@@ -1,4 +1,4 @@
-package gitAPIDependencies;
+package gitapidependencies;
 
 public class HereIsYourException extends Exception {
 

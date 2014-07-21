@@ -1,4 +1,4 @@
-package gitAPIDependencies;
+package gitapidependencies;
 
 import java.io.IOException;
 import java.util.LinkedList;

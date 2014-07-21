@@ -1,4 +1,4 @@
-package TestingHarness;
+package testingharness;
 
 import java.util.LinkedList;
 import java.util.Map;

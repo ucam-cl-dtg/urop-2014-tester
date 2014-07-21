@@ -1,4 +1,4 @@
-package gitAPIDependencies;
+package gitapidependencies;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

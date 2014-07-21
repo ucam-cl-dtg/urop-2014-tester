@@ -1,8 +1,10 @@
-package TestingHarness;
+package testingharness;
 
-import static org.junit.Assert.assertEquals;
-import gitAPIDependencies.HereIsYourException;
-import gitAPIDependencies.WebInterface;
+import exceptions.TestIDNotFoundException;
+import exceptions.TestStillRunningException;
+import exceptions.WrongFileTypeException;
+import gitapidependencies.HereIsYourException;
+import gitapidependencies.WebInterface;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -20,12 +22,13 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 
+import publicinterfaces.TestServiceInterface;
+import reportelements.Report;
+import reportelements.Status;
+
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
-
-
-
 
 import configuration.ConfigurationLoader;
 

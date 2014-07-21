@@ -1,6 +1,8 @@
-package TestingHarness;
+package testingharness;
 
 import java.util.List;
+
+import reportelements.StaticReportItem;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
