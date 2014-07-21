@@ -8,8 +8,8 @@ import java.util.Map;
  * @author as2388
  */
 public class TesterFactory {
-    public Tester createNewTester(Map<String, LinkedList<String>> arg0, String arg1)
+    public Tester createNewTester(Map<String, LinkedList<String>> testingQueue, String repoName)
     {
-        return new Tester(arg0, arg1);
+        return new Tester(testingQueue, repoName);
     }
 }
