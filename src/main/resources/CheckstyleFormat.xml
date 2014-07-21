@@ -82,6 +82,7 @@
     	
     	<!-- Checks that there is no whitespace before ; . - - ++ -->
     	<module name="NoWhitespaceBefore">
+			<property name="tokens" value="SEMI, DOT, POST_DEC, POST_INC" />
     		<message key="ws.preceded" value="Preceding whitespace ~ ''{0}'' should not be preceded by whitespace" />
     		<property name="severity" value="warning" />
     	</module>
@@ -101,6 +102,7 @@
 		<!-- Check that Java naming conventions are observed -->
 		<module name="AbstractClassName"> <!-- ^Abstract.*$|^.*Factory$ -->
 			<property name="severity" value="warning" /> 
+			<property name="ignoreModifier" value="true"/> <!-- without this, Checkstyle will complain about a missing abstract modifier in declarations such as 'public class ObjectFactory' --> 
 			<message key="name.invalidPattern" value="Naming convention violation ~ the abstract class name ''{0}'' should start with 'Abstract' or end with 'Factory'" />
 		</module>
 		<module name="ConstantName"> <!-- ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
