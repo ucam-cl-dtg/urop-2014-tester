@@ -15,13 +15,13 @@
 
 	<servlet-mapping>
 		<servlet-name>resteasy-servlet</servlet-name>
-		<url-pattern>/*</url-pattern>
+		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
 
 	<!-- this should be the same URL pattern as the servlet-mapping property -->
 	<context-param>
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
-		<param-value>/</param-value>
+		<param-value>/rest/</param-value>
 	</context-param>
 
 	<!-- Auto scan REST service -->
