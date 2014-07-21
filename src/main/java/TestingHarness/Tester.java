@@ -2,6 +2,7 @@ package TestingHarness;
 
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,11 +40,7 @@ public class Tester {
      * Creates a new Tester
      */
     public Tester(Map<String, LinkedList<String>> testingQueue, String repoName)  {
-        //sort the testing queue
-        FileTypeComparator comparator = new FileTypeComparator(testingQueue);
-        this.testingQueue = new TreeMap<String, LinkedList<String>>(comparator);
-        assert validateTestingQueueIsSorted(testingQueue);
-
+        this.testingQueue = testingQueue;
         this.repoName = repoName;
         
         //TODO: remove or use log4j for this
@@ -54,37 +51,8 @@ public class Tester {
     }
     
     /**
-     * Ensures that the testing queue contains .java files first,
-     * then .xml files
-     */
-    public boolean validateTestingQueueIsSorted(Map<String, LinkedList<String>> map) 
-    {
-        boolean foundXML = false;
-        for (String key : map.keySet())
-        {
-            String ext = FilenameUtils.getExtension(key);
-            if (foundXML)
-            {
-                if (ext.equals("java"))
-                {
-                    log.error("testingQueue files are not ordered java then xml");
-                    return false;
-                }
-            }
-            else
-            {
-                if (ext.equals("xml"))
-                {
-                    foundXML = true;
-                }
-            }
-        }
-        return true;
-    }
-    
-    /**
-     * Runs all tests required by the tick on all files required to be tested by the tick
-     * @throws IOException 
+     * Runs all tests required by the tick on all files required to be tested by the tick.
+     * Note: only runs static analysis if dynamic analysis succeeded
      */
     public void runTests() 
     {
@@ -92,34 +60,15 @@ public class Tester {
                 
         try {
             int noOfTests = testingQueue.size();
-            this.status = new Status("loading tests",noOfTests + 1);
-            //loop through each test, decide what type of test it is and run it, adding the result to outputs
-            for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
-                this.status.addProgress();
-                String testFileName = e.getKey();
-                LinkedList<String> fileNames = e.getValue();
-
-                String ext = testFileName.substring(testFileName.lastIndexOf('.') + 1, testFileName.length());
-
-                if ("xml".equals(ext)) {
-                    //run static analysis tests
-                    runStaticAnalysis(testFileName, fileNames);
-                }
-                else if ("java".equals(ext)) {
-                    //TODO: run dynamic analysis tests
-                }
-                else { 
-                    throw new WrongFileTypeException();
-                } 
-                //tempoarary for testing purposes
-                try  {
-                	Thread.sleep(7000);
-                }
-                catch (InterruptedException err) {
-                	err.printStackTrace();
-                }
-            } 
-            //Once the for loop is complete, all tests to be run have finished
+            this.status = new Status("loading tests", noOfTests + 1);            
+            
+            runDynamicTests();
+           
+            if (dynamicPass())
+            {
+               runStaticTests();
+            }           
+            
             log.info("Tick analysis finished successfully");
 
             //build the final report from the static and dynamic results
@@ -128,7 +77,7 @@ public class Tester {
             //TODO: remove this. For now, print result to the console
             printReport();
         }	
-        catch (CheckstyleException | WrongFileTypeException | IOException e)
+        catch (CheckstyleException | IOException e)
         {
             log.error("Tick analysis failed. Exception message: " + e.getMessage());
             failCause = e;
@@ -136,6 +85,89 @@ public class Tester {
         finally
         {
             this.status.complete();
+        }
+    }
+    
+    /**
+     * Runs all dynamic analysis tests required by the tick
+     */
+    private void runDynamicTests()
+    {
+        log.info("Started dynamic analysis");
+        Map<String, LinkedList<String>> dynamicTests = getDynamicTestItems(this.testingQueue);
+        //TODO: actually run some tests
+        log.info("Dynamic analysis complete");
+    }
+    
+    /**
+     * Runs all static analysis tests required by the tick
+     * @throws CheckstyleException
+     * @throws IOException
+     */
+    private void runStaticTests() throws CheckstyleException, IOException
+    {
+        log.info("Starting static analysis");
+        //get static tests from testingQueue
+        Map<String, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
+        //run Static analysis on each test
+        for (Map.Entry<String, LinkedList<String>> e : staticTests.entrySet()) {
+            status.addProgress();
+            runStaticAnalysis(e.getKey(), e.getValue());
+            delay(7000);
+        }
+        log.info("Static analysis complete");
+    }
+    
+    /**
+     * Check if all the dynamic tests were passed
+     * @return  true if all dynamic analysis tests were passed; false otherwise
+     */
+    private boolean dynamicPass()
+    {
+        //TODO
+        return true;
+    }
+    
+   /**
+    * Extracts only the tests with .java extensions from the testing queue
+    * @param testingQueue   Map from which to extract .java tests
+    * @return               Map containing only .java tests
+    */
+    public HashMap<String, LinkedList<String>> getDynamicTestItems(Map<String, LinkedList<String>> testingQueue)
+    {
+        HashMap<String, LinkedList<String>> mapReturn = new HashMap<String, LinkedList<String>>();
+        for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
+            if ("java".equals(FilenameUtils.getExtension(e.getKey()))) {
+                mapReturn.put(e.getKey(), e.getValue());
+            }
+        }
+        return mapReturn;
+    }
+    
+    /**
+     * Extracts only the tests with .xml extensions from the testing queue
+     * @param testingQueue   Map from which to extract .xml tests
+     * @return               Map containing only .xml tests
+     */
+    public HashMap<String, LinkedList<String>> getStaticTestItems(Map<String, LinkedList<String>> testingQueue)
+    {
+        HashMap<String, LinkedList<String>> mapReturn = new HashMap<String, LinkedList<String>>();
+        for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
+            if ("xml".equals(FilenameUtils.getExtension(e.getKey()))) {
+                mapReturn.put(e.getKey(), e.getValue());
+            }
+        }
+        return mapReturn;
+    }
+    
+    //TODO: remove
+    private void delay(int timeMS)
+    {
+        try  {
+            Thread.sleep(timeMS);
+        }
+        catch (InterruptedException err) {
+            err.printStackTrace();
         }
     }
 
