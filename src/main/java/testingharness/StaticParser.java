@@ -43,7 +43,6 @@ public class StaticParser {
         String contents = response.readEntity(String.class);
         response.close();  
 
-        //tmp file seems to add random unique number to end - TODO double check!
         File javaFile = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
         log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
 

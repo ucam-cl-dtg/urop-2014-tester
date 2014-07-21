@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
 import java.util.UUID;
 
 import javax.ws.rs.QueryParam;
@@ -45,7 +43,6 @@ public class TestService implements TestServiceInterface {
      * Maps the ID of a test to in-progress tests. TestService is responsible
      * for generating unique IDs Class users are responsible for remembering the
      * ID so that they can poll its status and get its report when done
-     * TODO: should we be keeping these in a DB instead?
      */
     private static Map<String, Tester> ticksInProgress;
     private WebInterface gitProxy;
@@ -70,7 +67,7 @@ public class TestService implements TestServiceInterface {
         }
     }
 
-    /** Constructor used for testing */
+    /** Initialise the proxy to the git API */
     private void buildGitProxy() {
         log.info("Creating new client for accessing git API");
         ResteasyClient c = new ResteasyClientBuilder().build();
@@ -234,8 +231,8 @@ public class TestService implements TestServiceInterface {
     }
 
     /**
-     * Used for manually testing that the three main API functions work
-     * 
+     * Used for manually testing that the three main API functions work.
+     * Will eventually be removed
      * @param testID
      * @return
      * @throws TestIDNotFoundException

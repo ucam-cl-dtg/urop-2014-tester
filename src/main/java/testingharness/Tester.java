@@ -44,7 +44,7 @@ public class Tester {
         this.testingQueue = testingQueue;
         this.repoName = repoName;
     }
-    
+
     /**
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
@@ -52,24 +52,24 @@ public class Tester {
     public void runTests() 
     {
         log.info("Tick analysis started");	     
-                
+
         try {
             int noOfTests = testingQueue.size();
             this.status = new Status("loading tests", noOfTests + 1);            
-            
+
             runDynamicTests();
-           
+
             if (dynamicPass())
             {
-               runStaticTests();
+                runStaticTests();
             }           
-            
+
             log.info("Building report");
             //build the final report from the static and dynamic results
             this.report = new Report(sReport, dReport);
-            
+
             log.info("Tick analysis finished successfully");
-            
+
             //TODO: remove this. For now, print result to the console
             printReport();
         }	
@@ -83,7 +83,7 @@ public class Tester {
             this.status.complete();
         }   
     }
-    
+
     /**
      * Runs all dynamic analysis tests required by the tick
      */
@@ -94,7 +94,7 @@ public class Tester {
         //TODO: actually run some tests
         log.info("Dynamic analysis complete");
     }
-    
+
     /**
      * Runs all static analysis tests required by the tick
      * @throws CheckstyleException
@@ -113,7 +113,7 @@ public class Tester {
         }
         log.info("Static analysis complete");
     }
-    
+
     /**
      * Check if all the dynamic tests were passed
      * @return  true if all dynamic analysis tests were passed; false otherwise
@@ -123,12 +123,12 @@ public class Tester {
         //TODO
         return true;
     }
-    
-   /**
-    * Extracts only the tests with .java extensions from the testing queue
-    * @param testingQueue   Map from which to extract .java tests
-    * @return               Map containing only .java tests
-    */
+
+    /**
+     * Extracts only the tests with .java extensions from the testing queue
+     * @param testingQueue   Map from which to extract .java tests
+     * @return               Map containing only .java tests
+     */
     public HashMap<String, LinkedList<String>> getDynamicTestItems(Map<String, LinkedList<String>> testingQueue)
     {
         HashMap<String, LinkedList<String>> mapReturn = new HashMap<String, LinkedList<String>>();
@@ -139,7 +139,7 @@ public class Tester {
         }
         return mapReturn;
     }
-    
+
     /**
      * Extracts only the tests with .xml extensions from the testing queue
      * @param testingQueue   Map from which to extract .xml tests
@@ -155,8 +155,8 @@ public class Tester {
         }
         return mapReturn;
     }
-    
-    //TODO: remove
+
+    //TODO: remove. Currently used for simulating delays
     private void delay(int timeMS)
     {
         try  {
@@ -211,9 +211,9 @@ public class Tester {
     public Report getReport() {
         return report;
     }
-    
+
     //TODO: temporary, delete
     public void setStatus(Status s) {
-    	this.status = s;
+        this.status = s;
     }
 }
