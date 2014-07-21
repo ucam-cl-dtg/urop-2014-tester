@@ -34,6 +34,7 @@ public class StaticLogger implements AuditListener
      * If an sReportItem with the same message has already been found, add the line number of the problem to that sReportItem,
      * otherwise create a new sReportItem
      */
+    @Override
     public void addError(AuditEvent event)
     {
         String fileName = this.fileName;
@@ -67,6 +68,7 @@ public class StaticLogger implements AuditListener
         }
     }
 
+    @Override
     public void addException(AuditEvent arg0, Throwable arg1)
     {
         String fileName = this.fileName;
@@ -92,24 +94,9 @@ public class StaticLogger implements AuditListener
         }
     }
 
-
-    public void auditFinished(AuditEvent arg0)
-    {
-
-    }
-
-    public void auditStarted(AuditEvent arg0)
-    {
-
-    }
-
-    public void fileFinished(AuditEvent arg0)
-    {
-
-    }
-
-    public void fileStarted(AuditEvent arg0)
-    {
-
-    }
+    //The following four functions are needed to implement AuditListener, but we have no use for them
+    @Override public void auditFinished(AuditEvent arg0){}
+    @Override public void auditStarted(AuditEvent arg0){}
+    @Override public void fileFinished(AuditEvent arg0){}
+    @Override public void fileStarted(AuditEvent arg0){}
 }

@@ -70,7 +70,10 @@ public class StaticParser {
 
         try {
             log.info("Testing: " + javaFile.getAbsolutePath());
-            Configuration config = ConfigurationLoader.loadConfiguration(configuration.ConfigurationLoader.getConfig().getGitAPIPath() + "git/" + repoName + ".git/" + test, new PropertiesExpander(properties));
+            Configuration config = ConfigurationLoader.loadConfiguration(
+                    configuration.ConfigurationLoader.getConfig().getGitAPIPath() 
+                    + "git/" + repoName + ".git/" + test, 
+                    new PropertiesExpander(properties));
             AuditListener listener = new StaticLogger(sReport,file);
             Checker c = createChecker(config, listener); 
             c.process(fileList); 

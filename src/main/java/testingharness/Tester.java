@@ -28,12 +28,11 @@ import exceptions.WrongFileTypeException;
 public class Tester {
     static Logger log = Logger.getLogger(Tester.class.getName()); //initialise log4j logger
 
-    private List<StaticReportItem> sReport = new LinkedList<StaticReportItem>();    //list of static report items
-    private List<DynamicReportItem> dReport = new LinkedList<DynamicReportItem>();  //list of dynamic report items
-    private Report report;              //Report object into which all the report items will ultimately go
-    private Status status;
-    private Exception failCause;        //if the report fails, save it here, so that it can be thrown when
-                                        //the report is requested
+    private List<StaticReportItem> sReport = new LinkedList<StaticReportItem>();   //list of static report items
+    private List<DynamicReportItem> dReport = new LinkedList<DynamicReportItem>(); //list of dynamic report items
+    private Report report; //Report object into which all the report items will ultimately go
+    private Status status; 
+    private Exception failCause; //if the report fails, save it here, so that it can be thrown when the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
     private Map<String, LinkedList<String>> testingQueue;
