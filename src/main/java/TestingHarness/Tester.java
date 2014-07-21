@@ -1,15 +1,10 @@
 package TestingHarness;
 
-
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.LinkedList;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
 
@@ -34,7 +29,7 @@ public class Tester {
                                         //the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
-    private Map<String, LinkedList<String>> testingQueue;// = new TreeMap<String, LinkedList<String>>();
+    private Map<String, LinkedList<String>> testingQueue;
 
     /**
      * Creates a new Tester
@@ -42,12 +37,6 @@ public class Tester {
     public Tester(Map<String, LinkedList<String>> testingQueue, String repoName)  {
         this.testingQueue = testingQueue;
         this.repoName = repoName;
-        
-        //TODO: remove or use log4j for this
-        System.out.println("testing Queue contains:");
-        for (Map.Entry<String, LinkedList<String>> entry : testingQueue.entrySet()) {
-            System.out.println(entry.getKey());
-        }   
     }
     
     /**
@@ -69,11 +58,12 @@ public class Tester {
                runStaticTests();
             }           
             
-            log.info("Tick analysis finished successfully");
-
+            log.info("Building report");
             //build the final report from the static and dynamic results
             this.report = new Report(sReport, dReport);
-
+            
+            log.info("Tick analysis finished successfully");
+            
             //TODO: remove this. For now, print result to the console
             printReport();
         }	
@@ -86,6 +76,7 @@ public class Tester {
         {
             this.status.complete();
         }
+        
     }
     
     /**
