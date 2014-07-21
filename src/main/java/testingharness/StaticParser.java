@@ -7,7 +7,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Properties;
 
 import javax.ws.rs.core.Response;
 
@@ -27,9 +26,23 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
 
+/**
+ * Provides function for running Checkstyle with a given config file and .java file
+ * @author kls82
+ *
+ */
 public class StaticParser {
     static Logger log = Logger.getLogger(StaticParser.class.getName());
 
+    /**
+     * Runs Checkstyle with a given config file and .java file, and puts results into a linked list of static report items
+     * @param test                      Path to Checkstyle configuration file to use
+     * @param file                      Path to .java file on which to run Checkstyle
+     * @param sReport                   Reference to LinkedList of StaticReportItems into which to insert found problems
+     * @param repoName                  Name of git repository in which {@code file} is located
+     * @throws CheckstyleException      
+     * @throws IOException              
+     */
     public static void test(String test, String file, List<StaticReportItem> sReport, String repoName) throws CheckstyleException, IOException{ 		
         //must be in list for .process to work
         LinkedList<File> fileList = new LinkedList<File>();
@@ -61,18 +74,14 @@ public class StaticParser {
             throw new IOException("Could not find file: " + file);
         }
 
-        //get system properties
-        Properties properties = System.getProperties();
-
         //test the java file and use the listener to add each line with an error
         //in it to the linked list of static report items
-
         try {
             log.info("Testing: " + javaFile.getAbsolutePath());
             Configuration config = ConfigurationLoader.loadConfiguration(
                     configuration.ConfigurationLoader.getConfig().getGitAPIPath() 
                     + "git/" + repoName + ".git/" + test, 
-                    new PropertiesExpander(properties));
+                    new PropertiesExpander(System.getProperties()));
             AuditListener listener = new StaticLogger(sReport,file);
             Checker c = createChecker(config, listener); 
             c.process(fileList); 

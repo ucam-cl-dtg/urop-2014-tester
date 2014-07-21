@@ -31,6 +31,7 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import configuration.ConfigurationLoader;
 
 /**
+ * Default implementation of TestServiceInterface
  * @author as2388
  * @author kls82
  */
@@ -207,7 +208,7 @@ public class TestService implements TestServiceInterface {
             }
             else
             {
-                throw new TestStillRunningException();
+                throw new TestStillRunningException(testID);
             }
 
         } else {
