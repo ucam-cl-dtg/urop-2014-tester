@@ -19,15 +19,12 @@ public class GitService implements WebInterface {
         files.add("testfile.java");
         files.add("CheckstyleFormat.xml");
         
-        System.out.println("list files!");
         return files;
     }   
     
     public Response getFile(String fileName, String repoName)
             throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(/* add path */ fileName));
-        /*String output = "";
-        String line;
+        /*String line;
         while ((line = br.readLine()) != null) {
             output += line + "\n";
         }

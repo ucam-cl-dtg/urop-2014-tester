@@ -44,7 +44,7 @@ public interface TestServiceInterface {
      */
     @GET
     @Path("/pollStatus")
-    public abstract String pollStatus(@QueryParam("testID") String testID) throws TestIDNotFoundException;
+    public abstract Status pollStatus(@QueryParam("testID") String testID) throws TestIDNotFoundException;
 
     /**
      * Gets the report associated with the testID, or throws an exception if the report couldn't be generated

@@ -80,7 +80,6 @@ public class TestService implements TestServiceInterface {
     }
 
     /** {@inheritDoc} */
-    @Override
     public String runNewTest(@QueryParam("repoName") String repoName) throws IOException, WrongFileTypeException {
         log.info("New test request received");
         // generate a UUID for the tester
@@ -99,6 +98,7 @@ public class TestService implements TestServiceInterface {
         
         LinkedList<String> filesToTest = new LinkedList<String>();
         LinkedList<String> staticTests = new LinkedList<String>();
+
         log.info(id + ": request successful");
         List<String> filesInRepo = gitProxy.listFiles(repoName);
         /* List<String> filesInRepo = gitProxy.listFiles(repoName).readEntity(List.class); */
@@ -149,12 +149,11 @@ public class TestService implements TestServiceInterface {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public String pollStatus(@QueryParam("testID") String testID)
+    public Status pollStatus(@QueryParam("testID") String testID)
             throws TestIDNotFoundException {
         log.info(testID + ": pollStatus: request received");
         if (ticksInProgress.containsKey(testID)) {
-            String status = ticksInProgress.get(testID).getStatus();
+            Status status = ticksInProgress.get(testID).getStatus();
             log.info(testID + ": pollStatus: returning " + status);
             return status;
         } else {
@@ -164,14 +163,13 @@ public class TestService implements TestServiceInterface {
     }
 
     /** {@inheritDoc} */
-    @Override
     public Report getReport(@QueryParam("testID") String testID)
             throws TestIDNotFoundException, CheckstyleException,
             WrongFileTypeException, IOException, TestStillRunningException {
         log.info(testID + ": getReport: request received");
         if (ticksInProgress.containsKey(testID)) {
             //if the test finished
-            if (ticksInProgress.get(testID).getStatus().equals("complete"))
+            if (ticksInProgress.get(testID).getStatus().getInfo().equals("complete"))
             {
                 Tester tester = ticksInProgress.get(testID);
                 // Assuming we're not responsible for storing tests, we should
@@ -217,7 +215,6 @@ public class TestService implements TestServiceInterface {
     }
 
     /** {@inheritDoc} */
-    @Override
     public String getException() 
     {
         log.info("getException: accessing get exception method on git API");
