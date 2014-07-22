@@ -8,6 +8,7 @@ import exceptions.WrongFileTypeException;
 import gitapidependencies.HereIsYourException;
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
+import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
@@ -107,9 +108,24 @@ public class TestService implements TestServiceInterface {
         /*TODO: look in a different repo for the test files. This 
                 will require lots of collaboration with the git team*/
         for (String file : filesInRepo) {
-            String ext = file.substring(file.lastIndexOf('.') + 1,
-                    file.length());
-            if (ext.equals("java")) {
+            //String ext = file.substring(file.lastIndexOf('.') + 1, file.length());
+
+            switch (FilenameUtils.getExtension(file))
+            {
+                case "java":
+                    filesToTest.add(file);
+                    log.info("added java file to test : " + file);
+                    break;
+                case "xml":
+                    staticTests.add(file);
+                    log.info("added test file: " + file);
+                    break;
+                default:
+                    throw new WrongFileTypeException();
+            }
+            
+
+            /*if (ext.equals("java")) {
                 filesToTest.add(file);
                 log.info("added java file to test : " + file);
             } else if (ext.equals("xml")) {
@@ -117,7 +133,7 @@ public class TestService implements TestServiceInterface {
                 log.info("added test file: " + file);
             } else {
                 throw new WrongFileTypeException();
-            }
+            }*/
         }
 
         log.info(id + ": runNewTest: creating Tester object");

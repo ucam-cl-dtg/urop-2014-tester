@@ -2,14 +2,10 @@ package gitapidependencies;
 
 import java.io.IOException;
 import java.util.LinkedList;
-import java.util.List;
 
 public class GitService implements WebInterface {
 
-    public List<String> listRepositories() {
-        return null;
-    }
-
+    @Override
     public LinkedList<String> listFiles(String repoName) throws IOException {
         LinkedList<String> files = new LinkedList<>();
         //add files here!

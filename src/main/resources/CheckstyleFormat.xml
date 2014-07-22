@@ -4,7 +4,7 @@
     "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
 
  <!-- Notes: Default severity for each check is error; change to warning by including <property name="severity" value="warning" />
- 			 The message displayed for each problem is of the format "general problem ~ advice/more detail" 
+ 			 The message displayed for each problemCategory is of the format "general problemCategory ~ advice/more detail"
  			 Each message needs to override a key which is different for each Checker Module.
  			    A list of these keys can be found on this website:
  			    http://grepcode.com/file/repo1.maven.org/maven2/com.puppycrawl.tools/checkstyle/5.2/com/puppycrawl/tools/checkstyle/checks/coding/messages.properties?av=f

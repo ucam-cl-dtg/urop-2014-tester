@@ -13,7 +13,7 @@ import java.io.IOException;
  *  A configuration file loader class, set at compile time, loaded at
  *  initialisation.
  *  
- * This just a simple class to load the file {@value FILENAME} in the
+ * This just a simple class to load the file {@value #FILENAME} in the
  * current directory and convert it into a
  * {@link configuration.ConfigurationFile}
  * class.
