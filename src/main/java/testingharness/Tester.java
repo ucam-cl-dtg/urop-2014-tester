@@ -42,6 +42,7 @@ public class Tester {
     public Tester(Map<String, LinkedList<String>> testingQueue, String repoName)  {
         this.testingQueue = testingQueue;
         this.repoName = repoName;
+        System.out.println(testingQueue.size());
     }
 
     /**
@@ -104,10 +105,10 @@ public class Tester {
         log.info("Starting static analysis");
         //get static tests from testingQueue
         Map<String, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
-
         //run Static analysis on each test
         for (Map.Entry<String, LinkedList<String>> e : staticTests.entrySet()) {
             status.addProgress();
+            System.out.println("running test " + e);
             runStaticAnalysis(e.getKey(), e.getValue());
             delay(7000);
         }
