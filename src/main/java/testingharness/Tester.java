@@ -1,21 +1,19 @@
 package testingharness;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.LinkedList;
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import gitapidependencies.RepositoryNotFoundException;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.log4j.Logger;
-
 import reportelements.DynamicReportItem;
 import reportelements.Report;
 import reportelements.StaticReportItem;
 import reportelements.Status;
 
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-
-import exceptions.WrongFileTypeException;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Runs all the static and dynamic analysis tests for a given tick, and produces a report,
@@ -28,8 +26,8 @@ import exceptions.WrongFileTypeException;
 public class Tester {
     static Logger log = Logger.getLogger(Tester.class.getName()); //initialise log4j logger
 
-    private List<StaticReportItem> sReport = new LinkedList<StaticReportItem>();   //list of static report items
-    private List<DynamicReportItem> dReport = new LinkedList<DynamicReportItem>(); //list of dynamic report items
+    private List<StaticReportItem> sReport = new LinkedList<>();   //list of static report items
+    private List<DynamicReportItem> dReport = new LinkedList<>(); //list of dynamic report items
     private Report report; //Report object into which all the report items will ultimately go
     private Status status; 
     private Exception failCause; //if the report fails, save it here, so that it can be thrown when the report is requested
@@ -49,7 +47,7 @@ public class Tester {
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
      */
-    public void runTests() 
+    public void runTests()
     {
         log.info("Tick analysis started");	     
 
@@ -73,7 +71,7 @@ public class Tester {
             //TODO: remove this. For now, print result to the console
             printReport();
         }	
-        catch (CheckstyleException | IOException e)
+        catch (CheckstyleException | IOException | RepositoryNotFoundException e)
         {
             log.error("Tick analysis failed. Exception message: " + e.getMessage());
             failCause = e;
@@ -100,7 +98,7 @@ public class Tester {
      * @throws CheckstyleException
      * @throws IOException
      */
-    private void runStaticTests() throws CheckstyleException, IOException
+    private void runStaticTests() throws CheckstyleException, IOException, RepositoryNotFoundException
     {
         log.info("Starting static analysis");
         //get static tests from testingQueue
@@ -131,7 +129,7 @@ public class Tester {
      */
     public HashMap<String, LinkedList<String>> getDynamicTestItems(Map<String, LinkedList<String>> testingQueue)
     {
-        HashMap<String, LinkedList<String>> mapReturn = new HashMap<String, LinkedList<String>>();
+        HashMap<String, LinkedList<String>> mapReturn = new HashMap<>();
         for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
             if ("java".equals(FilenameUtils.getExtension(e.getKey()))) {
                 mapReturn.put(e.getKey(), e.getValue());
@@ -147,7 +145,7 @@ public class Tester {
      */
     public HashMap<String, LinkedList<String>> getStaticTestItems(Map<String, LinkedList<String>> testingQueue)
     {
-        HashMap<String, LinkedList<String>> mapReturn = new HashMap<String, LinkedList<String>>();
+        HashMap<String, LinkedList<String>> mapReturn = new HashMap<>();
         for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
             if ("xml".equals(FilenameUtils.getExtension(e.getKey()))) {
                 mapReturn.put(e.getKey(), e.getValue());
@@ -191,7 +189,7 @@ public class Tester {
      * @throws CheckstyleException	
      * @throws IOException 
      */
-    public void runStaticAnalysis(String configFileName, List<String> fileNames) throws CheckstyleException, IOException {
+    public void runStaticAnalysis(String configFileName, List<String> fileNames) throws CheckstyleException, IOException, RepositoryNotFoundException {
         for (String file : fileNames) {
             StaticParser.test(configFileName, file, this.sReport, repoName);
         }

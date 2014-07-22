@@ -2,17 +2,16 @@ package gitapidependencies;
 
 import java.io.IOException;
 import java.util.LinkedList;
-
-import javax.ws.rs.core.Response;
+import java.util.List;
 
 public class GitService implements WebInterface {
 
-    public Response listRepositories() {
+    public List<String> listRepositories() {
         return null;
     }
 
     public LinkedList<String> listFiles(String repoName) throws IOException {
-        LinkedList<String> files = new LinkedList<String>();
+        LinkedList<String> files = new LinkedList<>();
         //add files here!
         files.add("testfile.java");
         files.add("CheckstyleFormat.xml");
@@ -20,7 +19,7 @@ public class GitService implements WebInterface {
         return files;
     }   
     
-    public Response getFile(String fileName, String repoName)
+    public String getFile(String fileName, String repoName)
             throws IOException {
         /*String line;
         while ((line = br.readLine()) != null) {
@@ -28,7 +27,7 @@ public class GitService implements WebInterface {
         }
         br.close();
         return Response.status(200).entity(output).build();*/
-        return Response.status(200).entity("").build();
+        return "";
         
     }
     
@@ -36,12 +35,12 @@ public class GitService implements WebInterface {
     public Double getMeAnException() throws HereIsYourException {
         System.out.println("Get exception!");
         
-        int x = 42;
+        double x = 42;
         if (x == 42)
         {  
             System.out.println("throwing!");
             throw new HereIsYourException();
         }
-        return new Double(x);
+        return x;
     }
 }

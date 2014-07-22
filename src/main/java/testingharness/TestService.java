@@ -1,34 +1,26 @@
 package testingharness;
 
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import configuration.ConfigurationLoader;
 import exceptions.TestIDNotFoundException;
 import exceptions.TestStillRunningException;
 import exceptions.WrongFileTypeException;
 import gitapidependencies.HereIsYourException;
+import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
-import javax.ws.rs.QueryParam;
-
 import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-
 import publicinterfaces.TestServiceInterface;
 import reportelements.Report;
 import reportelements.Status;
 
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import javax.ws.rs.QueryParam;
+import java.io.IOException;
+import java.util.*;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
-
-import configuration.ConfigurationLoader;
 
 /**
  * Default implementation of TestServiceInterface
@@ -54,7 +46,7 @@ public class TestService implements TestServiceInterface {
         buildGitProxy();
         if (ticksInProgress == null) {
             log.info("ticksInProgress Initialised");
-            ticksInProgress = new HashMap<String, Tester>();
+            ticksInProgress = new HashMap<>();
         }
     }
     
@@ -83,7 +75,8 @@ public class TestService implements TestServiceInterface {
     }
 
     /** {@inheritDoc} */
-    public String runNewTest(@QueryParam("repoName") String repoName) throws IOException, WrongFileTypeException {
+    public String runNewTest(@QueryParam("repoName") String repoName) throws IOException, WrongFileTypeException,
+            RepositoryNotFoundException {
         log.info("New test request received");
         // generate a UUID for the tester
         String id;
@@ -168,7 +161,7 @@ public class TestService implements TestServiceInterface {
     /** {@inheritDoc} */
     public Report getReport(@QueryParam("testID") String testID)
             throws TestIDNotFoundException, CheckstyleException,
-            WrongFileTypeException, IOException, TestStillRunningException {
+            RepositoryNotFoundException, IOException, TestStillRunningException {
         log.info(testID + ": getReport: request received");
         if (ticksInProgress.containsKey(testID)) {
             //check if the test if finished
@@ -200,8 +193,8 @@ public class TestService implements TestServiceInterface {
                     Exception failCause = tester.getFailCause();
                     if (failCause instanceof CheckstyleException) {
                         throw (CheckstyleException) failCause;
-                    } else if (failCause instanceof WrongFileTypeException) {
-                        throw (WrongFileTypeException) failCause;
+                    } else if (failCause instanceof RepositoryNotFoundException) {
+                        throw (RepositoryNotFoundException) failCause;
                     } else {
                         throw (IOException) failCause;
                     }

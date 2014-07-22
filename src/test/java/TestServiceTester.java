@@ -1,28 +1,24 @@
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
-import org.easymock.EasyMock;
-import org.junit.Test;
-
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-
 import exceptions.TestIDNotFoundException;
 import exceptions.TestStillRunningException;
 import exceptions.WrongFileTypeException;
+import gitapidependencies.RepositoryNotFoundException;
+import gitapidependencies.WebInterface;
+import org.easymock.EasyMock;
+import org.junit.Test;
 import reportelements.Report;
 import reportelements.Status;
 import testingharness.TestService;
 import testingharness.Tester;
 import testingharness.TesterFactory;
 
+import java.io.IOException;
+import java.util.*;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
-import gitapidependencies.WebInterface;
 
 /**
  * Used for unit testing of API functions 
@@ -31,15 +27,15 @@ import gitapidependencies.WebInterface;
 public class TestServiceTester
 {
     @Test
-    public void testRunNewTestNormal() throws IOException, WrongFileTypeException
+    public void testRunNewTestNormal() throws IOException, WrongFileTypeException, RepositoryNotFoundException
     {
         //mock proxy
         String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
         WebInterface proxy = buildMockedProxy(filePaths, false);
 
         //build map which runNewTest() should create
-        SortedMap<String, LinkedList<String>> testMap = new TreeMap<String, LinkedList<String>>();
-        LinkedList<String> ll = new LinkedList<String>();
+        SortedMap<String, LinkedList<String>> testMap = new TreeMap<>();
+        LinkedList<String> ll = new LinkedList<>();
         ll.add("testfile1.java");
         ll.add("testfile2.java");
         testMap.put("config.xml", ll);
@@ -63,19 +59,12 @@ public class TestServiceTester
         EasyMock.verify(mockedTester);
     }
 
-    @Test(expected = IOException.class)
-    public void testRunNewTestRepoNotFound() throws IOException, WrongFileTypeException
+    @Test(expected = RepositoryNotFoundException.class)
+    public void testRunNewTestRepoNotFound() throws IOException, WrongFileTypeException, RepositoryNotFoundException
     {
         //mock proxy
         String[] filePaths = {"config.xml", "testfile1.java", "testfile2.java"};
         WebInterface proxy = buildMockedProxy(filePaths, true);
-
-        //build map which runNewTest() should create
-        Map<String, LinkedList<String>> testMap = new HashMap<String, LinkedList<String>>();
-        LinkedList<String> ll = new LinkedList<String>();
-        ll.add("testfile1.java");
-        ll.add("testfile2.java");
-        testMap.put("config.xml", ll);
 
         //mock tester factory and the tester runNewTest() would normally create
         TesterFactory mockedTesterFactory = EasyMock.createMock(TesterFactory.class);
@@ -90,19 +79,17 @@ public class TestServiceTester
         ts.runNewTest("");
     }
 
-    private WebInterface buildMockedProxy(String[] filePaths, boolean throwIOException) throws IOException
+    private WebInterface buildMockedProxy(String[] filePaths, boolean throwIOException) throws IOException,
+            RepositoryNotFoundException
     {
         WebInterface proxy = EasyMock.createMock(WebInterface.class);			
-        LinkedList<String> files = new LinkedList<String>();
+        LinkedList<String> files = new LinkedList<>();
 
-        for (int i = 0; i < filePaths.length; i++)
-        {
-            files.add(filePaths[i]);
-        }
+        files.addAll(Arrays.asList(filePaths));
 
         if (throwIOException)
         {
-            EasyMock.expect(proxy.listFiles("")).andThrow(new IOException());
+            EasyMock.expect(proxy.listFiles("")).andThrow(new RepositoryNotFoundException());
         }
         else
         {
@@ -127,7 +114,8 @@ public class TestServiceTester
     }
 
     @Test
-    public void testGetReportNormal() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException, TestStillRunningException
+    public void testGetReportNormal() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException,
+            IOException, TestStillRunningException, RepositoryNotFoundException
     {
         //set up
         Report r = EasyMock.createMock(Report.class);
@@ -144,7 +132,7 @@ public class TestServiceTester
         EasyMock.replay(s);
         EasyMock.replay(t);
 
-        Map<String, Tester> ticksInProgress = new HashMap<String, Tester>();
+        Map<String, Tester> ticksInProgress = new HashMap<>();
         ticksInProgress.put("testID", t);
 
         TestService ts = new TestService(ticksInProgress);
@@ -155,7 +143,8 @@ public class TestServiceTester
     }
 
     @Test(expected = TestIDNotFoundException.class)
-    public void testGetReportNotFound() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException, TestStillRunningException
+    public void testGetReportNotFound() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException,
+            IOException, TestStillRunningException, RepositoryNotFoundException
     {
         //set up
         Report r = EasyMock.createMock(Report.class);
@@ -169,7 +158,7 @@ public class TestServiceTester
         EasyMock.replay(s);
         EasyMock.replay(t);
 
-        Map<String, Tester> ticksInProgress = new HashMap<String, Tester>();
+        Map<String, Tester> ticksInProgress = new HashMap<>();
         ticksInProgress.put("testID", t);
 
         TestService ts = new TestService(ticksInProgress);
@@ -178,8 +167,9 @@ public class TestServiceTester
         ts.getReport("badID");
     }	
 
-    @Test(expected = WrongFileTypeException.class)
-    public void testGetReportFailedToRun() throws TestIDNotFoundException, CheckstyleException, WrongFileTypeException, IOException, TestStillRunningException
+    @Test(expected = IOException.class)
+    public void testGetReportFailedToRun() throws TestIDNotFoundException, CheckstyleException,
+            IOException, TestStillRunningException, RepositoryNotFoundException
     {
         //set up
         Tester t = EasyMock.createMock(Tester.class);
@@ -189,12 +179,12 @@ public class TestServiceTester
         EasyMock.expect(t.getStatus()).andReturn(s);
         EasyMock.expect(s.getInfo()).andReturn("complete");
        
-        EasyMock.expect(t.getFailCause()).andReturn((Exception) new WrongFileTypeException());
-        EasyMock.expect(t.getFailCause()).andReturn((Exception) new WrongFileTypeException());
+        EasyMock.expect(t.getFailCause()).andReturn(new IOException());
+        EasyMock.expect(t.getFailCause()).andReturn(new IOException());
         EasyMock.replay(s);
         EasyMock.replay(t);
 
-        Map<String, Tester> ticksInProgress = new HashMap<String, Tester>();
+        Map<String, Tester> ticksInProgress = new HashMap<>();
         ticksInProgress.put("testID", t);
 
         TestService ts = new TestService(ticksInProgress);
@@ -216,7 +206,7 @@ public class TestServiceTester
         EasyMock.replay(t);
 
         // Create dependency for TestService and insert the mocked tester
-        Map<String, Tester> ticksInProgress = new HashMap<String, Tester>();
+        Map<String, Tester> ticksInProgress = new HashMap<>();
         ticksInProgress.put("testID", t);
 
         // create and return TestService

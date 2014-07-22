@@ -1,21 +1,19 @@
 package publicinterfaces;
 
+import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import exceptions.TestIDNotFoundException;
 import exceptions.TestStillRunningException;
 import exceptions.WrongFileTypeException;
 import gitapidependencies.HereIsYourException;
-
-import java.io.IOException;
+import gitapidependencies.RepositoryNotFoundException;
+import reportelements.Report;
+import reportelements.Status;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-
-import reportelements.Report;
-import reportelements.Status;
-
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+import java.io.IOException;
 /**
  * Provides all API functions. 
  * @author as2388
@@ -37,7 +35,7 @@ public interface TestServiceInterface {
      */
     @GET
     @Path("/runNewTest")
-    public abstract String runNewTest(@QueryParam("repoName") String repoName) throws IOException, WrongFileTypeException;
+    public abstract String runNewTest(@QueryParam("repoName") String repoName) throws IOException, WrongFileTypeException, RepositoryNotFoundException;
 
     /**
      * Returns the status of the test with ID testID if a test with testID exists, otherwise returns an error code
@@ -58,17 +56,17 @@ public interface TestServiceInterface {
      * @throws TestIDNotFoundException      No test exists for the given testID
      * @throws CheckstyleException		    Something went wrong with CheckStyle, probably due to a bad config file, but
      *                                      could be a missing file; check the exception's message
-     * @throws WrongFileTypeException	    A given test file is not a .xml or .java file
      * @throws TestStillRunningException    The test isn't complete, so there is no report to remove
+     * @throws RepositoryNotFoundException  When accessing a file from a git repo, that repo wasn't found.
      * @throws IOException                  Git API threw IOException when getting a file or TestService couldn't create and
      *                                      use temporary files
      */
     @GET
     @Path("/getReport")
     public Report getReport(@QueryParam("testID") String testID) throws TestIDNotFoundException, 
-                                                                        CheckstyleException, 
-                                                                        WrongFileTypeException, 
+                                                                        CheckstyleException,
                                                                         TestStillRunningException,
+                                                                        RepositoryNotFoundException,
                                                                         IOException;
 
     /**
