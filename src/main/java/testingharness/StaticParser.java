@@ -8,10 +8,11 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
-import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reportelements.StaticReportItem;
 
 import java.io.File;
@@ -28,7 +29,7 @@ import java.util.List;
  *
  */
 public class StaticParser {
-    static Logger log = Logger.getLogger(StaticParser.class.getName());
+    static Logger log = LoggerFactory.getLogger(StaticParser.class);
 
     /**
      * Runs Checkstyle with a given config file and .java file, and puts results into a linked list of static report items

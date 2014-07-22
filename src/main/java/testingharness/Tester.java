@@ -3,7 +3,8 @@ package testingharness;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import gitapidependencies.RepositoryNotFoundException;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reportelements.DynamicReportItem;
 import reportelements.Report;
 import reportelements.StaticReportItem;
@@ -24,7 +25,7 @@ import java.util.Map;
  *
  */
 public class Tester {
-    static Logger log = Logger.getLogger(Tester.class.getName()); //initialise log4j logger
+    static Logger log = LoggerFactory.getLogger(Tester.class); //initialise log4j logger
 
     private List<StaticReportItem> sReport = new LinkedList<>();   //list of static report items
     private List<DynamicReportItem> dReport = new LinkedList<>(); //list of dynamic report items

@@ -1,18 +1,19 @@
 package configuration;
 
-import java.io.IOException;
-import java.io.File;
-
-import org.apache.log4j.Logger;
-
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
 
 /**
  *  A configuration file loader class, set at compile time, loaded at
  *  initialisation.
  *  
- * This just a simple class to load the file {@value fileName} in the
+ * This just a simple class to load the file {@value FILENAME} in the
  * current directory and convert it into a
  * {@link configuration.ConfigurationFile}
  * class.
@@ -22,7 +23,7 @@ import com.fasterxml.jackson.databind.*;
 public class ConfigurationLoader
 {
     // initialise log4j logger
-    static Logger log = Logger.getLogger(ConfigurationLoader.class.getName());
+    static Logger log = LoggerFactory.getLogger(ConfigurationLoader.class);
     
     static public final String FILENAME = "UROP-Tester-config.json";   //location of config file
     static private File file = new File(FILENAME);

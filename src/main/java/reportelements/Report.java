@@ -1,8 +1,8 @@
 package reportelements;
 
-import java.util.List;
-
 import edu.emory.mathcs.backport.java.util.Collections;
+
+import java.util.List;
 
 /**
  * Stores all information about a report i.e. status, lists of errors, and the overall result
@@ -42,7 +42,7 @@ public class Report {
         }
     }
 
-    public Report(){};
+    public Report(){}
 
     //GETTERS AND SETTERS
     public List<StaticReportItem> getsReport() {

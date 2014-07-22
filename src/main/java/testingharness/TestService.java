@@ -8,10 +8,11 @@ import exceptions.WrongFileTypeException;
 import gitapidependencies.HereIsYourException;
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
-import org.apache.log4j.Logger;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import publicinterfaces.TestServiceInterface;
 import reportelements.Report;
 import reportelements.Status;
@@ -30,7 +31,7 @@ import java.util.*;
 // full path to here is /rest/tester/API/
 public class TestService implements TestServiceInterface {
     // initialise log4j logger
-    static Logger log = Logger.getLogger(TestService.class.getName());
+    private static Logger log = LoggerFactory.getLogger(TestService.class);
 
     /*
      * Maps the ID of a test to in-progress tests. TestService is responsible
