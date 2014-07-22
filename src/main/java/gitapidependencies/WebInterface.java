@@ -11,11 +11,6 @@ import java.util.List;
 @Path("/")
 public interface WebInterface {
     @GET
-    @Path("/git")
-    @Produces("application/json")
-    public List<String> listRepositories();
-
-    @GET
     @Path("/git/{repoName:.*}.git")
     @Produces("application/json")
     public List<String> listFiles(@PathParam("repoName") String repoName) throws IOException, RepositoryNotFoundException;

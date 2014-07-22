@@ -55,7 +55,7 @@ public class TestService implements TestServiceInterface {
         this.gitProxy = gitProxy;
         this.testerFactory = testerFactory;
         if (ticksInProgress == null) { 
-            ticksInProgress = new HashMap<String, Tester>();
+            ticksInProgress = new HashMap<>();
             log.info("ticksInProgress Initialised");
         }
     }
@@ -85,15 +85,15 @@ public class TestService implements TestServiceInterface {
         } while (ticksInProgress.containsKey(id));
         log.info(id + ": runNewTest: test creation started");
 
-        Map<String, LinkedList<String>> tests = new HashMap<String, LinkedList<String>>();
+        Map<String, LinkedList<String>> tests = new HashMap<>();
 
         // add corresponding git file to tests
         log.info(id
                 + ": runNewTest: Connecting to git API to obtain list of files in repo");
         /* Response response = gitProxy.listFiles(repoName); */
         
-        LinkedList<String> filesToTest = new LinkedList<String>();
-        LinkedList<String> staticTests = new LinkedList<String>();
+        LinkedList<String> filesToTest = new LinkedList<>();
+        LinkedList<String> staticTests = new LinkedList<>();
 
         log.info(id + ": request successful");
         List<String> filesInRepo = gitProxy.listFiles(repoName);
@@ -227,8 +227,8 @@ public class TestService implements TestServiceInterface {
     /**
      * Used for manually testing that the three main API functions work.
      * Will eventually be removed
-     * @param testID
-     * @return
+     * @param testID                    optional parameter, depending on manual test to be performed
+     * @return                          depends on test
      * @throws TestIDNotFoundException
      * @throws HereIsYourException 
      */

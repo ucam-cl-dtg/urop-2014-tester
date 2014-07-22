@@ -41,7 +41,7 @@ public class StaticParser {
      */
     public static void test(String test, String file, List<StaticReportItem> sReport, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException{
         //must be in list for .process to work
-        LinkedList<File> fileList = new LinkedList<File>();
+        LinkedList<File> fileList = new LinkedList<>();
 
         //read contents of file from git and store in a temporary file
         ResteasyClient rc = new ResteasyClientBuilder().build();
@@ -83,8 +83,13 @@ public class StaticParser {
             log.info("Finished");
         }
         finally {
-            javaFile.delete();
-            log.info("Deleted: " + javaFile.getAbsolutePath() + " = " + !(javaFile.exists()));
+            //try to delete the temp file which was created
+            if( javaFile.delete()) {
+                log.info("Deleted temp file: " + javaFile.getAbsolutePath());
+            }
+            else {
+                log.error("Failed to delete temp file: " + javaFile.getAbsoluteFile());
+            }
 
             //Close the rest easy client
             rc.close();
