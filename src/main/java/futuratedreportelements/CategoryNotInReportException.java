@@ -1,4 +1,4 @@
-package report_elements;
+package futuratedreportelements;
 
 public class CategoryNotInReportException extends Exception {
     public CategoryNotInReportException(String message) {

@@ -1,4 +1,4 @@
-package report_elements;
+package futuratedreportelements;
 
 public class CategoryAlreadyExistsException extends Exception {
     public CategoryAlreadyExistsException(String message) {

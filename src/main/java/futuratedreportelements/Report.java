@@ -1,4 +1,4 @@
-package report_elements;
+package futuratedreportelements;
 
 
 import java.util.HashMap;
@@ -39,8 +39,7 @@ public class Report {
             this.addProblem(category, severity);
         }
 
-        try
-        {
+        try {
             this.addDetail(category, filename, lineNumber, details);
         }
         catch (CategoryNotInReportException e) {
