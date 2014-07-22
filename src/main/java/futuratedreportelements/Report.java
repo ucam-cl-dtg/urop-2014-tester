@@ -1,6 +1,8 @@
 package futuratedreportelements;
 
 
+import sun.util.logging.resources.logging;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +45,7 @@ public class Report {
             this.addDetail(category, filename, lineNumber, details);
         }
         catch (CategoryNotInReportException e) {
-            //Because this function has just added the category to the report, this exception will not be raised here
+            //Because this function has just added the category to the report, this exception will not be raised here.
         }
     }
 }

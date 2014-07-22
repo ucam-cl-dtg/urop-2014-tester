@@ -104,6 +104,7 @@ public class Tester {
         log.info("Starting static analysis");
         //get static tests from testingQueue
         Map<String, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
+
         //run Static analysis on each test
         for (Map.Entry<String, LinkedList<String>> e : staticTests.entrySet()) {
             status.addProgress();
