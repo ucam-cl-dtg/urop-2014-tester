@@ -42,6 +42,7 @@ public class StaticParser {
      */
     public static void test(String test, String file, List<StaticReportItem> sReport, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException{
         //must be in list for .process to work
+    	log.info("starting to run test with URL " + test + " on file " + file);
         LinkedList<File> fileList = new LinkedList<>();
 
         //read contents of file from git and store in a temporary file
@@ -73,9 +74,7 @@ public class StaticParser {
         //in it to the linked list of static report items
         try {
             log.info("Testing: " + javaFile.getAbsolutePath());
-            Configuration config = ConfigurationLoader.loadConfiguration(
-                    configuration.ConfigurationLoader.getConfig().getGitAPIPath() 
-                    + "git/" + repoName + ".git/" + test, 
+            Configuration config = ConfigurationLoader.loadConfiguration(test, 
                     new PropertiesExpander(System.getProperties()));
             AuditListener listener = new StaticLogger(sReport,file);
             Checker c = createChecker(config, listener); 

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+    "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+
+<!-- This is a checkstyle configuration file. For descriptions of
+what the following rules do, please see the checkstyle configuration
+page at http://checkstyle.sourceforge.net/config.html.
+ -->
+ 
+ <!-- Notes: default severity for each check is error 
+ 			 the message displayed for each problem is of the format "general problem ~ advice/more detail" -->
+
+<module name="Checker">
+	<module name="TreeWalker">
+		<!-- Check that Java naming conventions are observed -->
+		<module name="AbstractClassName"> <!-- ^Abstract.*$|^.*Factory$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="ClassTypeParameterName"> <!-- ^[A-Z]$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="ConstantName"> <!-- ^[A-Z][A-Z0-9]*(_[A-Z0-9]+)*$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="LocalFinalVariableName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="LocalVariableName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="MemberName"> <!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>				
+		<module name="MethodName" > <!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>		
+		<module name="MethodTypeParameterName" > <!-- ^[A-Z]$-->
+			<property name="severity" value="warning" /> 
+		</module>
+		<module name="ParameterName" > <!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>	
+		<module name="StaticVariableName" >	<!-- ^[a-z][a-zA-Z0-9]*$ -->	
+			<property name="severity" value="warning" /> 
+		</module>		
+		<module name="TypeName" ><!-- ^[A-Z][a-zA-Z0-9]*$ -->
+			<property name="severity" value="warning" /> 
+		</module>
+	</module>
+</module>

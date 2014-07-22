@@ -1,24 +1,35 @@
 package testingharness;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
+import configuration.ConfigurationFile;
 import configuration.ConfigurationLoader;
 import exceptions.TestIDNotFoundException;
+import exceptions.TestNameNotFoundException;
 import exceptions.TestStillRunningException;
 import exceptions.WrongFileTypeException;
 import gitapidependencies.HereIsYourException;
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
+
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import publicinterfaces.TestServiceInterface;
 import reportelements.Report;
 import reportelements.Status;
 
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
+
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.*;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
@@ -32,7 +43,8 @@ import java.util.*;
 public class TestService implements TestServiceInterface {
     // initialise log4j logger
     private static Logger log = LoggerFactory.getLogger(TestService.class);
-
+    //TODO: implement database - this stores the settings for each tick that has been set
+    private static Map<String, List<String>> availableTestSettings;
     /*
      * Maps the ID of a test to in-progress tests. TestService is responsible
      * for generating unique IDs Class users are responsible for remembering the
@@ -48,6 +60,7 @@ public class TestService implements TestServiceInterface {
         if (ticksInProgress == null) {
             log.info("ticksInProgress Initialised");
             ticksInProgress = new HashMap<>();
+            availableTestSettings = new HashMap<>();
         }
     }
     
@@ -76,8 +89,8 @@ public class TestService implements TestServiceInterface {
     }
 
     /** {@inheritDoc} */
-    public String runNewTest(@QueryParam("repoName") String repoName) throws IOException, WrongFileTypeException,
-            RepositoryNotFoundException {
+    public String runNewTest(@QueryParam("repoName") String repoName, @QueryParam("testName") String testName) throws IOException, WrongFileTypeException,
+            RepositoryNotFoundException, TestNameNotFoundException {
         log.info("New test request received");
         // generate a UUID for the tester
         String id;
@@ -89,42 +102,32 @@ public class TestService implements TestServiceInterface {
         Map<String, LinkedList<String>> tests = new HashMap<>();
 
         // add corresponding git file to tests
-        log.info(id
-                + ": runNewTest: Connecting to git API to obtain list of files in repo");
         /* Response response = gitProxy.listFiles(repoName); */
         
         LinkedList<String> filesToTest = new LinkedList<>();
-        LinkedList<String> staticTests = new LinkedList<>();
-
+        
+        //collect files to test from git
+        log.info(id
+                + ": runNewTest: Connecting to git API to obtain list of files in repo");
+        filesToTest = gitProxy.listFiles(repoName);
         log.info(id + ": request successful");
-        List<String> filesInRepo = gitProxy.listFiles(repoName);
-        /* List<String> filesInRepo = gitProxy.listFiles(repoName).readEntity(List.class); */
-        log.info(id + ": runNewTest: List of files obtained");
-
-        //add files from filesInRepo to filesToTest or static tests.
-        //At the moment, we assume .xml and .java are in the same repo, 
-        // and all .java files are files to be tested
-        /*TODO: look in a different repo for the test files. This 
-                will require lots of collaboration with the git team*/
-        for (String file : filesInRepo) {
-            String ext = file.substring(file.lastIndexOf('.') + 1,
-                    file.length());
-            if (ext.equals("java")) {
-                filesToTest.add(file);
-                log.info("added java file to test : " + file);
-            } else if (ext.equals("xml")) {
-                staticTests.add(file);
-                log.info("added test file: " + file);
-            } else {
-                throw new WrongFileTypeException();
-            }
+        
+        //obtain static tests to run on files according to what tick it is
+        List<String> staticTests = new LinkedList<>();
+        
+        if(TestService.availableTestSettings.containsKey(testName)) {
+        	System.out.println("obtained test settings");
+        	staticTests = TestService.availableTestSettings.get(testName);
         }
-
+        else {
+        	throw new TestNameNotFoundException("The test requested does not exist!");
+        }
+        
         log.info(id + ": runNewTest: creating Tester object");
 
         for (String test : staticTests) {
             tests.put(test, filesToTest);
-            log.info("test added");
+            log.info("test added: " + test );
         }
 
         // create a new Tester object
@@ -246,4 +249,22 @@ public class TestService implements TestServiceInterface {
         
         //return proxy.pollStatus(testID);
     }
+
+	@Override
+	public void createNewTest(/* String testName, List<String> checkstyleOpts */) {
+		//TODO: will need name/ file exists checks
+		String testName = "exampleTest";
+		List<String> checkstyleOpts = new LinkedList<>();
+		String dir = ConfigurationLoader.getConfig().getCheckstyleResourcesPath();
+		List<String> checkstyleFiles = new LinkedList<>();
+		checkstyleOpts.add("emptyBlocks");
+		checkstyleOpts.add("longVariableDeclaration");
+		checkstyleOpts.add("unusedImports");
+		checkstyleOpts.add("TODOorFIXME");
+		for (String option : checkstyleOpts) {
+			checkstyleFiles.add(dir + option + ".xml");
+			System.out.println("added : " + dir + option + ".xml");
+		}
+		TestService.availableTestSettings.put(testName, checkstyleFiles);
+	}
 }
