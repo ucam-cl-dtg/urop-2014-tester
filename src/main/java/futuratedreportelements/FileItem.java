@@ -2,11 +2,19 @@ package futuratedreportelements;
 
 
 public class FileItem {
-    private int lineNumber;
-    private String detail;
+    private final int lineNumber;
+    private final String detail;
 
-    public FileItem(int lineNumber, String detail) {
+    protected FileItem(int lineNumber, String detail) {
         this.lineNumber = lineNumber;
         this.detail = detail;
+    }
+
+    public int getLineNumber() {
+        return lineNumber;
+    }
+
+    public String getDetail() {
+        return detail;
     }
 }
