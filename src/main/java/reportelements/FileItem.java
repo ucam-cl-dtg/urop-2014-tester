@@ -5,7 +5,7 @@ package reportelements;
  */
 
 public class FileItem {
-    private final int lineNumber;
+    private final Integer lineNumber; //Integer not int because we need the option for it to be null
     private final String detail;
 
     protected FileItem(int lineNumber, String detail) {
