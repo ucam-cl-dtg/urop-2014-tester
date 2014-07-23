@@ -2,7 +2,6 @@ package testingharness;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
-import configuration.ConfigurationFile;
 import configuration.ConfigurationLoader;
 import exceptions.TestIDNotFoundException;
 import exceptions.TestNameNotFoundException;
@@ -11,6 +10,7 @@ import exceptions.WrongFileTypeException;
 import gitapidependencies.HereIsYourException;
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
+
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -20,16 +20,12 @@ import org.slf4j.LoggerFactory;
 
 import publicinterfaces.TestServiceInterface;
 import reportelements.Report;
+import reportelements.Severity;
 import reportelements.Status;
 
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Response;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
@@ -44,7 +40,7 @@ public class TestService implements TestServiceInterface {
     // initialise log4j logger
     private static Logger log = LoggerFactory.getLogger(TestService.class);
     //TODO: implement database - this stores the settings for each tick that has been set
-    private static Map<String, List<String>> availableTestSettings;
+    private static Map<String, List<XMLTestSettings>> availableTestSettings;
     /*
      * Maps the ID of a test to in-progress tests. TestService is responsible
      * for generating unique IDs Class users are responsible for remembering the
@@ -99,7 +95,7 @@ public class TestService implements TestServiceInterface {
         } while (ticksInProgress.containsKey(id));
         log.info(id + ": runNewTest: test creation started");
 
-        Map<String, LinkedList<String>> tests = new HashMap<>();
+        Map<XMLTestSettings, LinkedList<String>> tests = new HashMap<>();
 
         // add corresponding git file to tests
         /* Response response = gitProxy.listFiles(repoName); */
@@ -111,52 +107,25 @@ public class TestService implements TestServiceInterface {
                 + ": runNewTest: Connecting to git API to obtain list of files in repo");
         filesToTest = gitProxy.listFiles(repoName);
         log.info(id + ": request successful");
-<<<<<<< HEAD
-        List<String> filesInRepo = gitProxy.listFiles(repoName);
-        /* List<String> filesInRepo = gitProxy.listFiles(repoName).readEntity(List.class); */
-        log.info(id + ": runNewTest: List of files obtained");
 
-        //add files from filesInRepo to filesToTest or static tests.
-        //At the moment, we assume .xml and .java are in the same repo, 
-        // and all .java files are files to be tested
-        /*TODO: look in a different repo for the test files. This 
-                will require lots of collaboration with the git team*/
-        for (String file : filesInRepo) {
-            //String ext = file.substring(file.lastIndexOf('.') + 1, file.length());
-
+        for (String file : filesToTest) {
             switch (FilenameUtils.getExtension(file))
             {
                 case "java":
-                    filesToTest.add(file);
                     log.info("added java file to test : " + file);
-                    break;
-                case "xml":
-                    staticTests.add(file);
-                    log.info("added test file: " + file);
                     break;
                 default:
                     throw new WrongFileTypeException();
             }
-            
-
-            /*if (ext.equals("java")) {
-                filesToTest.add(file);
-                log.info("added java file to test : " + file);
-            } else if (ext.equals("xml")) {
-                staticTests.add(file);
-                log.info("added test file: " + file);
-            } else {
-                throw new WrongFileTypeException();
-            }*/
-=======
+        }
         
         //obtain static tests to run on files according to what tick it is
-        List<String> staticTests = new LinkedList<>();
+        List<XMLTestSettings> staticTests = new LinkedList<>();
         
         if(TestService.availableTestSettings.containsKey(testName)) {
-        	System.out.println("obtained test settings");
+        	log.info("obtained test settings");
         	staticTests = TestService.availableTestSettings.get(testName);
->>>>>>> 35551a00ce30803ea86643c8803c447c1eabd712
+        	System.out.println(staticTests.size());
         }
         else {
         	throw new TestNameNotFoundException("The test requested does not exist!");
@@ -164,7 +133,7 @@ public class TestService implements TestServiceInterface {
         
         log.info(id + ": runNewTest: creating Tester object");
 
-        for (String test : staticTests) {
+        for (XMLTestSettings test : staticTests) {
             tests.put(test, filesToTest);
             log.info("test added: " + test );
         }
@@ -192,8 +161,10 @@ public class TestService implements TestServiceInterface {
             throws TestIDNotFoundException {
         log.info(testID + ": pollStatus: request received");
         if (ticksInProgress.containsKey(testID)) {
+        	Tester tester = ticksInProgress.get(testID);
             Status status = ticksInProgress.get(testID).getStatus();
             log.info(testID + ": pollStatus: returning " + status);
+            System.out.println("in tester as tests are running report has " + tester.getReport().getProblems().size() + " entries");
             return status;
         } else {
             log.error(testID + ": pollStatus: testID not found");
@@ -290,20 +261,17 @@ public class TestService implements TestServiceInterface {
     }
 
 	@Override
-	public void createNewTest(/* String testName, List<String> checkstyleOpts */) {
-		//TODO: will need name/ file exists checks
+	public void createNewTest(/* String testName, List<XMLTestSettings> checkstyleOpts */) {
 		String testName = "exampleTest";
-		List<String> checkstyleOpts = new LinkedList<>();
-		String dir = ConfigurationLoader.getConfig().getCheckstyleResourcesPath();
-		List<String> checkstyleFiles = new LinkedList<>();
-		checkstyleOpts.add("emptyBlocks");
-		checkstyleOpts.add("longVariableDeclaration");
-		checkstyleOpts.add("unusedImports");
-		checkstyleOpts.add("TODOorFIXME");
-		for (String option : checkstyleOpts) {
-			checkstyleFiles.add(dir + option + ".xml");
-			System.out.println("added : " + dir + option + ".xml");
-		}
-		TestService.availableTestSettings.put(testName, checkstyleFiles);
+		List<XMLTestSettings> checkstyleOpts = new LinkedList<>();
+		checkstyleOpts.add(new XMLTestSettings("emptyBlocks",Severity.ERROR,"empty blocks between braces"));
+		checkstyleOpts.add(new XMLTestSettings("longVariableDeclaration",Severity.WARNING,"use of 'L' to declare long"));
+		checkstyleOpts.add(new XMLTestSettings("unusedImports",Severity.WARNING,"unused imports"));
+		checkstyleOpts.add(new XMLTestSettings("TODOorFIXME",Severity.ERROR,"TODO or FIXME still in code"));
+		log.info("all tests added for " + testName);
+		TestService.availableTestSettings.put(testName, checkstyleOpts);
 	}
+	
+	//TODO: getAvailableCheckstyleTests()
+	//TODO: ? danger of repeats ? addACheckstyleTest(xml content, filename, description);
 }

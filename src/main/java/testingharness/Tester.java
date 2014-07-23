@@ -1,13 +1,14 @@
 package testingharness;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
 import gitapidependencies.RepositoryNotFoundException;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reportelements.DynamicReportItem;
+
 import reportelements.Report;
-import reportelements.StaticReportItem;
 import reportelements.Status;
 
 import java.io.IOException;
@@ -27,20 +28,19 @@ import java.util.Map;
 public class Tester {
     static Logger log = LoggerFactory.getLogger(Tester.class); //initialise log4j logger
 
-    private List<StaticReportItem> sReport = new LinkedList<>();   //list of static report items
-    private List<DynamicReportItem> dReport = new LinkedList<>(); //list of dynamic report items
     private Report report; //Report object into which all the report items will ultimately go
     private Status status; 
     private Exception failCause; //if the report fails, save it here, so that it can be thrown when the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
-    private Map<String, LinkedList<String>> testingQueue;
+    private Map<XMLTestSettings, LinkedList<String>> testingQueue;
 
     /**
      * Creates a new Tester
      */
-    public Tester(Map<String, LinkedList<String>> testingQueue, String repoName)  {
+    public Tester(Map<XMLTestSettings, LinkedList<String>> testingQueue, String repoName)  {
         this.testingQueue = testingQueue;
+        this.report = new Report();
         this.repoName = repoName;
         System.out.println(testingQueue.size());
     }
@@ -64,10 +64,6 @@ public class Tester {
                 runStaticTests();
             }           
 
-            log.info("Building report");
-            //build the final report from the static and dynamic results
-            this.report = new Report(sReport, dReport);
-
             log.info("Tick analysis finished successfully");
 
             //TODO: remove this. For now, print result to the console
@@ -89,10 +85,12 @@ public class Tester {
      */
     private void runDynamicTests()
     {
+    	/*
         log.info("Started dynamic analysis");
         Map<String, LinkedList<String>> dynamicTests = getDynamicTestItems(this.testingQueue);
         //TODO: actually run some tests
         log.info("Dynamic analysis complete");
+        */
     }
 
     /**
@@ -104,13 +102,13 @@ public class Tester {
     {
         log.info("Starting static analysis");
         //get static tests from testingQueue
-        Map<String, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
+        Map<XMLTestSettings, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
-        for (Map.Entry<String, LinkedList<String>> e : staticTests.entrySet()) {
+        for (Map.Entry<XMLTestSettings, LinkedList<String>> e : staticTests.entrySet()) {
             status.addProgress();
-            System.out.println("running test " + e);
+            System.out.println("running test " + e.getKey().getTestFile());
             runStaticAnalysis(e.getKey(), e.getValue());
-            delay(7000);
+            System.out.println("in tester the report has " + report.getProblems().size() + " items");
         }
         log.info("Static analysis complete");
     }
@@ -146,32 +144,21 @@ public class Tester {
      * @param testingQueue   Map from which to extract .xml tests
      * @return               Map containing only .xml tests
      */
-    public HashMap<String, LinkedList<String>> getStaticTestItems(Map<String, LinkedList<String>> testingQueue)
+    public HashMap<XMLTestSettings, LinkedList<String>> getStaticTestItems(Map<XMLTestSettings, LinkedList<String>> testingQueue)
     {
-        HashMap<String, LinkedList<String>> mapReturn = new HashMap<>();
-        for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
-            if ("xml".equals(FilenameUtils.getExtension(e.getKey()))) {
+        HashMap<XMLTestSettings, LinkedList<String>> mapReturn = new HashMap<>();
+        for (Map.Entry<XMLTestSettings, LinkedList<String>> e : testingQueue.entrySet()) {
+            if ("xml".equals(FilenameUtils.getExtension(e.getKey().getTestFile()))) {
                 mapReturn.put(e.getKey(), e.getValue());
             }
         }
         return mapReturn;
     }
 
-    //TODO: remove. Currently used for simulating delays
-    private void delay(int timeMS)
-    {
-        try  {
-            Thread.sleep(timeMS);
-        }
-        catch (InterruptedException err) {
-            err.printStackTrace();
-        }
-    }
-
     private void printReport()
     {
         //print the overall test result
-        System.out.println("Your result: " + report.getResult());
+       /* System.out.println("Your result: " + report.getResult());
         System.out.println();
 
         //Print each error
@@ -180,8 +167,8 @@ public class Tester {
             for (int l : i.getLineNumbers()) {
                 System.out.print(l + ", ");		//print the line numbers of ass the instances on which this particular error was found
             }
-            System.out.println(i.getMessage());
-        }		
+            System.out.println(i.getMessage()); 
+        }		*/
     }
 
     /**
@@ -192,10 +179,8 @@ public class Tester {
      * @throws CheckstyleException	
      * @throws IOException 
      */
-    public void runStaticAnalysis(String configFileName, List<String> fileNames) throws CheckstyleException, IOException, RepositoryNotFoundException {
-        for (String file : fileNames) {
-            StaticParser.test(configFileName, file, this.sReport, repoName);
-        }
+    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames) throws CheckstyleException, IOException, RepositoryNotFoundException {
+           StaticParser.test(configFileName, fileNames, report, repoName);
     }
 
     //GETTERS
@@ -210,6 +195,7 @@ public class Tester {
     }
 
     public Report getReport() {
+    	report.calculateProblemStatuses();
         return report;
     }
 

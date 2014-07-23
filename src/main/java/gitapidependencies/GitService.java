@@ -15,13 +15,12 @@ public class GitService implements WebInterface {
     public LinkedList<String> listFiles(String repoName) throws IOException, RepositoryNotFoundException{
         LinkedList<String> files = new LinkedList<>();
         //add files here!
-        
         return files;
     }   
     
     public String getFile(String fileName, String repoName)
             throws IOException {
-    	BufferedReader br = new BufferedReader(new FileReader(/* path */ fileName));
+    	BufferedReader br = new BufferedReader(new FileReader(/* pathname here */ fileName));
     	String output = "";
     	String line;
     	while ((line = br.readLine()) != null) {

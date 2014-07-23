@@ -1,5 +1,8 @@
-package futuratedreportelements;
+package reportelements;
 
+/*
+ * stores details of where a problem was found in a file and describes in more detail the problem found
+ */
 
 public class FileItem {
     private final int lineNumber;

@@ -6,14 +6,17 @@ import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
+
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
+
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import reportelements.StaticReportItem;
+
+import reportelements.Report;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,57 +43,60 @@ public class StaticParser {
      * @throws CheckstyleException      
      * @throws IOException              
      */
-    public static void test(String test, String file, List<StaticReportItem> sReport, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException{
+    public static void test(XMLTestSettings test, List<String> files, Report report, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException{
         //must be in list for .process to work
-    	log.info("starting to run test with URL " + test + " on file " + file);
+    	log.info("starting to run test with URL " + test.getTestFile());
         LinkedList<File> fileList = new LinkedList<>();
 
-        //read contents of file from git and store in a temporary file
+        //read contents of file from git and store all files to test in temporary files
         ResteasyClient rc = new ResteasyClientBuilder().build();
-        		
         ResteasyWebTarget t = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
         WebInterface proxy = t.proxy(WebInterface.class);
-        String contents = proxy.getFile(file, repoName);
-
-        File javaFile = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
-        log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
-
-        //write string to temp file
-        log.info("writing data to " + javaFile.getAbsolutePath());
-        FileOutputStream output = new FileOutputStream(javaFile.getAbsolutePath());
-        byte[] bytes = contents.getBytes();
-        output.write(bytes);
-        output.flush();
-        output.close();
-
-        if (javaFile.exists()){
-            fileList.add(javaFile);
-        }
-        else {
-            throw new IOException("Could not find file: " + file);
+        
+        for (String file : files) {
+	        String contents = proxy.getFile(file, repoName);
+	
+	        File javaFile = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
+	        log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
+	
+	        //write string to temp file
+	        log.info("writing data to " + javaFile.getAbsolutePath());
+	        FileOutputStream output = new FileOutputStream(javaFile.getAbsolutePath());
+	        byte[] bytes = contents.getBytes();
+	        output.write(bytes);
+	        output.flush();
+	        output.close();
+	
+	        if (javaFile.exists()){
+	            fileList.add(javaFile);
+	        }
+	        else {
+	            throw new IOException("Could not find file: " + file);
+	        }
         }
 
         //test the java file and use the listener to add each line with an error
         //in it to the linked list of static report items
         try {
-            log.info("Testing: " + javaFile.getAbsolutePath());
-            Configuration config = ConfigurationLoader.loadConfiguration(test, 
+            log.info("Testing: java files");
+            Configuration config = ConfigurationLoader.loadConfiguration(test.getTestFile(), 
                     new PropertiesExpander(System.getProperties()));
-            AuditListener listener = new StaticLogger(sReport,file);
+            AuditListener listener = new StaticLogger(report,test);
             Checker c = createChecker(config, listener); 
             c.process(fileList); 
             c.destroy();
             log.info("Finished");
         }
         finally {
-            //try to delete the temp file which was created
-            if( javaFile.delete()) {
-                log.info("Deleted temp file: " + javaFile.getAbsolutePath());
-            }
-            else {
-                log.error("Failed to delete temp file: " + javaFile.getAbsoluteFile());
-            }
-
+            //try to delete all the temp files that were created
+        	for (File javaFile : fileList) {
+	            if( javaFile.delete()) {
+	                log.info("Deleted temp file: " + javaFile.getAbsolutePath());
+	            }
+	            else {
+	                log.error("Failed to delete temp file: " + javaFile.getAbsoluteFile());
+	            }
+        	}
             //Close the rest easy client
             rc.close();
         }

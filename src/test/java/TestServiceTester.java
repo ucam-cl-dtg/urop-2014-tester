@@ -1,11 +1,14 @@
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
+
 import exceptions.TestIDNotFoundException;
 import exceptions.TestStillRunningException;
 import exceptions.WrongFileTypeException;
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
+
 import org.easymock.EasyMock;
 import org.junit.Test;
+
 import reportelements.Report;
 import reportelements.Status;
 import testingharness.TestService;
