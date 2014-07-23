@@ -21,7 +21,7 @@ public class ProblemCategory {
      * @param detail        More specific problem description e.g. java.io.StreamReader, expected
      *                      12 spaces, found 16
      */
-    protected void addDetail(String filename, int lineNumber, String detail) {
+    protected void addDetail(String filename, Integer lineNumber, String detail) {
         if (!(fileDetails.containsKey(filename))) {
             fileDetails.put(filename, new LinkedList<FileItem>());
         }

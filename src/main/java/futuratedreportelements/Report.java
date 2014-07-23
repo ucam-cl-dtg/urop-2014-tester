@@ -50,7 +50,7 @@ public class Report {
      * @throws CategoryNotInReportException Thrown if the category into which the new details should go does not exist
      *                                      in this report
      */
-    public void addDetail(String category, String filename, int lineNumber, String details)
+    public void addDetail(String category, String filename, Integer lineNumber, String details)
             throws CategoryNotInReportException {
         if (problems.containsKey(category))
         {
@@ -75,7 +75,7 @@ public class Report {
      * @param details       More specific problem description e.g. java.io.StreamReader, expected
      *                      12 spaces, found 16
      */
-    public void addDetail(String category, Severity severity, String filename, int lineNumber, String details)  {
+    public void addDetail(String category, Severity severity, String filename, Integer lineNumber, String details)  {
         if (!(problems.containsKey(category))) {
             this.addProblem(category, severity);
         }
@@ -86,6 +86,14 @@ public class Report {
         catch (CategoryNotInReportException e) {
             //Because this function has just added the category to the report, this exception will not be raised here.
         }
+    }
+
+    /**
+     * Adds a new category which has no problems
+     * @param category     General problem description e.g. unused import, bad indentation
+     */
+    public void addDetail(String category) {
+        addDetail(category, null, null, null, null);
     }
 
     public ReportResult getReportResult() {
