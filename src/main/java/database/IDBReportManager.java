@@ -1,7 +1,7 @@
 package database;
 
 
-import futuratedreportelements.AbstractReport;
+import reportelements.AbstractReport;
 
 import java.util.List;
 

@@ -1,13 +1,9 @@
 package database;
 
-import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
-import com.mongodb.DBObject;
 
-import futuratedreportelements.AbstractReport;
-import futuratedreportelements.SimpleReport;
+import reportelements.AbstractReport;
 
-import org.apache.velocity.app.event.ReferenceInsertionEventHandler;
 import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

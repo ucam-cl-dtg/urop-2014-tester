@@ -1,9 +1,8 @@
-package futuratedreportelements;
+package reportelements;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.LinkedList;
-import java.util.List;
 
 public class SimpleReport extends AbstractReport {
     private LinkedList<SimpleReportItem> items = new LinkedList<>();

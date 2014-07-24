@@ -3,9 +3,9 @@ package testingharness;
 import database.IDBReportManager;
 import database.Mongo;
 import database.MongoDBReportManager;
-import futuratedreportelements.AbstractReport;
+import reportelements.AbstractReport;
 import futuratedreportelements.Severity;
-import futuratedreportelements.SimpleReport;
+import reportelements.SimpleReport;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

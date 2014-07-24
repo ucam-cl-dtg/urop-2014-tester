@@ -1,16 +1,22 @@
-package futuratedreportelements;
+package reportelements;
 
 
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+/*
+ * class stores details about where instances of the problem being looked for in the code appears (if anywhere)
+ */
 
-public class ProblemCategory {
+public class ProblemDetails {
+	//hypothetical severity of the problem in case it is found in the code
     private final Severity severity;
+    //stores files where the corresponding problem was found (the string)  with the details describing where it is (the FileItem)
+    //note this map is empty if all given java files pass the test for the problem being checked for
     private Map<String, List<FileItem>> fileDetails = new HashMap<>();
 
-    protected ProblemCategory(Severity severity) {
+    protected ProblemDetails(Severity severity) {
         this.severity = severity;
     }
 

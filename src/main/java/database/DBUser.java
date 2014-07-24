@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import futuratedreportelements.AbstractReport;
-import sun.org.mozilla.javascript.internal.annotations.JSSetter;
+import reportelements.AbstractReport;
 
 import java.util.HashMap;
 import java.util.List;

@@ -1,8 +1,8 @@
 package testingharness;
 
-import java.util.List;
-
-import reportelements.StaticReportItem;
+import reportelements.CategoryNotInReportException;
+import reportelements.Report;
+import reportelements.Severity;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
@@ -17,16 +17,20 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
  */
 public class StaticLogger implements AuditListener
 {
-    List<StaticReportItem> output;	//reference to the list in the report containing the static report items
-    String fileName;
+    private Report report;	//reference to the list in the report containing the static report items
+    private String testDef;
+    private Severity severity;
     /**
      * Constructor for StaticLogger
      * @param output List where generated report items will go.
      */
-    public StaticLogger(List<StaticReportItem> output, String file)
+    public StaticLogger(Report report , XMLTestSettings test)
     {
-        this.output = output;
-        this.fileName = file;
+        this.report = report;
+        this.testDef = test.getTestDefinition();
+        this.severity = test.getSeverity();
+        System.out.println("added " + testDef + " to report");
+        report.addProblem(this.testDef,this.severity);
     }
 
     /**
@@ -37,45 +41,28 @@ public class StaticLogger implements AuditListener
     @Override
     public void addError(AuditEvent event)
     {
-        String fileName = this.fileName;
-
-        //split the message into the problem and detail components (by splitting the message about the tilde symbol)
-        //At the moment, remove the apostrophes (which CheckStyle insists on putting around parameters).
-        //	TODO: these could ultimately be left in and replaced with <em> tags by the UI team
-        String[] messages = event.getMessage().replaceAll("\'", "").split(" ~ ");
-
-        //extract the problem and, if it exists, the detail
-        String problem = messages[0];
-        String detail = "";
-        if (messages.length > 1) {
-            detail = messages[1];
-        }
-
-        //search to see if the message has already been found. If it has, add the line number to the existing sReportItem
-        boolean exists = false;
-        for (StaticReportItem i : output) {
-            if (i.getFileName().equals(fileName) & i.getProblem().equals(problem) & i.getDetail().equals(detail)) {
-                exists = true;
-                i.addErrorAtLine(event.getLine());
-            }
-        }
-
-        //if the message has not been found, create a new report item
-        if (!exists) {
-            StaticReportItem newItem = new StaticReportItem(event.getSeverityLevel().toString(),fileName,event.getLine(),problem,detail);							
-            //add the item to the linked list in the report
-            output.add(newItem);
-        }
+        try {
+        	//want to remove random number at the end of the temp file
+        	//note this means no .java file submitted can contain a number!
+        	String file = event.getFileName().replaceAll("[0-9]","");
+        	String fileInput = file.substring(file.lastIndexOf("\\")+1,file.length());
+			report.addDetail(testDef,fileInput,event.getLine(),event.getMessage());
+			System.out.println("checkstyles found something!");
+		} catch (CategoryNotInReportException e) {
+			// TODO how to handle?
+			e.printStackTrace();
+		}
     }
-
+    //TODO: what is this???
     @Override
-    public void addException(AuditEvent arg0, Throwable arg1)
+    public void addException(AuditEvent event, Throwable t){}
+    /*
     {
-        String fileName = this.fileName;
+        String fileName = event.getFileName();
         String problem = "Malformed java";
         String detail = "";
 
-        System.out.println("ERR MSG: " + arg0.getMessage());
+        System.out.println("ERR MSG: " + event.getMessage());
 
         //search to see if the message has already been found. If it has, add the line number to the existing sReportItem
         boolean exists = false;
@@ -93,9 +80,12 @@ public class StaticLogger implements AuditListener
             output.add(newItem);
         }
     }
+    */
 
     //The following four functions are needed to implement AuditListener, but we have no use for them
-    @Override public void auditFinished(AuditEvent arg0){}
+    @Override public void auditFinished(AuditEvent arg0){
+    	System.out.println("test complete now report has " + report.getProblems().size() + " items!");
+    }
     @Override public void auditStarted(AuditEvent arg0){}
     @Override public void fileFinished(AuditEvent arg0){}
     @Override public void fileStarted(AuditEvent arg0){}

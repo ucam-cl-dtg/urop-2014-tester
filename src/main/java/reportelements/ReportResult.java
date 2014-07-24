@@ -1,4 +1,4 @@
-package futuratedreportelements;
+package reportelements;
 
 public enum ReportResult {
     PASS, FAIL

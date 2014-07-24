@@ -1,71 +1,128 @@
 package reportelements;
 
+import java.util.LinkedList;
+import java.util.List;
 import edu.emory.mathcs.backport.java.util.Collections;
 
-import java.util.List;
-
 /**
- * Stores all information about a report i.e. status, lists of errors, and the overall result
- * <p>
- * Users of this class should poll status to check when the report is complete
- * 
- * @author kls82
- *
+ * Maintains all details about a report, and provides methods to update and retrieve report data
  */
 public class Report {
-    private List<StaticReportItem> sReport;	//list of static analysis report items
-    private List<DynamicReportItem> dReport;	//list of dynamic analysis report items
-    private String result;				//Overall PASS/FAIL/UNDETERMINED
+    private ReportResult reportResult = ReportResult.PASS; //default to PASS. addDetail() and addProblem() will change to FAIL if an item
+                                         //with severity ERROR is added
+    private List<Problem> problemsTestedFor = new LinkedList<>(); //list storing all problems looked for (also see what each Problem holds)
 
     /**
-     * Constructor for a successfully completed report
-     * @param sReport	list of static report items to be inserted into the report
-     * @param dReport	list of dynamic report items to be inserted into the report
+     * Create a new problem object to add to this report
+     * @param category  General problem description e.g. unused import, bad indentation
+     * @param severity  Either error or warning
      */
-    public Report(List<StaticReportItem> sReport, List<DynamicReportItem> dReport) {
-        this.sReport = sReport;
-        this.dReport = dReport;
+    public void addProblem(String category, Severity severity) {
+        problemsTestedFor.add(new Problem(category, new ProblemDetails(severity)));
+    }
 
-        //Handle static reports
-        Collections.sort(sReport);
-        //If the severity of any problem found by CheckStyle is an error, then fail the student
-        for (StaticReportItem s : sReport) {
-            if (s.getSeverity().equals("error")) {
-                this.result = "FAIL";
-            }
+    /**
+     * Add an existing problem object to this report
+     * @param category                          General problem description e.g. unused import, bad indentation
+     * @param problem                           Existing problem object to add
+     * @throws CategoryAlreadyExistsException   Thrown if the problem object to add already exists in the report
+     */
+    public void addProblem(String category, ProblemDetails problem) throws CategoryAlreadyExistsException {
+        for (Problem t : problemsTestedFor) {
+        	if (t.getCategory().equals(category)) {
+        		throw new CategoryAlreadyExistsException(category);
+        	}
         }
+        problemsTestedFor.add(new Problem(category, problem));
 
-        //TODO: Handle dynamic reports
-
-        if (this.result == null) {
-            this.result = "PASS";
+        //check if this problem should set the status to fail
+        if (problem.causesFail()) {
+            reportResult = ReportResult.FAIL;
         }
     }
 
-    public Report(){}
+    /**
+     * Adds a new problem detail to an existing report
+     * @param category                      General problem description e.g. unused import, bad indentation
+     * @param filename                      Name of the file in which the problem was found
+     * @param lineNumber                    Line number within the file where the problem was found
+     * @param details                       More specific problem description e.g. java.io.StreamReader, expected
+     *                                      12 space, found 16
+     * @throws CategoryNotInReportException Thrown if the category into which the new details should go does not exist
+     *                                      in this report
+     */
+    public void addDetail(String category, String filename, int lineNumber, String details)
+            throws CategoryNotInReportException {
+    	boolean found = false;
+    	for (Problem t : problemsTestedFor) {
+        	if (t.getCategory().equals(category)) {
+        		found = true;
+        		t.getProblems().addDetail(filename, lineNumber, details);
 
-    //GETTERS AND SETTERS
-    public List<StaticReportItem> getsReport() {
-        return sReport;
+                if (t.getProblems().getSeverity() == Severity.ERROR) {
+                    reportResult = ReportResult.FAIL;
+                }
+        	}
+        }
+	    if (!found) {
+	    	throw new CategoryNotInReportException(category);
+	    }
     }
 
-    public void setsReport(List<StaticReportItem> sReport) {
-        this.sReport = sReport;
+    /**
+     * Adds a new problem detail to an existing report if the problem already exists, otherwise creates a new problem
+     * object and adds a new problem to that.
+     * @param category      General problem description e.g. unused import, bad indentation
+     * @param severity      Either error or warning
+     * @param filename      Name of the file in which the problem was found
+     * @param lineNumber    Line number within the file where the problem was found
+     * @param details       More specific problem description e.g. java.io.StreamReader, expected
+     *                      12 spaces, found 16
+     */
+    public void addDetail(String category, Severity severity, String filename, int lineNumber, String details)  {
+    	boolean found = false;
+    	for (Problem t : problemsTestedFor) {
+	       	if (t.getCategory().equals(category)) {
+	       		found = true;
+	       	}
+    	}
+	    if (!found) {
+	    	problemsTestedFor.add(new Problem(category,severity));
+	    }
+        try {
+            this.addDetail(category, filename, lineNumber, details);
+        }
+        catch (CategoryNotInReportException e) {
+            //Because this function has just added the category to the report, this exception will not be raised here.
+        }
     }
 
-    public List<DynamicReportItem> getdReport() {
-        return dReport;
+    public ReportResult getReportResult() {
+        return reportResult;
     }
 
-    public void setdReport(List<DynamicReportItem> dReport) {
-        this.dReport = dReport;
+    public List<Problem> getProblems() {
+        return problemsTestedFor;
     }
-
-    public String getResult() {
-        return this.result;
-    }
-
-    public void setResult(String result) {
-        this.result = result;
+    
+    /*
+     * calculates what tests parts/problems were passed, failed or got a warning
+     */
+    public void calculateProblemStatuses() {
+		for (Problem e : problemsTestedFor)
+		{
+		    if (e.getProblems().getFileDetails().size() > 0) {
+		    	if (e.getProblems().getSeverity() == Severity.ERROR) {
+	            	e.setOutcome(Outcome.ERROR);
+	            }
+	            else {
+	            	e.setOutcome(Outcome.WARNING);
+	            }
+		    }
+		    else {
+		    	e.setOutcome(Outcome.PASS);
+		    }
+		}
+		Collections.sort(problemsTestedFor);
     }
 }

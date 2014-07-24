@@ -1,9 +1,8 @@
-package futuratedreportelements;
+package reportelements;
 
 import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import sun.print.resources.serviceui;
 
 @JsonDeserialize(as=SimpleReport.class)
 public abstract class AbstractReport {

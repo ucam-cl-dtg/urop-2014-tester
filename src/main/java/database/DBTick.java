@@ -1,7 +1,7 @@
 package database;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import futuratedreportelements.AbstractReport;
+import reportelements.AbstractReport;
 
 import java.util.LinkedList;
 import java.util.List;

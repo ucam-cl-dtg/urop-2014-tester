@@ -1,12 +1,9 @@
 package publicinterfaces;
 
-import futuratedreportelements.AbstractReport;
-import futuratedreportelements.Report;
+import reportelements.AbstractReport;
 import reportelements.Status;
 
 import javax.ws.rs.*;
-
-import database.DBUser;
 
 import java.util.List;
 

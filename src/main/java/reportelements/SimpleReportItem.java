@@ -1,4 +1,4 @@
-package futuratedreportelements;
+package reportelements;
 
 public class SimpleReportItem {
     private String category;
