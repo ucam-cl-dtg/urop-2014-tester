@@ -19,7 +19,6 @@ public class SimpleReport extends AbstractReport {
         }
     }
 
-
     //for JSON serialisation
     public LinkedList<SimpleReportItem> getItems() {
         return items;

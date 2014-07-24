@@ -51,8 +51,8 @@ public class TestServiceTwo implements ITestService {
     @Override
     public void runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName, @QueryParam("commitId") final String commitId)
-            throws TestStillRunningException, IOException, RepositoryNotFoundException, WrongFileTypeException,
-            TestIDNotFoundException {
+            throws IOException, RepositoryNotFoundException, WrongFileTypeException,
+            TestStillRunningException, TestIDNotFoundException {
     	Map<XMLTestSettings, LinkedList<String>> tests = new HashMap<>();
 
         // add corresponding git file to tests
@@ -73,6 +73,8 @@ public class TestServiceTwo implements ITestService {
                     log.info("added java file to test : " + file);
                     break;
                 default:
+                    //TODO: should we really  be throwing an exception? Isn't it conceivable that a student's repo might contain
+                    //a non .java file? (1A Java tick 1 needs a .txt file, for example)
                     throw new WrongFileTypeException();
             }
         }
@@ -93,8 +95,8 @@ public class TestServiceTwo implements ITestService {
         // add the object to the list of in-progress tests
         //this key should be unique as they shouldn't be able to run the same tests more than once
         //at the same time
-        if (!ticksInProgress.containsKey(crsId+tickId)) {
-        	ticksInProgress.put(crsId+tickId, tester);
+        if (!ticksInProgress.containsKey(crsId + tickId)) {
+        	ticksInProgress.put(crsId + tickId, tester);
         }
         else {
         	throw new TestStillRunningException("You can't submit this tick as you already have the same one running");
