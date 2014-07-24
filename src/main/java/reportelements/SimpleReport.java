@@ -7,7 +7,7 @@ import java.util.LinkedList;
 public class SimpleReport extends AbstractReport {
     private LinkedList<SimpleReportItem> items = new LinkedList<>();
 
-    public SimpleReport() {};
+    public SimpleReport() {}
 
     /** {@inheritDoc} */
     @Override

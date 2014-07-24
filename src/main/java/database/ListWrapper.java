@@ -21,7 +21,7 @@ public class ListWrapper {
         this.elements = elements;
     }
 
-    public ListWrapper() {};
+    public ListWrapper() {}
 
     public List<XMLTestSettings> getElements() {
         return elements;

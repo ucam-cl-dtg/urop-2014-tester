@@ -24,7 +24,7 @@ public abstract class AbstractReport {
      */
     public abstract void addDetail(String category, Severity severity, String filename, Integer lineNumber, String details);
 
-    public AbstractReport() {};
+    public AbstractReport() {}
 
     public Date getCreationDate() {
         return creationDate;
