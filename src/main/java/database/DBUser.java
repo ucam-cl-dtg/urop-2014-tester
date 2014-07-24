@@ -3,6 +3,7 @@ package database;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import exceptions.TickNotInDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reportelements.AbstractReport;
@@ -47,7 +48,7 @@ public class DBUser {
      * Returns the last report added to a given tick.
      * @param tickId                Unique identifier of tick to look up last report from
      * @return                      Last report added
-     * @throws TickNotInDBException Thrown if the tick wasn't found in the database
+     * @throws exceptions.TickNotInDBException Thrown if the tick wasn't found in the database
      */
     @JsonIgnore
     public AbstractReport getLastReport(String tickId) throws TickNotInDBException {

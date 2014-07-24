@@ -1,16 +1,5 @@
-import static org.junit.Assert.*;
-
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-
-import org.junit.Test;
-
-import testingharness.Tester;
-
-
 public class TesterTester {
-    @Test
+   /* @Test
     public void testGetTestItemsJavaNormal()
     {
         String[] inputPaths = {"Aconfig1.xml", "Bfile1.java", "Zfile2.java", "Qfile3.java", "YConfig.xml"};
@@ -90,5 +79,5 @@ public class TesterTester {
             map.put(paths[i], new LinkedList<String>());
         }
         return map;
-    }
+    } */
 }

@@ -1,4 +1,4 @@
-package database;
+package exceptions;
 
 public class TickNotInDBException extends Exception {
     public TickNotInDBException(String message) {

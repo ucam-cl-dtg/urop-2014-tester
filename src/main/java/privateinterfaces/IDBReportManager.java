@@ -1,6 +1,8 @@
-package database;
+package privateinterfaces;
 
 
+import exceptions.TickNotInDBException;
+import exceptions.UserNotInDBException;
 import reportelements.AbstractReport;
 
 import java.util.List;
@@ -25,8 +27,8 @@ public interface IDBReportManager {
      * @param crsId                 Id of user to get report from
      * @param tickId                Id of tick to get report from
      * @return                      Last added report
-     * @throws UserNotInDBException Thrown if user with id crsId was not found in the database
-     * @throws TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
+     * @throws exceptions.UserNotInDBException Thrown if user with id crsId was not found in the database
+     * @throws exceptions.TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
      */
     public AbstractReport getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
 

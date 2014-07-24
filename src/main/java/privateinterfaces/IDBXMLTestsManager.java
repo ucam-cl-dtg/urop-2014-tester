@@ -1,34 +1,39 @@
 package privateinterfaces;
 
-import java.util.List;
+import exceptions.TestIDAlreadyExistsException;
+import exceptions.TestIDNotFoundException;
+import testingharness.XMLTestSettings;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import java.util.List;
 
-import exceptions.TestIDNotFoundException;
-import testingharness.XMLTestSettings;
-
+/**
+ * @author kls82
+ */
 @Path("/accessTests")
-public interface MongoTestsInterface {
+public interface IDBXMLTestsManager {
 	/**
      * creates a new test and stores its settings for access later
      *
-     * @param tickId	unique Id of the tick being created
+     * @param tickId	            unique Id of the tick being created
+     * @param staticTestSettings    settings to insert into database
      */
 	@GET
     @Path("addNewTest/{tickId}")
-    public void addNewTest(@PathParam("tickId") String tickId , List<XMLTestSettings> staticTestSettings);
+    public void addNewTest(@PathParam("tickId") String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDAlreadyExistsException;
 
 	/**
      * edits an existing test if it is stored - if it is not found an exception is thrown
      *
-     * @param tickId	unique Id of the tick being edited
+     * @param tickId	                    unique Id of the tick being edited
+     * @param staticTestSettings            settings to insert into database
      * @throws TestIDNotFoundException		if testId doesn't exist
      */
     @GET
     @Path("editExistingTest/{tickId}")
-    public void editExistingTest (@PathParam("tickId") String tickId) throws TestIDNotFoundException;
+    public void update(@PathParam("tickId") String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDNotFoundException;
 
     /**
      * deletes an existing test if it is stored - if it is not found an exception is thrown

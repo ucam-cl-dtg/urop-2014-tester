@@ -6,8 +6,9 @@ import testingharness.XMLTestSettings;
 
 import javax.ws.rs.*;
 
-import database.TickNotInDBException;
-import database.UserNotInDBException;
+import exceptions.TestIDAlreadyExistsException;
+import exceptions.TickNotInDBException;
+import exceptions.UserNotInDBException;
 import exceptions.TestIDNotFoundException;
 import exceptions.TestStillRunningException;
 import exceptions.WrongFileTypeException;
@@ -64,5 +65,5 @@ public interface ITestService {
     
     @GET
     @Path("/createNewTest/{tickId}")
-	void createNewTest(@PathParam("tickId") String tickId, List<XMLTestSettings> checkstyleOpts);
+	void createNewTest(@PathParam("tickId") String tickId, List<XMLTestSettings> checkstyleOpts) throws TestIDAlreadyExistsException;
 }

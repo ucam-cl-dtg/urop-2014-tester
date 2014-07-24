@@ -1,7 +1,8 @@
 package testingharness;
 
-import reportelements.Severity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import configuration.ConfigurationLoader;
+import reportelements.Severity;
 
 public class XMLTestSettings {
 	private String testFile;
@@ -29,7 +30,31 @@ public class XMLTestSettings {
 		return testDefinition;
 	}
 
+    @JsonIgnore
 	public boolean isDefault() {
 		return defaultSettings;
 	}
+
+    //for JSON serialisation
+    public XMLTestSettings() {}
+
+    public boolean getDefaultSettings() {
+        return defaultSettings;
+    }
+
+    public void setDefaultSettings(boolean defaultSettings) {
+        this.defaultSettings = defaultSettings;
+    }
+
+    public void setSeverity(Severity severity) {
+        this.severity = severity;
+    }
+
+    public void setTestDefinition(String testDefinition) {
+        this.testDefinition = testDefinition;
+    }
+
+    public void setTestFile(String testFile) {
+        this.testFile = testFile;
+    }
 }

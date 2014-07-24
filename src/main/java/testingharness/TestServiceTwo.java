@@ -1,10 +1,10 @@
 package testingharness;
 
-import database.IDBReportManager;
 import database.Mongo;
 import database.MongoDBReportManager;
-import database.TickNotInDBException;
-import database.UserNotInDBException;
+import exceptions.TestIDAlreadyExistsException;
+import exceptions.TickNotInDBException;
+import exceptions.UserNotInDBException; 
 import exceptions.TestIDNotFoundException;
 import exceptions.TestStillRunningException;
 import exceptions.WrongFileTypeException;
@@ -12,7 +12,6 @@ import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
 import reportelements.AbstractReport;
 import reportelements.Severity;
-import reportelements.SimpleReport;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -21,7 +20,9 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import privateinterfaces.MongoTestsInterface;
+import privateinterfaces.IDBXMLTestsManager;
+
+import privateinterfaces.IDBReportManager;
 import publicinterfaces.ITestService;
 import reportelements.Status;
 
@@ -29,13 +30,16 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class TestServiceTwo implements ITestService {
     // initialise log4j logger
     private static Logger log = LoggerFactory.getLogger(TestServiceTwo.class);
     private static final IDBReportManager db = new MongoDBReportManager(Mongo.getDb());
-    private static final MongoTestsInterface testProxy;
+    private static final IDBXMLTestsManager testProxy;
     private static final WebInterface gitProxy;
     private static Map<String,Tester> ticksInProgress = new HashMap<String,Tester>();
     
@@ -44,7 +48,7 @@ public class TestServiceTwo implements ITestService {
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 	    
 	    ResteasyWebTarget forTests = rc.target(configuration.ConfigurationLoader.getConfig().getDatabaseTestsPath());
-	    testProxy = forTests.proxy(MongoTestsInterface.class);
+	    testProxy = forTests.proxy(IDBXMLTestsManager.class);
 	    
 	    ResteasyWebTarget forGit = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
 	    gitProxy = forGit.proxy(WebInterface.class);
@@ -146,7 +150,7 @@ public class TestServiceTwo implements ITestService {
     }
     
     @Override
-	public void createNewTest(@PathParam("tickId") String tickId, List<XMLTestSettings> checkstyleOpts) {
+	public void createNewTest(@PathParam("tickId") String tickId, List<XMLTestSettings> checkstyleOpts) throws TestIDAlreadyExistsException {
 		String testName = "exampleTest";
 		List<XMLTestSettings> checkstyleOptsTemp = new LinkedList<>();
 		checkstyleOptsTemp.add(new XMLTestSettings("emptyBlocks",Severity.ERROR,"empty blocks between braces"));

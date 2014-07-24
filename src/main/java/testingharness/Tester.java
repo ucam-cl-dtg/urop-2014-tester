@@ -5,15 +5,10 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import gitapidependencies.RepositoryNotFoundException;
 
 import org.apache.commons.io.FilenameUtils;
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import privateinterfaces.MongoTestsInterface;
 import reportelements.Report;
-import reportelements.SimpleReport;
 import reportelements.Status;
 
 import java.io.IOException;
