@@ -2,9 +2,18 @@ package publicinterfaces;
 
 import reportelements.AbstractReport;
 import reportelements.Status;
+import testingharness.XMLTestSettings;
 
 import javax.ws.rs.*;
 
+import database.TickNotInDBException;
+import database.UserNotInDBException;
+import exceptions.TestIDNotFoundException;
+import exceptions.TestStillRunningException;
+import exceptions.WrongFileTypeException;
+import gitapidependencies.RepositoryNotFoundException;
+
+import java.io.IOException;
 import java.util.List;
 
 @Path("/testerAPI/v2/")
@@ -14,7 +23,7 @@ public interface ITestService {
     @GET //TODO: change to POST (GET is being used for testing)
     @Path("/{crsId}/{tickId}/{repoName}")
     public void runNewTest(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId,
-                           @PathParam("repoName") String repoName);
+                           @PathParam("repoName") String repoName, @QueryParam("commitId") String commitId) throws TestStillRunningException, IOException, RepositoryNotFoundException, WrongFileTypeException, TestIDNotFoundException;
 
     //TODO: should we also do a GET for this?
 
@@ -30,14 +39,16 @@ public interface ITestService {
      * @param crsId
      * @param tickId
      * @return
+     * @throws TickNotInDBException 
+     * @throws UserNotInDBException 
      */
     @GET
     @Path("/{crsId}/{tickId}/last")
-    public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId);
+    public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId) throws UserNotInDBException, TickNotInDBException;
 
     @GET
     @Path("/{crsId}/{tickId}/all")
-    public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId);
+    public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId) throws UserNotInDBException, TickNotInDBException;
 
     @DELETE
     @Path("/{crsId}")
@@ -50,4 +61,8 @@ public interface ITestService {
     @DELETE
     @Path("/{crsId}/{tickId}/{TODO}")
     public void deleteStudentTickCommit(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId);
+    
+    @GET
+    @Path("/createNewTest/{tickId}")
+	void createNewTest(@PathParam("tickId") String tickId, List<XMLTestSettings> checkstyleOpts);
 }

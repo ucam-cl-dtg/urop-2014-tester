@@ -7,9 +7,7 @@ import edu.emory.mathcs.backport.java.util.Collections;
 /**
  * Maintains all details about a report, and provides methods to update and retrieve report data
  */
-public class Report {
-    private ReportResult reportResult = ReportResult.PASS; //default to PASS. addDetail() and addProblem() will change to FAIL if an item
-                                         //with severity ERROR is added
+public class Report extends AbstractReport{
     private List<Problem> problemsTestedFor = new LinkedList<>(); //list storing all problems looked for (also see what each Problem holds)
 
     /**
@@ -79,7 +77,7 @@ public class Report {
      * @param details       More specific problem description e.g. java.io.StreamReader, expected
      *                      12 spaces, found 16
      */
-    public void addDetail(String category, Severity severity, String filename, int lineNumber, String details)  {
+    public void addDetail(String category, Severity severity, String filename, Integer lineNumber, String details)  {
     	boolean found = false;
     	for (Problem t : problemsTestedFor) {
 	       	if (t.getCategory().equals(category)) {

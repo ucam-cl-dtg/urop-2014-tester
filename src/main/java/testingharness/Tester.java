@@ -5,10 +5,15 @@ import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import gitapidependencies.RepositoryNotFoundException;
 
 import org.apache.commons.io.FilenameUtils;
+import org.jboss.resteasy.client.jaxrs.ResteasyClient;
+import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
+import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import privateinterfaces.MongoTestsInterface;
 import reportelements.Report;
+import reportelements.SimpleReport;
 import reportelements.Status;
 
 import java.io.IOException;
@@ -50,7 +55,7 @@ public class Tester {
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
      */
-    public void runTests()
+    public void runTests(String crsId, String tickId, String commitId)
     {
         log.info("Tick analysis started");	     
 
@@ -78,6 +83,9 @@ public class Tester {
         finally
         {
             this.status.complete();
+    	    //TODO: should we make another interface?
+            Report reportToAdd = this.report;
+            TestServiceTwo.getDatabase().addReport(crsId, tickId, commitId, reportToAdd);
         }   
     }
 
