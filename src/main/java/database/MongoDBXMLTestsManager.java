@@ -1,19 +1,17 @@
 package database;
 
-import java.util.List;
-
 import com.mongodb.DB;
-
+import configuration.ConfigurationLoader;
 import exceptions.TestIDAlreadyExistsException;
+import exceptions.TestIDNotFoundException;
 import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import privateinterfaces.IDBXMLTestsManager;
 import testingharness.XMLTestSettings;
-import exceptions.TestIDNotFoundException;
 
 import javax.ws.rs.PathParam;
+import java.util.List;
 
 /**
  * Implementation of TestsInterface using MongoDB
@@ -25,8 +23,9 @@ public class MongoDBXMLTestsManager implements IDBXMLTestsManager {
     private final JacksonDBCollection<ListWrapper, String> XMLTetsSettingsColl;
 
     public MongoDBXMLTestsManager(DB database) {
-        //TODO: remove hard coded string
-        XMLTetsSettingsColl = JacksonDBCollection.wrap(database.getCollection("XMLSettings"), ListWrapper.class, String.class);
+        XMLTetsSettingsColl = JacksonDBCollection.wrap(
+                database.getCollection(ConfigurationLoader.getConfig().getMongoXMLSettingsCollectionName()),
+                ListWrapper.class, String.class);
     }
     
     public MongoDBXMLTestsManager() {

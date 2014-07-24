@@ -1,6 +1,7 @@
 package database;
 
 import com.mongodb.DB;
+import configuration.ConfigurationLoader;
 import exceptions.TestIDNotFoundException;
 import exceptions.TickNotInDBException;
 import exceptions.UserNotInDBException;
@@ -23,8 +24,9 @@ public class MongoDBReportManager implements IDBReportManager {
     private final JacksonDBCollection<DBUser, String> DBUserColl;
 
     public MongoDBReportManager(DB database) {
-        //TODO: remove hard coded string
-        DBUserColl = JacksonDBCollection.wrap(database.getCollection("users"), DBUser.class, String.class);
+        DBUserColl = JacksonDBCollection.wrap(
+                database.getCollection(ConfigurationLoader.getConfig().getMongoUsersCollectionName()),
+                DBUser.class, String.class);
     }
 
     /** {@inheritDoc} */

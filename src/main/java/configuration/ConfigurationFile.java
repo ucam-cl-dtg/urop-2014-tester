@@ -4,9 +4,11 @@ public class ConfigurationFile {
     private String gitAPIPath;
     private String checkstyleResourcesPath;
     private String mongoHost;
-    private int mongoPort;
     private String mongoReportDBName;
     private String databaseTestsPath;
+    private String mongoUsersCollectionName;
+    private String mongoXMLSettingsCollectionName;
+    private int mongoPort;
     
     public String getGitAPIPath()
     {
@@ -59,4 +61,21 @@ public class ConfigurationFile {
 	public void setDatabaseTestsPath(String databaseTestsPath) {
 		this.databaseTestsPath = databaseTestsPath;
 	}
+
+    public String getMongoXMLSettingsCollectionName() {
+        return mongoXMLSettingsCollectionName;
+    }
+
+    public String getMongoUsersCollectionName() {
+        return mongoUsersCollectionName;
+    }
+
+    public void setMongoXMLSettingsCollectionName(String mongoXMLSettingsCollectionName) {
+        this.mongoXMLSettingsCollectionName = mongoXMLSettingsCollectionName;
+    }
+
+    public void setMongoUsersCollectionName(String mongoUsersCollectionName) {
+        this.mongoUsersCollectionName = mongoUsersCollectionName;
+    }
 }
+
