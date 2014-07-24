@@ -78,8 +78,7 @@ public class TestServiceTwo implements ITestService {
                     throw new WrongFileTypeException();
             }
         }
-        
-        //obtain static tests to run on files according to what tick it is
+         //obtain static tests to run on files according to what tick it is
         List<XMLTestSettings> staticTests = testDb.getTestSettings(tickId);
         
         log.info(crsId + " " + tickId + ": runNewTest: creating Tester object");
@@ -105,7 +104,7 @@ public class TestServiceTwo implements ITestService {
         // start the test in an asynchronous thread
         new Thread(new Runnable() {
             public void run() {
-                tester.runTests(crsId,tickId,commitId);
+                asyncTestRunner(tester, crsId, tickId, commitId);
             }
         }).start();
 
@@ -116,6 +115,22 @@ public class TestServiceTwo implements ITestService {
         reportToAdd.addDetail("bad indentation", Severity.WARNING, "eg.java", 7, "Expected 12 spaces, found 10");
         db.addReport(crsId, tickId, commitId, reportToAdd);
         */
+    }
+
+    /**
+     * Runs a test, then deletes the tester object from the map of in progress tests
+     * Note: named async because this function is expected to be run in a separate thread
+     * @param tester    The tester object configured to be run
+     * @param crsId     As required by tester.runTests()
+     * @param tickId    As required by tester.runTests()
+     * @param commitId  As required by tester.runTests()
+     */
+    private void asyncTestRunner(final Tester tester, final String crsId, final String tickId, final String commitId) {
+        tester.runTests(crsId, tickId, commitId);
+
+        //once tests have run, remove the tester from the map of in-progress tests
+        assert ticksInProgress.containsKey(crsId + tickId);
+        ticksInProgress.remove(crsId + tickId);
     }
 
     @Override
