@@ -47,7 +47,8 @@ public class TestServiceTwo implements ITestService {
 	    
 	    testDb = new MongoDBXMLTestsManager(Mongo.getDb());
     }
-    
+
+    /** {@inheritDoc} */
     @Override
     public void runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName, @QueryParam("commitId") final String commitId)
@@ -133,6 +134,7 @@ public class TestServiceTwo implements ITestService {
         ticksInProgress.remove(crsId + tickId);
     }
 
+    /** {@inheritDoc} */
     @Override
     public Status pollStatus(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws NoSuchTestException {
@@ -150,29 +152,34 @@ public class TestServiceTwo implements ITestService {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException {
         return db.getLastReport(crsId, tickId);
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException {
         return db.getAllReports(crsId, tickId);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteStudentReportData(@PathParam("crsId") String crsId) throws UserNotInDBException {
         db.removeUserReports(crsId);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws TestIDNotFoundException, UserNotInDBException {
         db.removeUserTickReports(crsId, tickId);
     }
-    
+
+    /** {@inheritDoc} */
     @Override
 	public void createNewTest(@PathParam("tickId") String tickId /* List<XMLTestSettings> checkstyleOpts */)
             throws TestIDAlreadyExistsException {
