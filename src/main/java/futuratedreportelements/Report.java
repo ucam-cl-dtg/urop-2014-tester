@@ -75,7 +75,7 @@ public class Report {
      * @param details       More specific problem description e.g. java.io.StreamReader, expected
      *                      12 spaces, found 16
      */
-    public void addDetail(String category, Severity severity, String filename, Integer lineNumber, String details)  {
+    public void addDetail(String category, Severity severity, String filename, Integer lineNumber, String details) {
         if (!(problems.containsKey(category))) {
             this.addProblem(category, severity);
         }

@@ -40,8 +40,8 @@ import java.util.*;
  * @author kls82
  */
 // full path to here is /rest/tester/API/
-public class TestService implements TestServiceInterface {
-    // initialise log4j logger
+public class TestService {// implements TestServiceInterface {
+    // initialise slf4j logger
     private static Logger log = LoggerFactory.getLogger(TestService.class);
     //TODO: implement database - this stores the settings for each tick that has been set
     private static Map<String, List<String>> availableTestSettings;
