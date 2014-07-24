@@ -1,9 +1,12 @@
 package database;
 
 import com.mongodb.DB;
+import exceptions.TickNotInDBException;
+import exceptions.UserNotInDBException;
 import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import privateinterfaces.IDBReportManager;
 import reportelements.AbstractReport;
 
 import java.util.List;
@@ -25,7 +28,7 @@ public class MongoDBReportManager implements IDBReportManager {
     /** {@inheritDoc} */
     @Override
     public void addReport(String crsId, String tickId, String commitId, AbstractReport report) {
-       //look up user by crsId
+        //look up user by crsId
         DBUser user = DBUserColl.findOneById(crsId);
 
         //if user wasn't found, create them.

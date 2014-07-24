@@ -1,4 +1,4 @@
-package database;
+package exceptions;
 
 public class UserNotInDBException extends Exception {
     public UserNotInDBException(String message) {

@@ -1,26 +1,3 @@
-import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-
-import exceptions.TestIDNotFoundException;
-import exceptions.TestStillRunningException;
-import exceptions.WrongFileTypeException;
-import gitapidependencies.RepositoryNotFoundException;
-import gitapidependencies.WebInterface;
-
-import org.easymock.EasyMock;
-import org.junit.Test;
-
-import reportelements.Report;
-import reportelements.Status;
-import testingharness.TestService;
-import testingharness.Tester;
-import testingharness.TesterFactory;
-
-import java.io.IOException;
-import java.util.*;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
 
 /**
@@ -29,7 +6,7 @@ import static org.junit.Assert.assertNotEquals;
  */
 public class TestServiceTester
 {
-    @Test
+    /* @Test
     public void testRunNewTestNormal() throws IOException, WrongFileTypeException, RepositoryNotFoundException
     {
         //mock proxy
@@ -214,6 +191,6 @@ public class TestServiceTester
 
         // create and return TestService
         return new TestService(ticksInProgress);
-    }
+    } */
 
 }

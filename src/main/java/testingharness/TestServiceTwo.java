@@ -1,21 +1,18 @@
 package testingharness;
 
-import database.IDBReportManager;
 import database.Mongo;
 import database.MongoDBReportManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import privateinterfaces.IDBReportManager;
+import publicinterfaces.ITestService;
 import reportelements.AbstractReport;
 import reportelements.Severity;
 import reportelements.SimpleReport;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import publicinterfaces.ITestService;
 import reportelements.Status;
 
 import javax.ws.rs.PathParam;
-
-import java.util.*;
+import java.util.List;
 
 public class TestServiceTwo implements ITestService {
     // initialise log4j logger
