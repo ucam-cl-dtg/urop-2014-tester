@@ -15,6 +15,7 @@ public class SimpleReportItem {
         this.details = details;
     }
 
+    //JSON serialisation stuff:
     public SimpleReportItem() {}
 
     public String getCategory() {

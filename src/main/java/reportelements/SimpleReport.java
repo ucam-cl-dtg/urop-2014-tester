@@ -9,14 +9,6 @@ public class SimpleReport extends AbstractReport {
 
     public SimpleReport() {};
 
-    public LinkedList<SimpleReportItem> getItems() {
-        return items;
-    }
-
-    public void setItems(LinkedList<SimpleReportItem> items) {
-        this.items = items;
-    }
-
     /** {@inheritDoc} */
     @Override
     @JsonIgnore
@@ -25,5 +17,15 @@ public class SimpleReport extends AbstractReport {
         if (severity == Severity.ERROR && lineNumber != null) {
             this.reportResult = ReportResult.FAIL;
         }
+    }
+
+
+    //for JSON serialisation
+    public LinkedList<SimpleReportItem> getItems() {
+        return items;
+    }
+
+    public void setItems(LinkedList<SimpleReportItem> items) {
+        this.items = items;
     }
 }
