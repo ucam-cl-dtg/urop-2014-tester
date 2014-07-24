@@ -4,7 +4,7 @@ import database.IDBReportManager;
 import database.Mongo;
 import database.MongoDBReportManager;
 import reportelements.AbstractReport;
-import futuratedreportelements.Severity;
+import reportelements.Severity;
 import reportelements.SimpleReport;
 
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ import java.util.*;
 
 public class TestServiceTwo implements ITestService {
     // initialise log4j logger
-    private static Logger log = LoggerFactory.getLogger(TestService.class);
+    private static Logger log = LoggerFactory.getLogger(TestServiceTwo.class);
     private IDBReportManager db = new MongoDBReportManager(Mongo.getDb());
 
     @Override
