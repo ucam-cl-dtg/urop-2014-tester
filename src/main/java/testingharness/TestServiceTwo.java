@@ -74,7 +74,7 @@ public class TestServiceTwo implements ITestService {
                     break;
                 default:
                     //TODO: should we really  be throwing an exception? Isn't it conceivable that a student's repo might contain
-                    //a non .java file? (1A Java tick 1 needs a .txt file, for example)
+                    //TODO: a non .java file? (1A Java tick 1 needs a .txt file, for example)
                     throw new WrongFileTypeException();
             }
         }

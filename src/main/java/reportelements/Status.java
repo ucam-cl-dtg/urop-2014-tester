@@ -17,7 +17,7 @@ public class Status {
 
     /**
      * Use for creation of Status objects for finished tests
-     * @param maxProgress
+     * @param maxProgress   Total number of tests which were run
      */
     public Status(int maxProgress) {
         this.progress = maxProgress;

@@ -1,11 +1,10 @@
 package testingharness;
 
+import com.puppycrawl.tools.checkstyle.api.AuditEvent;
+import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import reportelements.CategoryNotInReportException;
 import reportelements.Report;
 import reportelements.Severity;
-
-import com.puppycrawl.tools.checkstyle.api.AuditEvent;
-import com.puppycrawl.tools.checkstyle.api.AuditListener;
 
 /**
  * Listener class for problems found by CheckStyle
@@ -22,9 +21,10 @@ public class StaticLogger implements AuditListener
     private Severity severity;
     /**
      * Constructor for StaticLogger
-     * @param output List where generated report items will go.
+     * @param report Report where generated report items will go.
+     * @param test   Checkstyle config data
      */
-    public StaticLogger(Report report , XMLTestSettings test)
+    public StaticLogger(Report report, XMLTestSettings test)
     {
         this.report = report;
         this.testDef = test.getTestDefinition();

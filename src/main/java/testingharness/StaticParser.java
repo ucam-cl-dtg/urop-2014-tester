@@ -6,16 +6,13 @@ import com.puppycrawl.tools.checkstyle.PropertiesExpander;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
-
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
-
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reportelements.Report;
 
 import java.io.File;
@@ -37,8 +34,8 @@ public class StaticParser {
     /**
      * Runs Checkstyle with a given config file and .java file, and puts results into a linked list of static report items
      * @param test                      Path to Checkstyle configuration file to use
-     * @param file                      Path to .java file on which to run Checkstyle
-     * @param sReport                   Reference to LinkedList of StaticReportItems into which to insert found problems
+     * @param files                     Paths to .java file on which to run Checkstyle
+     * @param report                    Reference to Report object into which found problems should go
      * @param repoName                  Name of git repository in which {@code file} is located
      * @throws CheckstyleException      
      * @throws IOException              
