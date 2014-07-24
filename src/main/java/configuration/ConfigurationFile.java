@@ -6,6 +6,7 @@ public class ConfigurationFile {
     private String mongoHost;
     private int mongoPort;
     private String mongoReportDBName;
+    private String databaseTestsPath;
     
     public String getGitAPIPath()
     {
@@ -50,4 +51,12 @@ public class ConfigurationFile {
     public void setMongoReportDBName(String mongoReportDBName) {
         this.mongoReportDBName = mongoReportDBName;
     }
+
+	public String getDatabaseTestsPath() {
+		return databaseTestsPath;
+	}
+
+	public void setDatabaseTestsPath(String databaseTestsPath) {
+		this.databaseTestsPath = databaseTestsPath;
+	}
 }

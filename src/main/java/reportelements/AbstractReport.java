@@ -4,7 +4,7 @@ import java.util.Date;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
-@JsonDeserialize(as=SimpleReport.class)
+@JsonDeserialize(as=Report.class)
 public abstract class AbstractReport {
     protected ReportResult reportResult = ReportResult.PASS; //default to pass
     protected Date creationDate = new Date();

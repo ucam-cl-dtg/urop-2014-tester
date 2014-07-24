@@ -50,7 +50,7 @@ public class Tester {
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
      */
-    public void runTests()
+    public void runTests(String crsId, String tickId, String commitId)
     {
         log.info("Tick analysis started");	     
 
@@ -78,6 +78,9 @@ public class Tester {
         finally
         {
             this.status.complete();
+    	    //TODO: should we make another interface?
+            Report reportToAdd = this.report;
+            TestServiceTwo.getDatabase().addReport(crsId, tickId, commitId, reportToAdd);
         }   
     }
 

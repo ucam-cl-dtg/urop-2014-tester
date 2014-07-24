@@ -7,12 +7,13 @@ import testingharness.XMLTestSettings;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+
 import java.util.List;
 
 /**
  * @author kls82
  */
-@Path("/accessTests")
 public interface IDBXMLTestsManager {
 	/**
      * creates a new test and stores its settings for access later
@@ -20,9 +21,7 @@ public interface IDBXMLTestsManager {
      * @param tickId	            unique Id of the tick being created
      * @param staticTestSettings    settings to insert into database
      */
-	@GET
-    @Path("addNewTest/{tickId}")
-    public void addNewTest(@PathParam("tickId") String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDAlreadyExistsException;
+    public void addNewTest(String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDAlreadyExistsException;
 
 	/**
      * edits an existing test if it is stored - if it is not found an exception is thrown
@@ -31,9 +30,7 @@ public interface IDBXMLTestsManager {
      * @param staticTestSettings            settings to insert into database
      * @throws TestIDNotFoundException		if testId doesn't exist
      */
-    @GET
-    @Path("editExistingTest/{tickId}")
-    public void update(@PathParam("tickId") String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDNotFoundException;
+    public void update(String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDNotFoundException;
 
     /**
      * deletes an existing test if it is stored - if it is not found an exception is thrown
@@ -41,9 +38,7 @@ public interface IDBXMLTestsManager {
      * @param tickId	unique Id of the tick being deleted
      * @throws TestIDNotFoundException		if testId doesn't exist
      */
-    @GET
-    @Path("deleteTest/{tickId}")
-    public void deleteTest (@PathParam("tickId") String tickId) throws TestIDNotFoundException;
+    public void deleteTest (String tickId) throws TestIDNotFoundException;
     
     /**
      * returns the settings for an existing test if it is stored - if it is not found an exception is thrown
@@ -52,9 +47,7 @@ public interface IDBXMLTestsManager {
      * @return settings		List containing the settings for each static test to be run for this test
      * @throws TestIDNotFoundException		if testId doesn't exist
      */
-    @GET
-    @Path("getTestSettings/{tickId}")
-    public List<XMLTestSettings> getTestSettings (@PathParam("tickId") String tickId) throws TestIDNotFoundException;
+    public List<XMLTestSettings> getTestSettings (String tickId) throws TestIDNotFoundException;
     
     
 }
