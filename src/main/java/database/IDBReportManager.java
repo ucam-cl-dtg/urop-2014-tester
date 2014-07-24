@@ -5,6 +5,10 @@ import reportelements.AbstractReport;
 
 import java.util.List;
 
+/**
+ * Interface for adding, getting, and removing reports from a database
+ * @author as2388
+ */
 public interface IDBReportManager {
 
     /**
@@ -16,8 +20,29 @@ public interface IDBReportManager {
      */
     public void addReport(String crsId, String tickId, String commitId, AbstractReport report);
 
-    public AbstractReport getLastReport(String crsId, String tickId);
+    /**
+     * Gets the last report added to a given user's tick
+     * @param crsId                 Id of user to get report from
+     * @param tickId                Id of tick to get report from
+     * @return                      Last added report
+     * @throws UserNotInDBException Thrown if user with id crsId was not found in the database
+     * @throws TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
+     */
+    public AbstractReport getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
 
-    public List<AbstractReport> getAllReports(String crsId, String tickId);
+    /**
+     * Gets all reports in a given user's tick
+     * @param crsId                 Id of user to get reports from
+     * @param tickId                Id of tick to get reports from
+     * @return                      List of all reports in user's tick
+     * @throws UserNotInDBException Thrown if user with id crsId was not found in the database
+     * @throws TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
+     */
+    public List<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
 
+    public void removeUser(String crsId);
+
+    public void removeTick(String crsId, String tickId);
+
+    public void removeCommit(String crsId, String tickId, String commitId);
 }

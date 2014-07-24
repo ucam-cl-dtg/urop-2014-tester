@@ -3,23 +3,34 @@ package database;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reportelements.AbstractReport;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Maintains all reports added to all a user's ticks.
+ * @author as2388
+ */
 public class DBUser {
-    /*@JsonProperty("_id") */ private String crsId;
-    private Map<String, DBTick> ticks = new HashMap<>();
+    //Initialize slf4j logger
+    private static Logger log = LoggerFactory.getLogger(DBUser.class);
+    private String crsId;
+    private Map<String, DBTick> ticks = new HashMap<>(); //maps tick ids to a DBTick object
 
     @JsonCreator
-    public DBUser(@JsonProperty("_id") String crsId/*, @JsonProperty("Ticks") Map<String, DBTick> ticks*/) {
+    public DBUser(@JsonProperty("_id") String crsId) {
         this.crsId = crsId;
-        /*this.ticks = ticks;*/
     }
 
+    /**
+     * Add a new report to a given tick
+     * @param tickId    Unique identifier of tick to add report to
+     * @param newReport Report to add
+     */
     public void addReport(String tickId, AbstractReport newReport) {
         //if there is no tick object with the id of tickId, create one
         if (!(ticks.containsKey(tickId))) {
@@ -32,17 +43,41 @@ public class DBUser {
         System.out.println("Report added? " + ticks.containsKey(tickId));
     }
 
+    /**
+     * Returns the last report added to a given tick.
+     * @param tickId                Unique identifier of tick to look up last report from
+     * @return                      Last report added
+     * @throws TickNotInDBException Thrown if the tick wasn't found in the database
+     */
     @JsonIgnore
-    public AbstractReport getLastReport(String tickId) {
-        //TODO: ensure a tick with tickId is in the database
-        System.out.println("Report found? " + ticks.containsKey(tickId));
-        
-        return ticks.get(tickId).getLast();
+    public AbstractReport getLastReport(String tickId) throws TickNotInDBException {
+        return getValidTick(tickId).getLast();
     }
 
+    /**
+     * Returns a list containing all reports in a given tick
+     * @param tickId    Unique identifier of tick to look up
+     * @return          List of all reports user has for a given tick
+     */
     @JsonIgnore
-    public List<AbstractReport> getAllReports(String tickId) {
-        return ticks.get(tickId).getAll();
+    public List<AbstractReport> getAllReports(String tickId) throws TickNotInDBException {
+        return getValidTick(tickId).getAll();
+    }
+
+    /**
+     * Gets the tick collection associated with tickId
+     * @param tickId                Unique identifier of tick to look up
+     * @return                      DBTick
+     * @throws TickNotInDBException Thrown if the tick wasn't found in the database
+     */
+    private DBTick getValidTick(String tickId) throws TickNotInDBException {
+        if (!(ticks.containsKey(tickId)))
+        {
+            log.error("Request for non-existent tick made. crsId: " + crsId + " tickId: " + tickId);
+            throw new TickNotInDBException(tickId);
+        }
+
+        return ticks.get(tickId);
     }
 
     @JsonProperty("Ticks")
@@ -50,7 +85,7 @@ public class DBUser {
         return ticks;
     }
 
-    @JsonProperty("_id")
+    @JsonProperty("_id") //override mongoDB's auto-generated id with the user's crsId
     public String getCrsId() {
         return crsId;
     }

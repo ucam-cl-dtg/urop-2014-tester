@@ -1,19 +1,20 @@
 package database;
 
 import com.mongodb.DB;
-
-import reportelements.AbstractReport;
-
 import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import reportelements.AbstractReport;
 
 import java.util.List;
 
+/**
+ * Implementation of IDBReportManager using MongoDB
+ * @author as2388
+ */
 public class MongoDBReportManager implements IDBReportManager {
     // initialise slf4j logger
     private static Logger log = LoggerFactory.getLogger(MongoDBReportManager.class);
-
     private final JacksonDBCollection<DBUser, String> DBUserColl;
 
     public MongoDBReportManager(DB database) {
@@ -25,8 +26,7 @@ public class MongoDBReportManager implements IDBReportManager {
     @Override
     public void addReport(String crsId, String tickId, String commitId, AbstractReport report) {
        //look up user by crsId
-        DBUser user = null;
-        user = DBUserColl.findOneById(crsId);
+        DBUser user = DBUserColl.findOneById(crsId);
 
         //if user wasn't found, create them.
         if (user == null) {
@@ -43,32 +43,44 @@ public class MongoDBReportManager implements IDBReportManager {
 
     /** {@inheritDoc} */
     @Override
-    public AbstractReport getLastReport(String crsId, String tickId) {
-        DBUser user = getValidUser(crsId);
-
-        //TODO: what should happen if the tickId wasn't found?
-
-        //get and the report most recently added to the user's tick at tickId
-        return user.getLastReport(tickId);
+    public AbstractReport getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
+        return getValidUser(crsId).getLastReport(tickId);
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<AbstractReport> getAllReports(String crsId, String tickId) {
-        DBUser user = getValidUser(crsId);
-
-        //TODO: what should happen if tickId wasn't found?
-
-        return user.getAllReports(tickId);
+    public List<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
+        return getValidUser(crsId).getAllReports(tickId);
     }
 
-    private DBUser getValidUser(String crsId) {
+    @Override
+    public void removeUser(String crsId) {
+
+    }
+
+    @Override
+    public void removeTick(String crsId, String tickId) {
+
+    }
+
+    @Override
+    public void removeCommit(String crsId, String tickId, String commitId) {
+
+    }
+
+    /**
+     * Loads a valid user object from MongoDB
+     * @param crsId                 Id of user to load
+     * @return                      Loaded DBUser object from database
+     * @throws UserNotInDBException If the user with id crsId does not exist in the database
+     */
+    private DBUser getValidUser(String crsId) throws UserNotInDBException {
         //look up user by crsId
         DBUser user = DBUserColl.findOneById(crsId);
 
         if (user == null) {
-            //TODO: throw new UserNotFoundException();
             log.error("User not found");
+            throw new UserNotInDBException(crsId);
         }
 
         return user;
