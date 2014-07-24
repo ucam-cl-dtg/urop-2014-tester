@@ -34,18 +34,15 @@ public interface ITestService {
             throws TestStillRunningException, IOException, RepositoryNotFoundException, WrongFileTypeException,
             TestIDNotFoundException;
 
-    //TODO: should we also do a GET for this?
-
     /**
-     * TODO: finish JavaDoc
-     * Returns the status of the latest test running/ran for the given user's tick
+     * Returns the status of the latest test running/ran for a given user's tick
      * @param crsId                Id of user whose test should be polled
      * @param tickId               Id of tick whose latest test should be polled
      * @return                     Current status of test
      * @throws NoSuchTestException Thrown if no test has been started for this user/tick combination
      */
     @GET
-    @Path("{crsId}/{tickId}/poll")
+    @Path("{crsId}/{tickId}/running")
     public Status pollStatus(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws NoSuchTestException;
 
@@ -54,17 +51,25 @@ public interface ITestService {
      * Returns the most-recently generated report.
      * Note: this function returns the most recently generated report for a given crsID and tickID, not the report
      * associated with the newest commit, because these are not expected to be different.
-     * @param crsId
-     * @param tickId
-     * @return
-     * @throws TickNotInDBException 
-     * @throws UserNotInDBException 
+     * @param crsId                 Id of user whose report is to be returned
+     * @param tickId                Id of tick for which the latest report should be returned
+     * @return                      Most recently generated report
+     * @throws UserNotInDBException
+     * @throws TickNotInDBException
      */
     @GET
     @Path("/{crsId}/{tickId}/last")
     public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException;
 
+    /**
+     * Returns all generated reports for a given user's tick
+     * @param crsId                 Id of user whose reports should be returned
+     * @param tickId                Id of tick for which the latest reports should be returned
+     * @return                      List of all generated reports for a given user's tick
+     * @throws UserNotInDBException
+     * @throws TickNotInDBException
+     */
     @GET
     @Path("/{crsId}/{tickId}/all")
     public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
@@ -85,4 +90,8 @@ public interface ITestService {
             throws TestIDAlreadyExistsException;
 
     //TODO: cancel test?
+    //@DELETE
+    //@Path("/{crsid}/{tickid}/running")
+    //public void cancelRunningTest(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    //  throws NoTestRunningException;
 }
