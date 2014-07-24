@@ -1,6 +1,7 @@
 package database;
 
 import com.mongodb.DB;
+import exceptions.TestIDNotFoundException;
 import exceptions.TickNotInDBException;
 import exceptions.UserNotInDBException;
 import org.mongojack.JacksonDBCollection;
@@ -17,7 +18,7 @@ import java.util.List;
  */
 public class MongoDBReportManager implements IDBReportManager {
     // initialise slf4j logger
-    private static Logger log = LoggerFactory.getLogger(MongoDBReportManager.class);
+    private static final Logger log = LoggerFactory.getLogger(MongoDBReportManager.class);
     private final JacksonDBCollection<DBUser, String> DBUserColl;
 
     public MongoDBReportManager(DB database) {
@@ -27,7 +28,7 @@ public class MongoDBReportManager implements IDBReportManager {
 
     /** {@inheritDoc} */
     @Override
-    public void addReport(String crsId, String tickId, String commitId, AbstractReport report) {
+    public void addReport(String crsId, String tickId, AbstractReport report) {
         //look up user by crsId
         DBUser user = DBUserColl.findOneById(crsId);
 
@@ -56,19 +57,19 @@ public class MongoDBReportManager implements IDBReportManager {
         return getValidUser(crsId).getAllReports(tickId);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void removeUser(String crsId) {
+    public void removeUserReports(String crsId) throws UserNotInDBException {
+        getValidUser(crsId);
 
+        DBUserColl.removeById(crsId);
     }
 
+    /** {@inheritDoc} */
     @Override
-    public void removeTick(String crsId, String tickId) {
-
-    }
-
-    @Override
-    public void removeCommit(String crsId, String tickId, String commitId) {
-
+    public void removeUserTickReports(String crsId, String tickId) throws UserNotInDBException, TestIDNotFoundException {
+        DBUser user = getValidUser(crsId);
+        user.removeTick(tickId);
     }
 
     /**

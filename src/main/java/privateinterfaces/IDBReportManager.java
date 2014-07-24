@@ -1,6 +1,7 @@
 package privateinterfaces;
 
 
+import exceptions.TestIDNotFoundException;
 import exceptions.TickNotInDBException;
 import exceptions.UserNotInDBException;
 import reportelements.AbstractReport;
@@ -17,10 +18,9 @@ public interface IDBReportManager {
      * Adds a report to the database, and creates a new DBUser and/or DBTick if necessary
      * @param crsId         Id of user to add report to
      * @param tickId        Id of tick of user's tick to add report to
-     * @param commitId      Id of git commit of report
      * @param report        Report to add
      */
-    public void addReport(String crsId, String tickId, String commitId, AbstractReport report);
+    public void addReport(String crsId, String tickId, AbstractReport report);
 
     /**
      * Gets the last report added to a given user's tick
@@ -40,11 +40,23 @@ public interface IDBReportManager {
      * @throws UserNotInDBException Thrown if user with id crsId was not found in the database
      * @throws TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
      */
-    public List<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
+    public List<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException,
+            TickNotInDBException;
 
-    public void removeUser(String crsId);
+    /**
+     * Removes a user and all his/her reports from the database
+     * @param crsId                 Id of user to remove
+     * @throws UserNotInDBException Thrown if the user is not in the database
+     */
+    public void removeUserReports(String crsId) throws UserNotInDBException;
 
-    public void removeTick(String crsId, String tickId);
+    /**
+     * Removes a user's tick and all its associated reports from the database
+     * @param crsId                     Id of user whose tick is to be removed
+     * @param tickId                    Id of tick to be removed
+     * @throws UserNotInDBException     Thrown if the user is not in the database
+     * @throws TestIDNotFoundException  Thrown if the tick for the given user is not in the database
+     */
+    public void removeUserTickReports(String crsId, String tickId) throws UserNotInDBException, TestIDNotFoundException;
 
-    public void removeCommit(String crsId, String tickId, String commitId);
 }
