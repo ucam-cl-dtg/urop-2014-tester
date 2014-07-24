@@ -83,7 +83,7 @@ public class TestServiceTwo implements ITestService {
         }
         
         //obtain static tests to run on files according to what tick it is
-        List<XMLTestSettings> staticTests = testProxy.getTestSettings(tickId);
+        List<XMLTestSettings> staticTests = testDb.getTestSettings(tickId);
         
         log.info(crsId + " " + tickId + ": runNewTest: creating Tester object");
     	
@@ -162,7 +162,7 @@ public class TestServiceTwo implements ITestService {
 		log.info("all tests added for " + tickId);
 		
 		//add to database
-	    testProxy.addNewTest(tickId, checkstyleOptsTemp);
+	    testDb.addNewTest(tickId, checkstyleOptsTemp);
 	    log.info("added test to database");
 	}
 	
