@@ -10,7 +10,7 @@ import java.util.List;
  * Used to maintain all reports in a tick instance
  * @author as2388
  */
-public class DBTick {
+class DBTick {
     private LinkedList<AbstractReport> reports = new LinkedList<>();
 
     public DBTick() {}
@@ -38,8 +38,6 @@ public class DBTick {
     public List<AbstractReport> getAll() {
         return reports;
     }
-
-
 
     //JSON serialisation stuff:
     public LinkedList<AbstractReport> getReports() {

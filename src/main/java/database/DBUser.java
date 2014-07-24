@@ -3,6 +3,7 @@ package database;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import exceptions.TestIDNotFoundException;
 import exceptions.TickNotInDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,9 +17,9 @@ import java.util.Map;
  * Maintains all reports added to all a user's ticks.
  * @author as2388
  */
-public class DBUser {
+class DBUser {
     //Initialize slf4j logger
-    private static Logger log = LoggerFactory.getLogger(DBUser.class);
+    private static final Logger log = LoggerFactory.getLogger(DBUser.class);
     private String crsId;
     private Map<String, DBTick> ticks = new HashMap<>(); //maps tick ids to a DBTick object
 
@@ -69,7 +70,7 @@ public class DBUser {
      * Gets the tick collection associated with tickId
      * @param tickId                Unique identifier of tick to look up
      * @return                      DBTick
-     * @throws TickNotInDBException Thrown if the tick wasn't found in the database
+     * @throws TickNotInDBException Thrown if the tick wasn't found
      */
     private DBTick getValidTick(String tickId) throws TickNotInDBException {
         if (!(ticks.containsKey(tickId)))
@@ -79,6 +80,18 @@ public class DBUser {
         }
 
         return ticks.get(tickId);
+    }
+
+    /**
+     * Deletes all the user's reports in a tick
+     * @param tickId                    Id of report to remove
+     * @throws TestIDNotFoundException  Thrown if the tick wasn't found
+     */
+    public void removeTick(String tickId) throws TestIDNotFoundException {
+        if (!(ticks.containsKey(tickId))) {
+            throw new TestIDNotFoundException(tickId);
+        }
+        ticks.remove(tickId);
     }
 
     @JsonProperty("Ticks")
