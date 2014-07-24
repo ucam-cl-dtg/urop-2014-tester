@@ -5,6 +5,7 @@ import exceptions.TestIDNotFoundException;
 import exceptions.TickNotInDBException;
 import exceptions.UserNotInDBException;
 import reportelements.AbstractReport;
+import reportelements.Status;
 
 import java.util.List;
 
@@ -31,6 +32,14 @@ public interface IDBReportManager {
      * @throws exceptions.TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
      */
     public AbstractReport getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
+
+    /**
+     * Gets the status of the last report in the given user's tick
+     * @param crsId     Id of user whose report is to be looked up
+     * @param tickId    Id of user's tick to look up
+     * @return          The status of the tick
+     */
+    public Status getLastStatus(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
 
     /**
      * Gets all reports in a given user's tick

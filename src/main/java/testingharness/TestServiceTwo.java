@@ -3,32 +3,24 @@ package testingharness;
 import database.Mongo;
 import database.MongoDBReportManager;
 import database.MongoDBXMLTestsManager;
-import exceptions.TestIDAlreadyExistsException;
-import exceptions.TickNotInDBException;
-import exceptions.UserNotInDBException; 
-import exceptions.TestIDNotFoundException;
-import exceptions.TestStillRunningException;
-import exceptions.WrongFileTypeException;
+import exceptions.*;
 import gitapidependencies.RepositoryNotFoundException;
 import gitapidependencies.WebInterface;
-import reportelements.AbstractReport;
-import reportelements.Severity;
-
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import privateinterfaces.IDBXMLTestsManager;
 import privateinterfaces.IDBReportManager;
+import privateinterfaces.IDBXMLTestsManager;
 import publicinterfaces.ITestService;
+import reportelements.AbstractReport;
+import reportelements.Severity;
 import reportelements.Status;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -41,7 +33,7 @@ public class TestServiceTwo implements ITestService {
     private static final IDBReportManager db = new MongoDBReportManager(Mongo.getDb());
     private static IDBXMLTestsManager testDb;
     private static WebInterface gitProxy;
-    private static Map<String,Tester> ticksInProgress = new HashMap<String,Tester>();
+    private static Map<String, Tester> ticksInProgress = new HashMap<>();
     
     //TODO: will this work?
     public TestServiceTwo() { 
@@ -57,13 +49,16 @@ public class TestServiceTwo implements ITestService {
     }
     
     @Override
-    public void runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId, @PathParam("repoName") String repoName, @QueryParam("commitId") final String commitId) throws TestStillRunningException, IOException, RepositoryNotFoundException, WrongFileTypeException, TestIDNotFoundException {
+    public void runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
+                           @PathParam("repoName") String repoName, @QueryParam("commitId") final String commitId)
+            throws TestStillRunningException, IOException, RepositoryNotFoundException, WrongFileTypeException,
+            TestIDNotFoundException {
     	Map<XMLTestSettings, LinkedList<String>> tests = new HashMap<>();
 
         // add corresponding git file to tests
         /* Response response = gitProxy.listFiles(repoName); */
         
-        LinkedList<String> filesToTest = new LinkedList<>();
+        LinkedList<String> filesToTest;
         
         //collect files to test from git
         log.info(crsId + " " + tickId
@@ -122,37 +117,48 @@ public class TestServiceTwo implements ITestService {
     }
 
     @Override
-    public Status pollStatus(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId) {
-        return null;
+    public Status pollStatus(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+            throws NoSuchTestException {
+        //if the test is currently running then return its status from memory
+        if (ticksInProgress.containsKey(crsId + tickId)) {
+            return ticksInProgress.get(crsId + tickId).getStatus();
+        }
+        else {
+            //the test is not currently in memory, so try to get it from the DB
+            try {
+                return db.getLastStatus(crsId, tickId);
+            } catch (UserNotInDBException | TickNotInDBException e) {
+                throw new NoSuchTestException();
+            }
+        }
     }
 
     @Override
-    public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId) throws UserNotInDBException, TickNotInDBException {
+    public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+            throws UserNotInDBException, TickNotInDBException {
         return db.getLastReport(crsId, tickId);
     }
 
     @Override
-    public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId) throws UserNotInDBException, TickNotInDBException {
+    public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+            throws UserNotInDBException, TickNotInDBException {
         return db.getAllReports(crsId, tickId);
     }
 
     @Override
-    public void deleteStudentReportData(@PathParam("crsId") String crsId) {
-
+    public void deleteStudentReportData(@PathParam("crsId") String crsId) throws UserNotInDBException {
+        db.removeUserReports(crsId);
     }
 
     @Override
-    public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId) {
-
-    }
-
-    @Override
-    public void deleteStudentTickCommit(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId) {
-
+    public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+            throws TestIDNotFoundException, UserNotInDBException {
+        db.removeUserTickReports(crsId, tickId);
     }
     
     @Override
-	public void createNewTest(@PathParam("tickId") String tickId /* List<XMLTestSettings> checkstyleOpts */) throws TestIDAlreadyExistsException {
+	public void createNewTest(@PathParam("tickId") String tickId /* List<XMLTestSettings> checkstyleOpts */)
+            throws TestIDAlreadyExistsException {
     	log.info("adding tests for " + tickId);
 		List<XMLTestSettings> checkstyleOptsTemp = new LinkedList<>();
 		checkstyleOptsTemp.add(new XMLTestSettings("emptyBlocks",Severity.ERROR,"empty blocks between braces"));

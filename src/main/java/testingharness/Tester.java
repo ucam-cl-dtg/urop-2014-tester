@@ -1,13 +1,10 @@
 package testingharness;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
-
 import gitapidependencies.RepositoryNotFoundException;
-
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reportelements.Report;
 import reportelements.Status;
 
@@ -80,7 +77,7 @@ public class Tester {
             this.status.complete();
     	    //TODO: should we make another interface?
             Report reportToAdd = this.report;
-            TestServiceTwo.getDatabase().addReport(crsId, tickId, commitId, reportToAdd);
+            TestServiceTwo.getDatabase().addReport(crsId, tickId, reportToAdd);
         }   
     }
 

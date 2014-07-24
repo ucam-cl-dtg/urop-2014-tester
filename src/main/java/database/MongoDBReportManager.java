@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import privateinterfaces.IDBReportManager;
 import reportelements.AbstractReport;
+import reportelements.Status;
 
 import java.util.List;
 
@@ -49,6 +50,12 @@ public class MongoDBReportManager implements IDBReportManager {
     @Override
     public AbstractReport getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
         return getValidUser(crsId).getLastReport(tickId);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Status getLastStatus(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
+        return getValidUser(crsId).getStatus(tickId);
     }
 
     /** {@inheritDoc} */

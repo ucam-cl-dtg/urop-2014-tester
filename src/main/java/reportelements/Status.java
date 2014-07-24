@@ -15,6 +15,16 @@ public class Status {
         this.info = init;
     }
 
+    /**
+     * Use for creation of Status objects for finished tests
+     * @param maxProgress
+     */
+    public Status(int maxProgress) {
+        this.progress = maxProgress;
+        this.maxProgress = maxProgress;
+        info = "Done";
+    }
+
     public void addProgress() {
         this.progress += 1;
         this.info = "running test " + this.progress + " of " + (this.maxProgress - 1);

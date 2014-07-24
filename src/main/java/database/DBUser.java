@@ -8,6 +8,7 @@ import exceptions.TickNotInDBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reportelements.AbstractReport;
+import reportelements.Status;
 
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +65,17 @@ class DBUser {
     @JsonIgnore
     public List<AbstractReport> getAllReports(String tickId) throws TickNotInDBException {
         return getValidTick(tickId).getAll();
+    }
+
+    /**
+     * Gets the status of the last report saved for this user's given tick
+     * @param tickId    Unique identifier of tick to get status of
+     * @return          Status of last report saved
+     */
+    @JsonIgnore
+    public Status getStatus(String tickId) throws TickNotInDBException {
+        AbstractReport report = getValidTick(tickId).getLast();
+        return new Status(report.getNoOfTests());
     }
 
     /**

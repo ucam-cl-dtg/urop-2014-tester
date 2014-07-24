@@ -1,14 +1,17 @@
 package reportelements;
 
-import java.util.Date;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
+import java.util.Date;
+
+/**
+ * Enables reports
+ */
 @JsonDeserialize(as=Report.class)
 public abstract class AbstractReport {
     protected ReportResult reportResult = ReportResult.PASS; //default to pass
     protected Date creationDate = new Date();
-    //TODO: protected Status or int noOfTests
+    protected int noOfTests;
     //TODO: protected String commitId or commitDate;
 
     /**
@@ -31,12 +34,20 @@ public abstract class AbstractReport {
         return reportResult;
     }
 
+    public int getNoOfTests() {
+        return noOfTests;
+    }
+
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
 
     public void setReportResult(ReportResult reportResult) {
         this.reportResult = reportResult;
+    }
+
+    public void setNoOfTests(int noOfTests) {
+        this.noOfTests = noOfTests;
     }
 
     //TODO
