@@ -64,6 +64,6 @@ public interface ITestService {
     public void deleteStudentTickCommit(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId);
     
     @GET
-    @Path("/createNewTest/{tickId}")
-	void createNewTest(@PathParam("tickId") String tickId, List<XMLTestSettings> checkstyleOpts) throws TestIDAlreadyExistsException;
+    @Path("createNewTest/{tickId}")
+	public void createNewTest(@PathParam("tickId") String tickId /* , List<XMLTestSettings> checkstyleOpts */) throws TestIDAlreadyExistsException;
 }
