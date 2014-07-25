@@ -2,14 +2,13 @@ package testingharness;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
-import gitapidependencies.RepositoryNotFoundException;
-
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import publicinterfaces.Report;
 import publicinterfaces.Status;
+import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -49,6 +48,7 @@ public class Tester {
     /**
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
+     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
     public void runTests(String crsId, String tickId, String commitId)
     {
@@ -102,8 +102,9 @@ public class Tester {
      * Runs all static analysis tests required by the tick
      * @throws CheckstyleException
      * @throws IOException
+     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    private void runStaticTests() throws CheckstyleException, IOException, RepositoryNotFoundException
+    private void runStaticTests() throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException
     {
         log.info("Starting static analysis");
         //get static tests from testingQueue
@@ -183,8 +184,9 @@ public class Tester {
      * @param fileNames				A list of paths to the files on which the static analyses tests are to be performed
      * @throws CheckstyleException	
      * @throws IOException 
+     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames) throws CheckstyleException, IOException, RepositoryNotFoundException {
+    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException {
            StaticParser.test(configFileName, fileNames, report, repoName);
     }
 

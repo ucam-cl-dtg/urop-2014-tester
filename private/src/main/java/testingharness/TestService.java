@@ -39,7 +39,7 @@ public class TestService implements ITestService {
     private static Logger log = LoggerFactory.getLogger(TestService.class);
     private static final IDBReportManager dbReport = new MongoDBReportManager(Mongo.getDb());
     private static final IDBXMLTestsManager dbXMLTests = new MongoDBXMLTestsManager(Mongo.getDb());
-    private static WebInterface gitProxy;
+    public static WebInterface gitProxy;
     private static Map<String, Tester> ticksInProgress = new HashMap<>();
 
     public TestService() {

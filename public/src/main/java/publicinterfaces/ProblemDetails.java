@@ -27,7 +27,9 @@ public class ProblemDetails {
      * @param detail        More specific problem description e.g. java.io.StreamReader, expected
      *                      12 spaces, found 16
      */
-    protected void addDetail(String filename, Integer lineNumber, String detail) {
+    protected void addDetail(String file, Integer lineNumber, String detail) {
+    	//TODO: remember .java has been removed here
+    	String filename = getName(file);
         if (!(fileDetails.containsKey(filename))) {
             fileDetails.put(filename, new LinkedList<FileItem>());
         }
@@ -48,5 +50,9 @@ public class ProblemDetails {
 
     public Map<String, List<FileItem>> getFileDetails() {
         return fileDetails;
+    }
+    
+    public String getName(String file) {
+    	return file.substring(0,file.lastIndexOf(".") - 1);
     }
 }
