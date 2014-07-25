@@ -30,9 +30,9 @@ public class Report extends AbstractReport{
      */
     public void addProblem(String category, ProblemDetails problem) throws CategoryAlreadyExistsException {
         for (Problem t : problemsTestedFor) {
-        	if (t.getCategory().equals(category)) {
-        		throw new CategoryAlreadyExistsException(category);
-        	}
+            if (t.getCategory().equals(category)) {
+                throw new CategoryAlreadyExistsException(category);
+            }
         }
         problemsTestedFor.add(new Problem(category, problem));
 

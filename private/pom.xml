@@ -112,7 +112,7 @@
 			<groupId>uk.ac.cam.cl.urop-test</groupId>
 			<artifactId>public</artifactId>
 			<version>0.0.7-SNAPSHOT</version>
-		</dependency>
+		</dependency>		
 	</dependencies>
 
 	<build>
