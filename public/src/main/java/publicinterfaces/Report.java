@@ -7,6 +7,8 @@ import java.util.Collections;
 
 /**
  * Maintains all details about a report, and provides methods to update and retrieve report data
+ * @author as2388
+ * @author kls82
  */
 public class Report extends AbstractReport{
     private List<Problem> problemsTestedFor = new LinkedList<>(); //list storing all problems looked for (also see what each Problem holds)
