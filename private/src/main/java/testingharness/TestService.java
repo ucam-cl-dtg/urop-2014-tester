@@ -54,7 +54,7 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
     @Override
-    public void runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
+    public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException {
     	Map<XMLTestSettings, LinkedList<String>> tests = new HashMap<>();
@@ -105,6 +105,8 @@ public class TestService implements ITestService {
         }).start();
 
         log.info(crsId+ " " + tickId + ": runNewTest: Test started");
+
+        return "Test Started";
     }
 
     /**

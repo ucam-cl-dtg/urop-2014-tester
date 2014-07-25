@@ -7,6 +7,11 @@ import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Interface for all API functions provided by UROP TestingSystem project
+ * @author as2388
+ * @author kls82
+ */
 @Path("/testerAPI/v2/")
 @Produces("application/json")
 public interface ITestService {
@@ -16,19 +21,18 @@ public interface ITestService {
      * @param crsId                         Id of user for whom test is to be run
      * @param tickId                        Id of tick for which test is
      * @param repoName                      Name of git repository to access to obtain the student's code
+     * @return                              "Test Started"
      * @throws TestStillRunningException    Thrown if the user already has a submission processing for this tick
      * @throws IOException                  Thrown by git API
      * @throws RepositoryNotFoundException  Thrown if the repository allegedly containing the student's code couldn't be
      *                                      found
      * @throws TestIDNotFoundException
-     * @throws RepositoryNotFoundException 
-     * @throws RepositoryNotFoundException 
      */
     @POST
     @Path("/{crsId}/{tickId}/{repoName}")
-    public void runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
+    public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
-            throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException, RepositoryNotFoundException;
+            throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException;
 
     /**
      * Returns the status of the latest test running/ran for a given user's tick
