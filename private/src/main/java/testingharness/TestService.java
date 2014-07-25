@@ -3,7 +3,6 @@ package testingharness;
 import database.Mongo;
 import database.MongoDBReportManager;
 import database.MongoDBXMLTestsManager;
-import exceptions.*;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -28,7 +27,6 @@ import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -36,16 +34,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class TestServiceTwo implements ITestService {
+public class TestService implements ITestService {
     // initialise log4j logger
-    private static Logger log = LoggerFactory.getLogger(TestServiceTwo.class);
-    private static final IDBReportManager db = new MongoDBReportManager(Mongo.getDb());
-    private static IDBXMLTestsManager testDb;
+    private static Logger log = LoggerFactory.getLogger(TestService.class);
+    private static final IDBReportManager dbReport = new MongoDBReportManager(Mongo.getDb());
+    private static IDBXMLTestsManager dbXMLTests = new MongoDBXMLTestsManager(Mongo.getDb());
     private static WebInterface gitProxy;
     private static Map<String, Tester> ticksInProgress = new HashMap<>();
-    
-    //TODO: will this work?
-    public TestServiceTwo() { 
+
+    public TestService() {
     	System.out.println("setting up proxys");
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 	    
@@ -53,8 +50,6 @@ public class TestServiceTwo implements ITestService {
 	    gitProxy = forGit.proxy(WebInterface.class);
 	   
 	    System.out.println("git proxy set up");
-	    
-	    testDb = new MongoDBXMLTestsManager(Mongo.getDb());
     }
 
     /** {@inheritDoc} */
@@ -80,7 +75,7 @@ public class TestServiceTwo implements ITestService {
             }
         }
          //obtain static tests to run on files according to what tick it is
-        List<XMLTestSettings> staticTests = testDb.getTestSettings(tickId);
+        List<XMLTestSettings> staticTests = dbXMLTests.getTestSettings(tickId);
         
         log.info(crsId + " " + tickId + ": runNewTest: creating Tester object");
     	
@@ -110,12 +105,6 @@ public class TestServiceTwo implements ITestService {
         }).start();
 
         log.info(crsId+ " " + tickId + ": runNewTest: Test started");
-        
-        /*
-    	AbstractReport reportToAdd = new SimpleReport();
-        reportToAdd.addDetail("bad indentation", Severity.WARNING, "eg.java", 7, "Expected 12 spaces, found 10");
-        db.addReport(crsId, tickId, commitId, reportToAdd);
-        */
     }
 
     /**
@@ -145,7 +134,7 @@ public class TestServiceTwo implements ITestService {
         else {
             //the test is not currently in memory, so try to get it from the DB
             try {
-                return db.getLastStatus(crsId, tickId);
+                return dbReport.getLastStatus(crsId, tickId);
             } catch (UserNotInDBException | TickNotInDBException e) {
                 throw new NoSuchTestException();
             }
@@ -156,27 +145,27 @@ public class TestServiceTwo implements ITestService {
     @Override
     public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException {
-        return db.getLastReport(crsId, tickId);
+        return dbReport.getLastReport(crsId, tickId);
     }
 
     /** {@inheritDoc} */
     @Override
     public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException {
-        return db.getAllReports(crsId, tickId);
+        return dbReport.getAllReports(crsId, tickId);
     }
 
     /** {@inheritDoc} */
     @Override
     public void deleteStudentReportData(@PathParam("crsId") String crsId) throws UserNotInDBException {
-        db.removeUserReports(crsId);
+        dbReport.removeUserReports(crsId);
     }
 
     /** {@inheritDoc} */
     @Override
     public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws TestIDNotFoundException, UserNotInDBException {
-        db.removeUserTickReports(crsId, tickId);
+        dbReport.removeUserTickReports(crsId, tickId);
     }
 
     /** {@inheritDoc} */
@@ -192,12 +181,12 @@ public class TestServiceTwo implements ITestService {
 		log.info("all tests added for " + tickId);
 		
 		//add to database
-	    testDb.addNewTest(tickId, checkstyleOptsTemp);
+	    dbXMLTests.addNewTest(tickId, checkstyleOptsTemp);
 	    log.info("added test to database");
 	}
 	
     public static IDBReportManager getDatabase() {
-    	return TestServiceTwo.db;
+    	return TestService.dbReport;
     }
     
 	//TODO: getAvailableCheckstyleTests()

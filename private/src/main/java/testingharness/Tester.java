@@ -81,7 +81,7 @@ public class Tester {
     	    //TODO: should we make another interface?
             Report reportToAdd = this.report;
             //TODO: should we add the report even if it failed to generate?
-            TestServiceTwo.getDatabase().addReport(crsId, tickId, reportToAdd);
+            TestService.getDatabase().addReport(crsId, tickId, reportToAdd);
         }   
     }
 
