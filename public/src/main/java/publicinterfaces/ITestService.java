@@ -30,6 +30,7 @@ public interface ITestService {
      */
     @POST
     @Path("/{crsId}/{tickId}/{repoName}")
+    @Consumes("application/json")
     public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException;

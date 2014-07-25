@@ -38,12 +38,12 @@ public class TestService implements ITestService {
     // initialise log4j logger
     private static Logger log = LoggerFactory.getLogger(TestService.class);
     private static final IDBReportManager dbReport = new MongoDBReportManager(Mongo.getDb());
-    private static IDBXMLTestsManager dbXMLTests = new MongoDBXMLTestsManager(Mongo.getDb());
+    private static final IDBXMLTestsManager dbXMLTests = new MongoDBXMLTestsManager(Mongo.getDb());
     private static WebInterface gitProxy;
     private static Map<String, Tester> ticksInProgress = new HashMap<>();
 
     public TestService() {
-    	System.out.println("setting up proxys");
+    	System.out.println("setting up proxies");
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 	    
 	    ResteasyWebTarget forGit = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
@@ -74,7 +74,7 @@ public class TestService implements ITestService {
                 filesToTest.add(file);
             }
         }
-         //obtain static tests to run on files according to what tick it is
+        //obtain static tests to run on files according to what tick it is
         List<XMLTestSettings> staticTests = dbXMLTests.getTestSettings(tickId);
         
         log.info(crsId + " " + tickId + ": runNewTest: creating Tester object");

@@ -19,7 +19,6 @@ public class StaticLogger implements AuditListener
 {
     private Report report;	//reference to the list in the report containing the static report items
     private String testDef;
-    private Severity severity;
     /**
      * Constructor for StaticLogger
      * @param report Report where generated report items will go.
@@ -29,9 +28,8 @@ public class StaticLogger implements AuditListener
     {
         this.report = report;
         this.testDef = test.getTestDefinition();
-        this.severity = test.getSeverity();
         System.out.println("added " + testDef + " to report");
-        report.addProblem(this.testDef,this.severity);
+        report.addProblem(this.testDef, test.getSeverity());
     }
 
     /**
