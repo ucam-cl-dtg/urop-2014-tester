@@ -1,0 +1,67 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>uk.ac.cam.cl.urop-test</groupId>
+  <artifactId>public</artifactId>
+  <version>0.0.4-SNAPSHOT</version>
+  
+  <repositories>
+		<repository>
+			<id>JBoss repository</id>
+			<url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+		</repository>
+ 	 </repositories>
+  
+  	<dependencies>
+  		<!-- RESTEasy -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jaxrs</artifactId>
+			<version>3.0.6.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson-provider</artifactId>
+			<version>3.0.6.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-multipart-provider</artifactId>
+			<version>3.0.6.Final</version>
+		</dependency>
+		
+		<!-- Jackson -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>2.4.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.4.1.2</version>
+		</dependency>
+		
+		<!-- Git API -->
+		<dependency>
+			<groupId>uk.ac.cam.cl.git</groupId>
+			<artifactId>remote</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+	
+	<distributionManagement>
+    <!-- use the following if you're not using a snapshot version.
+      <repository>
+        <id>dtg-code</id>
+          <name>RepositoryProxy</name>
+            <url>http://maven.dtg.cl.cam.ac.uk/content/repositories/releases</url>
+            </repository>
+          -->
+    <!-- use the following if you ARE using a snapshot version. -->
+    <snapshotRepository>
+      <id>dtg-code</id>
+      <name>RepositoryProxy</name>
+      <url>http://maven.dtg.cl.cam.ac.uk/content/repositories/snapshots</url>
+    </snapshotRepository>
+  </distributionManagement>
+</project>
