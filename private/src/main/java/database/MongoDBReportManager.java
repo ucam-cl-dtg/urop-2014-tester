@@ -15,6 +15,7 @@ import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
 import publicinterfaces.UserNotInDBException;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -65,7 +66,7 @@ public class MongoDBReportManager implements IDBReportManager {
 
     /** {@inheritDoc} */
     @Override
-    public List<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
+    public LinkedList<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
         return getValidUser(crsId).getAllReports(tickId);
     }
 

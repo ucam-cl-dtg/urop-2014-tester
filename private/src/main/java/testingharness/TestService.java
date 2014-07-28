@@ -144,7 +144,7 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
     @Override
-    public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public LinkedList<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException
     {
         return dbReport.getAllReports(crsId, tickId);

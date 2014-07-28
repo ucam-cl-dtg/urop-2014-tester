@@ -13,6 +13,7 @@ import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -65,7 +66,7 @@ class DBUser {
      * @return          List of all reports user has for a given tick
      */
     @JsonIgnore
-    public List<AbstractReport> getAllReports(String tickId) throws TickNotInDBException {
+    public LinkedList<AbstractReport> getAllReports(String tickId) throws TickNotInDBException {
         return getValidTick(tickId).getAll();
     }
 

@@ -36,7 +36,7 @@ class DBTick {
      * @return  All reports in this tick
      */
     @JsonIgnore
-    public List<AbstractReport> getAll() {
+    public LinkedList<AbstractReport> getAll() {
         return reports;
     }
 

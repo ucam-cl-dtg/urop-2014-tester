@@ -1,5 +1,6 @@
 package privateinterfaces;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import publicinterfaces.AbstractReport;
@@ -48,7 +49,7 @@ public interface IDBReportManager {
      * @throws UserNotInDBException Thrown if user with id crsId was not found in the database
      * @throws TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
      */
-    public List<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException,
+    public LinkedList<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException,
             TickNotInDBException;
 
     /**
