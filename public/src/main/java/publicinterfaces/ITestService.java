@@ -89,6 +89,10 @@ public interface ITestService {
 	public void createNewTest(@PathParam("tickId") String tickId /* , List<XMLTestSettings> checkstyleOpts */)
             throws TestIDAlreadyExistsException;
 
+    @GET
+    @Path("/test")
+    public void test() throws NoSuchTestException;
+
     //TODO: cancel test?
     //@DELETE
     //@Path("/{crsid}/{tickid}/running")

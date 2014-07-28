@@ -13,16 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
-import publicinterfaces.AbstractReport;
-import publicinterfaces.ITestService;
-import publicinterfaces.NoSuchTestException;
-import publicinterfaces.Severity;
-import publicinterfaces.Status;
-import publicinterfaces.TestIDAlreadyExistsException;
-import publicinterfaces.TestIDNotFoundException;
-import publicinterfaces.TestStillRunningException;
-import publicinterfaces.TickNotInDBException;
-import publicinterfaces.UserNotInDBException;
+import publicinterfaces.*;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
@@ -148,14 +139,16 @@ public class TestService implements ITestService {
     @Override
     public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException {
-        return dbReport.getLastReport(crsId, tickId);
+        return  dbReport.getLastReport(crsId, tickId);
     }
 
     /** {@inheritDoc} */
     @Override
     public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
-            throws UserNotInDBException, TickNotInDBException {
+            throws UserNotInDBException, TickNotInDBException
+    {
         return dbReport.getAllReports(crsId, tickId);
+        //return null;
     }
 
     /** {@inheritDoc} */
@@ -194,6 +187,17 @@ public class TestService implements ITestService {
 	
     public static IDBReportManager getDatabase() {
     	return TestService.dbReport;
+    }
+
+    @Override
+    public void test() throws NoSuchTestException {
+        ResteasyClient rc = new ResteasyClientBuilder().build();
+
+        ResteasyWebTarget t = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
+        ITestService proxy = t.proxy(ITestService.class);
+
+        proxy.pollStatus("as2388", "tick-test");
+        System.out.println("done");
     }
     
 	//TODO: getAvailableCheckstyleTests()

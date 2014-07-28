@@ -1,5 +1,8 @@
 package publicinterfaces;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Stores basic information about the progress of a test.
  * @author kls82
@@ -8,6 +11,7 @@ public class Status {
     private int progress; //number of completed tests
     private int maxProgress; //total number of tests which wil be run
     private String info; //string describing progress e.g. running test 1 of 3
+
 
     public Status(String init, int maxProg) {
         this.progress = 0;
@@ -19,6 +23,7 @@ public class Status {
      * Use for creation of Status objects for finished tests
      * @param maxProgress   Total number of tests which were run
      */
+    //@JsonCreator
     public Status(int maxProgress) {
         this.progress = maxProgress;
         this.maxProgress = maxProgress;
@@ -35,6 +40,8 @@ public class Status {
         this.info = "complete";
     }
 
+    public Status() {}
+
     public int getProgress() {
         return this.progress;
     }
@@ -45,5 +52,17 @@ public class Status {
 
     public String getInfo() {
         return this.info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
+    public void setMaxProgress(int maxProgress) {
+        this.maxProgress = maxProgress;
+    }
+
+    public void setProgress(int progress) {
+        this.progress = progress;
     }
 }

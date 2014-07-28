@@ -2,6 +2,7 @@ package publicinterfaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Date;
 import java.util.LinkedList;
 
 public class SimpleReport extends AbstractReport {
