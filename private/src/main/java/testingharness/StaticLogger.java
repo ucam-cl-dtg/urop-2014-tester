@@ -1,8 +1,8 @@
 package testingharness;
 
+import publicinterfaces.AbstractReport;
 import publicinterfaces.CategoryNotInReportException;
 import publicinterfaces.Report;
-import publicinterfaces.Severity;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
@@ -17,14 +17,14 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
  */
 public class StaticLogger implements AuditListener
 {
-    private Report report;	//reference to the list in the report containing the static report items
+    private AbstractReport report;	//reference to the list in the report containing the static report items
     private String testDef;
     /**
      * Constructor for StaticLogger
      * @param report Report where generated report items will go.
      * @param test   Checkstyle config data
      */
-    public StaticLogger(Report report, XMLTestSettings test)
+    public StaticLogger(AbstractReport report, XMLTestSettings test)
     {
         this.report = report;
         this.testDef = test.getTestDefinition();
@@ -52,7 +52,11 @@ public class StaticLogger implements AuditListener
 			e.printStackTrace();
 		}
     }
+
     //TODO: what is this???
+    //as2388: If Checkstyle fails because of malformed java, it raises addException. Because we only run Checkstyle if
+    //the dynamic tests were successful (and hence compiled), this shouldn't be raised, but just in case, this is here
+    //to deal with it. So, TODO: update implementation to insert into new report
     @Override
     public void addException(AuditEvent event, Throwable t){}
     /*
@@ -83,7 +87,7 @@ public class StaticLogger implements AuditListener
 
     //The following four functions are needed to implement AuditListener, but we have no use for them
     @Override public void auditFinished(AuditEvent arg0){
-    	System.out.println("test complete now report has " + report.getProblems().size() + " items!");
+    	//System.out.println("test complete now report has " + report.getProblems().size() + " items!");
     }
     @Override public void auditStarted(AuditEvent arg0){}
     @Override public void fileFinished(AuditEvent arg0){}

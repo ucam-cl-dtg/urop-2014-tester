@@ -2,14 +2,15 @@ package testingharness;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
-import gitapidependencies.RepositoryNotFoundException;
-
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import publicinterfaces.AbstractReport;
 import publicinterfaces.Report;
+import publicinterfaces.SimpleReport;
 import publicinterfaces.Status;
+import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -28,7 +29,7 @@ import java.util.Map;
 public class Tester {
     static Logger log = LoggerFactory.getLogger(Tester.class); //initialise log4j logger
 
-    private Report report; //Report object into which all the report items will ultimately go
+    private AbstractReport report; //Report object into which all the report items will ultimately go
     private Status status; 
     private Exception failCause; //if the report fails, save it here so that it can be thrown when the report is requested
     private String repoName;
@@ -41,7 +42,7 @@ public class Tester {
      */
     public Tester(Map<XMLTestSettings, LinkedList<String>> testingQueue, String repoName)  {
         this.testingQueue = testingQueue;
-        this.report = new Report();
+        this.report = new SimpleReport();
         this.repoName = repoName;
         System.out.println(testingQueue.size());
     }
@@ -49,6 +50,7 @@ public class Tester {
     /**
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
+     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
     public void runTests(String crsId, String tickId, String commitId)
     {
@@ -56,6 +58,7 @@ public class Tester {
 
         try {
             int noOfTests = testingQueue.size();
+            report.setNoOfTests(noOfTests+1);
             this.status = new Status("loading tests", noOfTests + 1);            
 
             runDynamicTests();
@@ -79,7 +82,7 @@ public class Tester {
         {
             this.status.complete();
     	    //TODO: should we make another interface?
-            Report reportToAdd = this.report;
+            AbstractReport reportToAdd = this.report;
             //TODO: should we add the report even if it failed to generate?
             TestService.getDatabase().addReport(crsId, tickId, reportToAdd);
         }   
@@ -102,18 +105,20 @@ public class Tester {
      * Runs all static analysis tests required by the tick
      * @throws CheckstyleException
      * @throws IOException
+     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    private void runStaticTests() throws CheckstyleException, IOException, RepositoryNotFoundException
+    private void runStaticTests() throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException
     {
         log.info("Starting static analysis");
         //get static tests from testingQueue
         Map<XMLTestSettings, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
         for (Map.Entry<XMLTestSettings, LinkedList<String>> e : staticTests.entrySet()) {
+            delay(3000);
             status.addProgress();
             System.out.println("running test " + e.getKey().getTestFile());
             runStaticAnalysis(e.getKey(), e.getValue());
-            System.out.println("in tester the report has " + report.getProblems().size() + " items");
+            //System.out.println("in tester the report has " + report.getProblems().size() + " items");
         }
         log.info("Static analysis complete");
     }
@@ -183,10 +188,13 @@ public class Tester {
      * @param fileNames				A list of paths to the files on which the static analyses tests are to be performed
      * @throws CheckstyleException	
      * @throws IOException 
+     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames) throws CheckstyleException, IOException, RepositoryNotFoundException {
+    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException {
            StaticParser.test(configFileName, fileNames, report, repoName);
     }
+
+
 
     //GETTERS
     public Exception getFailCause()
@@ -199,13 +207,21 @@ public class Tester {
         return this.status;
     }
 
-    public Report getReport() {
-    	report.calculateProblemStatuses();
+    public AbstractReport getReport() {
+    	//report.calculateProblemStatuses();
         return report;
     }
 
     //TODO: temporary, delete
     public void setStatus(Status s) {
         this.status = s;
+    }
+
+    private void delay(int timeMS) {
+        try {
+            Thread.sleep(timeMS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

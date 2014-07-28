@@ -39,7 +39,7 @@ public class TestService implements ITestService {
     private static Logger log = LoggerFactory.getLogger(TestService.class);
     private static final IDBReportManager dbReport = new MongoDBReportManager(Mongo.getDb());
     private static final IDBXMLTestsManager dbXMLTests = new MongoDBXMLTestsManager(Mongo.getDb());
-    private static WebInterface gitProxy;
+    public static WebInterface gitProxy;
     private static Map<String, Tester> ticksInProgress = new HashMap<>();
 
     public TestService() {
@@ -122,6 +122,7 @@ public class TestService implements ITestService {
 
         //once tests have run, remove the tester from the map of in-progress tests
         assert ticksInProgress.containsKey(crsId + tickId);
+        System.out.println("removing...");
         ticksInProgress.remove(crsId + tickId);
     }
 
@@ -176,10 +177,14 @@ public class TestService implements ITestService {
             throws TestIDAlreadyExistsException {
     	log.info("adding tests for " + tickId);
 		List<XMLTestSettings> checkstyleOptsTemp = new LinkedList<>();
-		checkstyleOptsTemp.add(new XMLTestSettings("emptyBlocks",Severity.ERROR,"empty blocks between braces"));
-		checkstyleOptsTemp.add(new XMLTestSettings("longVariableDeclaration",Severity.WARNING,"use of 'L' to declare long"));
-		checkstyleOptsTemp.add(new XMLTestSettings("unusedImports",Severity.WARNING,"unused imports"));
-		checkstyleOptsTemp.add(new XMLTestSettings("TODOorFIXME",Severity.ERROR,"TODO or FIXME still in code"));
+		checkstyleOptsTemp.add(new XMLTestSettings("emptyBlocks",Severity.ERROR,"Empty blocks"));
+		checkstyleOptsTemp.add(new XMLTestSettings("unusedImports",Severity.WARNING,"Unused Imports"));
+		checkstyleOptsTemp.add(new XMLTestSettings("TODOorFIXME",Severity.ERROR,"TODOs and FIXMEs"));
+        checkstyleOptsTemp.add(new XMLTestSettings("illegalCatch",Severity.ERROR,"Illegal catches"));
+        checkstyleOptsTemp.add(new XMLTestSettings("illegalThrow",Severity.ERROR,"Illegal throws"));
+        checkstyleOptsTemp.add(new XMLTestSettings("indentation",Severity.WARNING,"Indentation"));
+        checkstyleOptsTemp.add(new XMLTestSettings("noProblem", Severity.WARNING, "No problem"));
+        checkstyleOptsTemp.add(new XMLTestSettings("longVariableDeclaration",Severity.WARNING,"Lower case long assignment"));
 		log.info("all tests added for " + tickId);
 		
 		//add to database

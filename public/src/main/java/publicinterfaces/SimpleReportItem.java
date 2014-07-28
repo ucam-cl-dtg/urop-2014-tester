@@ -1,4 +1,4 @@
-package reportelements;
+package publicinterfaces;
 
 import publicinterfaces.Severity;
 

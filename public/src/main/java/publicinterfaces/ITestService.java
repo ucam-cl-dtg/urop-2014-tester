@@ -30,7 +30,6 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/{repoName}")
-    @Consumes("application/json")
     public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException;
@@ -43,7 +42,7 @@ public interface ITestService {
      * @throws NoSuchTestException Thrown if no test has been started for this user/tick combination
      */
     @GET
-    @Path("{crsId}/{tickId}/running")
+    @Path("{crsId}/{tickId}/poll")
     public Status pollStatus(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws NoSuchTestException;
 

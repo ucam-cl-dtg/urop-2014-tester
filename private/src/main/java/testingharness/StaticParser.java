@@ -7,8 +7,7 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
-import gitapidependencies.RepositoryNotFoundException;
-import gitapidependencies.WebInterface;
+
 
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
@@ -16,7 +15,9 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import publicinterfaces.AbstractReport;
 import publicinterfaces.Report;
+import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -42,19 +43,15 @@ public class StaticParser {
      * @param repoName                  Name of git repository in which {@code file} is located
      * @throws CheckstyleException      
      * @throws IOException              
+     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    public static void test(XMLTestSettings test, List<String> files, Report report, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException{
+    public static void test(XMLTestSettings test, List<String> files, AbstractReport report, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException{
         //must be in list for .process to work
     	log.info("starting to run test with URL " + test.getTestFile());
         LinkedList<File> fileList = new LinkedList<>();
 
-        //read contents of file from git and store all files to test in temporary files
-        ResteasyClient rc = new ResteasyClientBuilder().build();
-        ResteasyWebTarget t = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
-        WebInterface proxy = t.proxy(WebInterface.class);
-        
         for (String file : files) {
-	        String contents = proxy.getFile(file, repoName);
+	        String contents = TestService.gitProxy.getFile(file, repoName);
 	
 	        File javaFile = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
 	        log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
@@ -97,8 +94,6 @@ public class StaticParser {
 	                log.error("Failed to delete temp file: " + javaFile.getAbsoluteFile());
 	            }
         	}
-            //Close the rest easy client
-            rc.close();
         }
     }
 
