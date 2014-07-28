@@ -1,5 +1,7 @@
 package testingharness;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import publicinterfaces.AbstractReport;
 import publicinterfaces.CategoryNotInReportException;
 import publicinterfaces.Report;
@@ -17,6 +19,7 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
  */
 public class StaticLogger implements AuditListener
 {
+    Logger log = LoggerFactory.getLogger(StaticLogger.class);
     private AbstractReport report;	//reference to the list in the report containing the static report items
     private String testDef;
     /**
@@ -43,17 +46,16 @@ public class StaticLogger implements AuditListener
         try {
         	//want to remove random number at the end of the temp file
         	//note this means no .java file submitted can contain a number!
-        	String file = event.getFileName().replaceAll("[0-9]","");
-        	String fileInput = file.substring(file.lastIndexOf("\\")+1,file.length());
-			report.addDetail(testDef,fileInput,event.getLine(),event.getMessage());
+        	String file = event.getFileName().replaceAll("[0-9]", "");
+        	String fileInput = file.substring(file.lastIndexOf("\\") + 1, file.length());
+			report.addDetail(testDef, fileInput, event.getLine(), event.getMessage());
 			System.out.println("checkstyles found something!");
 		} catch (CategoryNotInReportException e) {
-			// TODO how to handle?
-			e.printStackTrace();
+			log.error("Category not found");
+            e.printStackTrace();
 		}
     }
 
-    //TODO: what is this???
     //as2388: If Checkstyle fails because of malformed java, it raises addException. Because we only run Checkstyle if
     //the dynamic tests were successful (and hence compiled), this shouldn't be raised, but just in case, this is here
     //to deal with it. So, TODO: update implementation to insert into new report

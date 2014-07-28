@@ -5,7 +5,9 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import java.util.Date;
 
 /**
- * Enables reports
+ * Outline of all parameters/functions which a report MUST have/implement.
+ * The exact method of organising this data is left to class extenders
+ * @author as2388
  */
 @JsonDeserialize(as=SimpleReport.class)
 public abstract class AbstractReport {
@@ -71,6 +73,4 @@ public abstract class AbstractReport {
     public void setNoOfTests(int noOfTests) {
         this.noOfTests = noOfTests;
     }
-
-    //TODO
 }

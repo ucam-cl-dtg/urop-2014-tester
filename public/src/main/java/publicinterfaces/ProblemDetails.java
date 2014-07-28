@@ -30,7 +30,8 @@ public class ProblemDetails {
      *                      12 spaces, found 16
      */
     protected void addDetail(String file, Integer lineNumber, String detail) {
-    	//TODO: remember .java has been removed here
+    	//TODO: at the moment, .java extension is removed here because filename is the key of a map. This could cause
+        //TODO: problems later, so something needs to be done about this...
     	String filename = getName(file);
         if (!(fileDetails.containsKey(filename))) {
             fileDetails.put(filename, new LinkedList<FileItem>());

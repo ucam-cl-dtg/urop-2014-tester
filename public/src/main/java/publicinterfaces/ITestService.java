@@ -47,7 +47,6 @@ public interface ITestService {
             throws NoSuchTestException;
 
     /**
-     * TODO: finish JavaDoc
      * Returns the most-recently generated report.
      * Note: this function returns the most recently generated report for a given crsID and tickID, not the report
      * associated with the newest commit, because these are not expected to be different.
