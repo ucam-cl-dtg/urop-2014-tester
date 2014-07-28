@@ -1,3 +1,9 @@
 TestingSystem.iml
 .idea/
 */target/
+private/TestingSystem.iml
+public/.classpath
+public/.project
+public/.settings/
+public/public.iml
+public/.setings/
