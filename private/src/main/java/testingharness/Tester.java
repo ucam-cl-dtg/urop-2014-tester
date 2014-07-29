@@ -6,9 +6,8 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import publicinterfaces.AbstractReport;
 import publicinterfaces.Report;
-import publicinterfaces.SimpleReport;
+import publicinterfaces.ReportResult;
 import publicinterfaces.Status;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
@@ -29,7 +28,7 @@ import java.util.Map;
 public class Tester {
     static Logger log = LoggerFactory.getLogger(Tester.class); //initialise log4j logger
 
-    private AbstractReport report; //Report object into which all the report items will ultimately go
+    private Report report; //Report object into which all the report items will ultimately go
     private Status status; 
     private Exception failCause; //if the report fails, save it here so that it can be thrown when the report is requested
     private String repoName;
@@ -42,9 +41,8 @@ public class Tester {
      */
     public Tester(Map<XMLTestSettings, LinkedList<String>> testingQueue, String repoName)  {
         this.testingQueue = testingQueue;
-        this.report = new SimpleReport();
+        this.report = new Report();
         this.repoName = repoName;
-        System.out.println(testingQueue.size());
     }
 
     /**
@@ -58,7 +56,7 @@ public class Tester {
 
         try {
             int noOfTests = testingQueue.size();
-            report.setNoOfTests(noOfTests+1);
+            report.setNoOfTests(noOfTests);
             this.status = new Status("loading tests", noOfTests + 1);            
 
             runDynamicTests();
@@ -67,23 +65,24 @@ public class Tester {
             {
                 runStaticTests();
             }           
+            
+            report.calculateProblemStatuses();
 
             log.info("Tick analysis finished successfully");
-
-            //TODO: remove this. For now, print result to the console
-            printReport();
         }	
         catch (CheckstyleException | IOException | RepositoryNotFoundException e)
         {
             log.error("Tick analysis failed. Exception message: " + e.getMessage());
+            report.setReportResult(ReportResult.UNDEFINED);
             failCause = e;
         }
         finally
         {
-            this.status.complete();
-            AbstractReport reportToAdd = this.report;
+        	//TODO: should we make another interface?
+            Report reportToAdd = this.report;
             //TODO: should we add the report even if it failed to generate?
             TestService.getDatabase().addReport(crsId, tickId, reportToAdd);
+            this.status.complete();
         }   
     }
 
@@ -113,11 +112,9 @@ public class Tester {
         Map<XMLTestSettings, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
         for (Map.Entry<XMLTestSettings, LinkedList<String>> e : staticTests.entrySet()) {
-            delay(3000);
+            // delay(3000);
             status.addProgress();
-            System.out.println("running test " + e.getKey().getTestFile());
             runStaticAnalysis(e.getKey(), e.getValue());
-            //System.out.println("in tester the report has " + report.getProblems().size() + " items");
         }
         log.info("Static analysis complete");
     }
@@ -164,22 +161,6 @@ public class Tester {
         return mapReturn;
     }
 
-    private void printReport()
-    {
-        //print the overall test result
-       /* System.out.println("Your result: " + report.getResult());
-        System.out.println();
-
-        //Print each error
-        for (StaticReportItem i : report.getsReport()){
-            System.out.print(i.getSeverity() + ": file " + i.getFileName() + "  at line(s) "); 
-            for (int l : i.getLineNumbers()) {
-                System.out.print(l + ", ");		//print the line numbers of ass the instances on which this particular error was found
-            }
-            System.out.println(i.getMessage()); 
-        }		*/
-    }
-
     /**
      * Run CheckStyle, set up with the given config file, on all the files to which it should be applied
      * 
@@ -189,7 +170,7 @@ public class Tester {
      * @throws IOException 
      * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException {
+    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames) throws CheckstyleException, IOException, uk.ac.cam.cl.git.api.RepositoryNotFoundException {
            StaticParser.test(configFileName, fileNames, report, repoName);
     }
 
@@ -206,8 +187,7 @@ public class Tester {
         return this.status;
     }
 
-    public AbstractReport getReport() {
-    	//report.calculateProblemStatuses();
+    public Report getReport() {
         return report;
     }
 

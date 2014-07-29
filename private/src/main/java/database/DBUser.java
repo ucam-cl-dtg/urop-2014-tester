@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import publicinterfaces.AbstractReport;
+import publicinterfaces.Report;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
@@ -37,7 +37,7 @@ class DBUser {
      * @param tickId    Unique identifier of tick to add report to
      * @param newReport Report to add
      */
-    public void addReport(String tickId, AbstractReport newReport) {
+    public void addReport(String tickId, Report newReport) {
         //if there is no tick object with the id of tickId, create one
         if (!(ticks.containsKey(tickId))) {
             ticks.put(tickId, new DBTick());
@@ -56,7 +56,7 @@ class DBUser {
      * @throws publicinterfaces.TickNotInDBException Thrown if the tick wasn't found in the database
      */
     @JsonIgnore
-    public AbstractReport getLastReport(String tickId) throws TickNotInDBException {
+    public Report getLastReport(String tickId) throws TickNotInDBException {
         return getValidTick(tickId).getLast();
     }
 
@@ -66,7 +66,7 @@ class DBUser {
      * @return          List of all reports user has for a given tick
      */
     @JsonIgnore
-    public LinkedList<AbstractReport> getAllReports(String tickId) throws TickNotInDBException {
+    public List<Report> getAllReports(String tickId) throws TickNotInDBException {
         return getValidTick(tickId).getAll();
     }
 
@@ -77,7 +77,7 @@ class DBUser {
      */
     @JsonIgnore
     public Status getStatus(String tickId) throws TickNotInDBException {
-        AbstractReport report = getValidTick(tickId).getLast();
+        Report report = getValidTick(tickId).getLast();
         return new Status(report.getNoOfTests());
     }
 

@@ -13,7 +13,18 @@ import org.slf4j.LoggerFactory;
 
 import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
-import publicinterfaces.*;
+
+import publicinterfaces.ITestService;
+import publicinterfaces.NoSuchTestException;
+import publicinterfaces.Report;
+import publicinterfaces.Severity;
+import publicinterfaces.Status;
+import publicinterfaces.TestIDAlreadyExistsException;
+import publicinterfaces.TestIDNotFoundException;
+import publicinterfaces.TestStillRunningException;
+import publicinterfaces.TickNotInDBException;
+import publicinterfaces.UserNotInDBException;
+
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
@@ -137,16 +148,15 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
     @Override
-    public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Report getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException {
         return  dbReport.getLastReport(crsId, tickId);
     }
 
     /** {@inheritDoc} */
     @Override
-    public LinkedList<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
-            throws UserNotInDBException, TickNotInDBException
-    {
+    public List<Report> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+            throws UserNotInDBException, TickNotInDBException {
         return dbReport.getAllReports(crsId, tickId);
         //return null;
     }

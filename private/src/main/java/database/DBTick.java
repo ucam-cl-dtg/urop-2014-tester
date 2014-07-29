@@ -5,14 +5,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.LinkedList;
 import java.util.List;
 
-import publicinterfaces.AbstractReport;
+import publicinterfaces.Report;
 
 /**
  * Used to maintain all reports in a tick instance
  * @author as2388
  */
 class DBTick {
-    private LinkedList<AbstractReport> reports = new LinkedList<>();
+    private LinkedList<Report> reports = new LinkedList<>();
 
     public DBTick() {}
 
@@ -20,7 +20,7 @@ class DBTick {
      * Adds a new report to this tick
      * @param newReport Report to add
      */
-    public void addReport(AbstractReport newReport) {
+    public void addReport(Report newReport) {
         reports.add(newReport);
     }
 
@@ -28,7 +28,7 @@ class DBTick {
      * @return  Last report added to this tick.
      */
     @JsonIgnore
-    public AbstractReport getLast() {
+    public Report getLast() {
         return reports.getLast();
     }
 
@@ -36,16 +36,16 @@ class DBTick {
      * @return  All reports in this tick
      */
     @JsonIgnore
-    public LinkedList<AbstractReport> getAll() {
+    public List<Report> getAll() {
         return reports;
     }
 
     //JSON serialisation stuff:
-    public LinkedList<AbstractReport> getReports() {
+    public LinkedList<Report> getReports() {
         return reports;
     }
 
-    public void setReports(LinkedList<AbstractReport> reports) {
+    public void setReports(LinkedList<Report> reports) {
         this.reports = reports;
     }
 }

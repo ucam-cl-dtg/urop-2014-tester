@@ -9,21 +9,24 @@ import com.puppycrawl.tools.checkstyle.api.Configuration;
 
 
 
+
+
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import publicinterfaces.AbstractReport;
 import publicinterfaces.Report;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
 
@@ -45,15 +48,17 @@ public class StaticParser {
      * @throws IOException              
      * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    public static void test(XMLTestSettings test, List<String> files, AbstractReport report, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException{
+    public static void test(XMLTestSettings test, List<String> files, Report report, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException{
         //must be in list for .process to work
+    	Map<String,String> filePathMap = new HashMap<>();
     	log.info("starting to run test with URL " + test.getTestFile());
         LinkedList<File> fileList = new LinkedList<>();
 
         for (String file : files) {
 	        String contents = TestService.gitProxy.getFile(file, repoName);
-	
-	        File javaFile = File.createTempFile(file.substring(0,file.lastIndexOf(".")),".java"); 
+	        String fileName = file.substring(0,file.lastIndexOf("."));
+	        
+	        File javaFile = File.createTempFile(fileName,".java"); 
 	        log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
 	
 	        //write string to temp file
@@ -66,6 +71,7 @@ public class StaticParser {
 	
 	        if (javaFile.exists()){
 	            fileList.add(javaFile);
+	            filePathMap.put(javaFile.getAbsolutePath(),file);
 	        }
 	        else {
 	            throw new IOException("Could not find file: " + file);
@@ -78,7 +84,7 @@ public class StaticParser {
             log.info("Testing: java files");
             Configuration config = ConfigurationLoader.loadConfiguration(test.getTestFile(), 
                     new PropertiesExpander(System.getProperties()));
-            AuditListener listener = new StaticLogger(report,test);
+            AuditListener listener = new StaticLogger(report,test,filePathMap);
             Checker c = createChecker(config, listener); 
             c.process(fileList); 
             c.destroy();
