@@ -2,48 +2,16 @@
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
 
-<polymer-element name="static-list-item">
+<polymer-element name="static-list-item" attributes="text">
     <template>
-        <style>
-            :host {
-                display: block;
-                position: relative;
-                background-color: white;
-                padding: 20px;
-                font-size: 1.2rem;
-                font-weight: 300;
-            }
-            paper-radio-button {
-                margin-top: 10px;
-                margin-left: 30px;
-            }
-            polyfill-next-selector { content: '#error shadow'; }
-            #error::shadow #ink[checked] {
-                color: #e51c23; <!-- Material design Red 500 -->
-            }
-            polyfill-next-selector { content: '#warning shadow'; }
-            #warning::shadow #ink[checked] {
-                color: #ff9800; <!-- Material design Orange 500 -->
-            }
-
-            polyfill-next-selector{ content: '#error shadow'; }
-            @media (min-width: 690px) {
-                paper-radio-group {
-                    width: 50%;
-                }
-                paper-radio-button {
-                    margin-top: 10px;
-                    margin-left: 20%;
-                }
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="static-list-item.css">
 
         <span layout horizontal>
-            <p flex>Checkstyle option</p>
+            <p flex>{{text}}</p>
             <paper-radio-group>
-                <paper-radio-button id="none" class="radio" name="none"></paper-radio-button>
-                <paper-radio-button id="warning" class="radio" name="warning"></paper-radio-button>
-                <paper-radio-button id="error" class="radio" name="error"></paper-radio-button>
+                <paper-radio-button id="none"    name="none"    ></paper-radio-button>
+                <paper-radio-button id="warning" name="warning" ></paper-radio-button>
+                <paper-radio-button id="error"   name="error"   ></paper-radio-button>
             </paper-radio-group>
         </span>
     </template>

@@ -1,0 +1,32 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="static-list-item.html">
+
+<polymer-element name="static-list" attributes="staticOptions">
+    <template>
+        <style>
+            :host {
+                display: block;
+                width: 100%;
+            }
+        </style>
+
+        <div layout vertical center>
+            <template repeat="{{staticOption, i in staticOptions}}">
+                <static-list-item
+                        text="{{staticOption.text}}"
+                        >
+                </static-list-item>
+            </template>
+        </div>
+    </template>
+    <script>
+        Polymer('static-list', {
+            ready: function() {
+                this.staticOptions = [];
+                this.staticOptions[0] = { text: "TODO or FIXME",  checked: 2};
+                this.staticOptions[1] = { text: "Unused imports", checked: 1};
+            }
+        });
+    </script>
+</polymer-element>
