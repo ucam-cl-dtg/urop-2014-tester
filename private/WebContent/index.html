@@ -5,7 +5,7 @@
     <script src="bower_components/platform/platform.js"></script>
     <link rel="import" href="bower_components/font-roboto/roboto.html">
     <link rel="import" href="elements/main-card.html">
-    <link rel="import" href="elements/static-test-options/static-list-item.html">
+    <link rel="import" href="elements/static-test-options/static-list.html">
 
     <style>
         html,body {
@@ -18,8 +18,8 @@
 </head>
 <body unresolved touch-action="auto">
     <div class="container">
-        <main-card>
-            <static-list-item></static-list-item>
+        <main-card animated>
+            <static-list staticOptions='[ { "text": "test", "checked": "0" } ]'></static-list>
         </main-card>
     </div>
 </body>
