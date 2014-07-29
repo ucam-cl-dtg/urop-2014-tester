@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
-import publicinterfaces.AbstractReport;
 import publicinterfaces.ITestService;
 import publicinterfaces.NoSuchTestException;
+import publicinterfaces.Report;
 import publicinterfaces.Severity;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDAlreadyExistsException;
@@ -146,14 +146,14 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
     @Override
-    public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Report getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException {
         return dbReport.getLastReport(crsId, tickId);
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public List<Report> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException {
         return dbReport.getAllReports(crsId, tickId);
     }

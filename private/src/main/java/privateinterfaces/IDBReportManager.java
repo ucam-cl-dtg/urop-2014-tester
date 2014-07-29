@@ -2,7 +2,7 @@ package privateinterfaces;
 
 import java.util.List;
 
-import publicinterfaces.AbstractReport;
+import publicinterfaces.Report;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
@@ -20,7 +20,7 @@ public interface IDBReportManager {
      * @param tickId        Id of tick of user's tick to add report to
      * @param report        Report to add
      */
-    public void addReport(String crsId, String tickId, AbstractReport report);
+    public void addReport(String crsId, String tickId, Report report);
 
     /**
      * Gets the last report added to a given user's tick
@@ -30,7 +30,7 @@ public interface IDBReportManager {
      * @throws UserNotInDBException Thrown if user with id crsId was not found in the database
      * @throws TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
      */
-    public AbstractReport getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
+    public Report getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
 
     /**
      * Gets the status of the last report in the given user's tick
@@ -48,7 +48,7 @@ public interface IDBReportManager {
      * @throws UserNotInDBException Thrown if user with id crsId was not found in the database
      * @throws TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
      */
-    public List<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException,
+    public List<Report> getAllReports(String crsId, String tickId) throws UserNotInDBException,
             TickNotInDBException;
 
     /**

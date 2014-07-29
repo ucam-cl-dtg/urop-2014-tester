@@ -1,6 +1,8 @@
 package testingharness;
 
-import publicinterfaces.AbstractReport;
+import java.util.Map;
+
+import publicinterfaces.Report;
 import publicinterfaces.CategoryNotInReportException;
 import publicinterfaces.Report;
 
@@ -17,17 +19,19 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
  */
 public class StaticLogger implements AuditListener
 {
-    private AbstractReport report;	//reference to the list in the report containing the static report items
+    private Report report;	//reference to the list in the report containing the static report items
     private String testDef;
+    private Map<String,String> filePathMap;
     /**
      * Constructor for StaticLogger
      * @param report Report where generated report items will go.
      * @param test   Checkstyle config data
      */
-    public StaticLogger(AbstractReport report, XMLTestSettings test)
+    public StaticLogger(Report report, XMLTestSettings test, Map<String,String> filePathMap)
     {
         this.report = report;
         this.testDef = test.getTestDefinition();
+        this.filePathMap = filePathMap;
         System.out.println("added " + testDef + " to report");
         report.addProblem(this.testDef, test.getSeverity());
     }
@@ -41,12 +45,8 @@ public class StaticLogger implements AuditListener
     public void addError(AuditEvent event)
     {
         try {
-        	//want to remove random number at the end of the temp file
-        	//note this means no .java file submitted can contain a number!
-        	String file = event.getFileName().replaceAll("[0-9]","");
-        	String fileInput = file.substring(file.lastIndexOf("\\")+1,file.length());
-			report.addDetail(testDef,fileInput,event.getLine(),event.getMessage());
-			System.out.println("checkstyles found something!");
+        	String requiredFilePath = filePathMap.get(event.getFileName());
+			report.addDetail(testDef,requiredFilePath,event.getLine(),event.getMessage());
 		} catch (CategoryNotInReportException e) {
 			// TODO how to handle?
 			e.printStackTrace();

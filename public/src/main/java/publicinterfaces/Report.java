@@ -2,9 +2,9 @@ package publicinterfaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
 import java.util.Collections;
 
 /**
@@ -12,47 +12,62 @@ import java.util.Collections;
  * @author as2388
  * @author kls82
  */
-public class Report extends AbstractReport{
+public class Report{
+	private ReportResult result = ReportResult.PASS;
     private List<Problem> problemsTestedFor = new LinkedList<>(); //list storing all problems looked for (also see what each Problem holds)
+    private Date creationDate = new Date();
+    private int noOfTests;
+    
+    //for JSON
+    public Report() {}
+    
+    public List<Problem> getItems() {
+        return problemsTestedFor;
+    }
 
-    /** {@inheritDoc} */
-    @Override
+    public void setProblemsTestedFor(List<Problem> items) {
+        this.problemsTestedFor = items;
+    }
+    
+    public void setCreationDate(Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setNoOfTests(int noOfTests) {
+		this.noOfTests = noOfTests;		
+	}
+
+	public int getNoOfTests() {
+		return noOfTests;
+	}
+
+	public void setReportResult(ReportResult result) {
+		this.result = result;
+	}
+	
+	public ReportResult getReportResult() {
+		return result;
+	}
+	
+	
     public void addProblem(String category, Severity severity) {
-        problemsTestedFor.add(new Problem(category, new ProblemDetails(severity)));
+        problemsTestedFor.add(new Problem(category, severity));
     }
 
-    /**
-     * Add an existing problem object to this report
-     * @param category                          General problem description e.g. unused import, bad indentation
-     * @param problem                           Existing problem object to add
-     * @throws CategoryAlreadyExistsException   Thrown if the problem object to add already exists in the report
-     */
-    public void addProblem(String category, ProblemDetails problem) throws CategoryAlreadyExistsException {
-        for (Problem t : problemsTestedFor) {
-            if (t.getCategory().equals(category)) {
-                throw new CategoryAlreadyExistsException(category);
-            }
-        }
-        problemsTestedFor.add(new Problem(category, problem));
-
-        //check if this problem should set the status to fail
-        if (problem.causesFail()) {
-            reportResult = ReportResult.FAIL;
-        }
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public void addDetail(String category, String filename, int lineNumber, String details)
             throws CategoryNotInReportException {
     	boolean found = false;
     	for (Problem t : problemsTestedFor) {
-        	if (t.getCategory().equals(category)) {
+        	if (t.getProblemDescription().equals(category)) {
         		found = true;
-        		t.getProblems().addDetail(filename, lineNumber, details);
+        		t.addDetail(filename, lineNumber, details);
 
-                if (t.getProblems().getSeverity() == Severity.ERROR) {
-                    reportResult = ReportResult.FAIL;
+                if (t.getSeverity() == Severity.ERROR) {
+                    setReportResult(ReportResult.FAIL);
                 }
         	}
         }
@@ -61,37 +76,23 @@ public class Report extends AbstractReport{
 	    }
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public void addDetail(String category, Severity severity, String filename, Integer lineNumber, String details)  {
+    public void addDetail(String category, Severity severity, String filename, Integer lineNumber, String details) throws CategoryAlreadyExistsException  {
     	boolean found = false;
     	for (Problem t : problemsTestedFor) {
-	       	if (t.getCategory().equals(category)) {
+	       	if (t.getProblemDescription().equals(category)) {
 	       		found = true;
 	       	}
     	}
 	    if (!found) {
-	    	problemsTestedFor.add(new Problem(category,severity));
+	    	Problem newProblem = new Problem(category,severity);
+	    	newProblem.addDetail(filename, lineNumber, details);
+	    	problemsTestedFor.add(newProblem);
 	    }
-        try {
-            this.addDetail(category, filename, lineNumber, details);
-        }
-        catch (CategoryNotInReportException e) {
-            //Because this function has just added the category to the report, this exception will not be raised here.
-        }
-    }
-
-    /*public ReportResult getReportResult() {
-        return reportResult;
-    }*/
-
-    @JsonIgnore
-    public List<Problem> getProblems() {
-        return problemsTestedFor;
-    }
-
-    public List<Problem> getProblemsTestedFor() {
-        return problemsTestedFor;
+	    //NOTE:category should never be repeated 
+	    //as each individual test only runs once, but add error just incase
+	    else {
+	    	throw new CategoryAlreadyExistsException("Tick has a repeated test");
+	    }
     }
 
     /*
@@ -100,8 +101,8 @@ public class Report extends AbstractReport{
     public void calculateProblemStatuses() {
 		for (Problem e : problemsTestedFor)
 		{
-		    if (e.getProblems().getFileDetails().size() > 0) {
-		    	if (e.getProblems().getSeverity() == Severity.ERROR) {
+		    if (e.getFileDetails().size() > 0) {
+		    	if (e.getSeverity() == Severity.ERROR) {
 	            	e.setOutcome(Outcome.ERROR);
 	            }
 	            else {

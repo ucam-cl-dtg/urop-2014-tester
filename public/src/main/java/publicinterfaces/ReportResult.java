@@ -1,5 +1,5 @@
 package publicinterfaces;
 
 public enum ReportResult {
-    PASS, FAIL
+    PASS, FAIL, UNDEFINED
 }

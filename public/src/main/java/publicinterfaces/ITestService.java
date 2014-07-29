@@ -59,7 +59,7 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/last")
-    public AbstractReport getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Report getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException;
 
     /**
@@ -72,7 +72,7 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/all")
-    public List<AbstractReport> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public List<Report> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException;
 
     @DELETE

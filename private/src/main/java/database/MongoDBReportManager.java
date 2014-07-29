@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import privateinterfaces.IDBReportManager;
-import publicinterfaces.AbstractReport;
+import publicinterfaces.Report;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
@@ -34,7 +34,7 @@ public class MongoDBReportManager implements IDBReportManager {
 
     /** {@inheritDoc} */
     @Override
-    public void addReport(String crsId, String tickId, AbstractReport report) {
+    public void addReport(String crsId, String tickId, Report report) {
         //look up user by crsId
         DBUser user = DBUserColl.findOneById(crsId);
 
@@ -53,7 +53,7 @@ public class MongoDBReportManager implements IDBReportManager {
 
     /** {@inheritDoc} */
     @Override
-    public AbstractReport getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
+    public Report getLastReport(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
         return getValidUser(crsId).getLastReport(tickId);
     }
 
@@ -65,7 +65,7 @@ public class MongoDBReportManager implements IDBReportManager {
 
     /** {@inheritDoc} */
     @Override
-    public List<AbstractReport> getAllReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
+    public List<Report> getAllReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
         return getValidUser(crsId).getAllReports(tickId);
     }
 
