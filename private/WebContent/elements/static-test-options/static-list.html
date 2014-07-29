@@ -12,10 +12,13 @@
         </style>
 
         <div layout vertical center>
+
+
+
             <template repeat="{{staticOption, i in staticOptions}}">
                 <static-list-item
                         text="{{staticOption.text}}"
-                        >
+                        checkedIndex="{{staticOption.checkedIndex}}">
                 </static-list-item>
             </template>
         </div>
@@ -24,8 +27,11 @@
         Polymer('static-list', {
             ready: function() {
                 this.staticOptions = [];
-                this.staticOptions[0] = { text: "TODO or FIXME",  checked: 2};
-                this.staticOptions[1] = { text: "Unused imports", checked: 1};
+                this.staticOptions[3] = { text: "Illegal catches",             checkedIndex: 2};
+                this.staticOptions[2] = { text: "Indentation",                 checkedIndex: 1};
+                this.staticOptions[0] = { text: "TODO or FIXME",               checkedIndex: 2};
+                this.staticOptions[1] = { text: "Unused imports",              checkedIndex: 1};
+                this.staticOptions[4] = { text: "Whitespace around operators", checkedIndex: 1};
             }
         });
     </script>
