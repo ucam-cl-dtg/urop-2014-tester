@@ -1,5 +1,7 @@
 package configuration;
 
+import java.util.Map;
+
 public class ConfigurationFile {
     private String gitAPIPath;
     private String checkstyleResourcesPath;
@@ -9,6 +11,7 @@ public class ConfigurationFile {
     private String mongoUsersCollectionName;
     private String mongoXMLSettingsCollectionName;
     private int mongoPort;
+    private Map<String,Integer> xmlTestSettings;
     
     public String getGitAPIPath()
     {
@@ -77,5 +80,14 @@ public class ConfigurationFile {
     public void setMongoUsersCollectionName(String mongoUsersCollectionName) {
         this.mongoUsersCollectionName = mongoUsersCollectionName;
     }
+
+    public void setxmlTestSettings(Map<String,Integer> xmlTestSettings) {
+    	this.xmlTestSettings = xmlTestSettings;
+    }
+    
+	public int getSeverity(String test) {
+		return this.xmlTestSettings.get(test);
+	}
+	
 }
 

@@ -8,12 +8,13 @@ import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
+import org.jboss.resteasy.client.jaxrs.internal.proxy.extractors.ClientContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import configuration.ConfigurationLoader;
 import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
-
 import publicinterfaces.ITestService;
 import publicinterfaces.NoSuchTestException;
 import publicinterfaces.Report;
@@ -24,13 +25,17 @@ import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TestStillRunningException;
 import publicinterfaces.TickNotInDBException;
 import publicinterfaces.UserNotInDBException;
-
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 import javax.ws.rs.PathParam;
+import javax.ws.rs.client.Client;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -209,6 +214,25 @@ public class TestService implements ITestService {
         proxy.pollStatus("as2388", "tick-test");
         System.out.println("done");
     }
-    
-	//TODO: getAvailableCheckstyleTests()
+
+	@Override
+	public Map<String,Integer> getTestFiles() {
+		Map<String,Integer> testFiles = new HashMap<>();
+		try {
+			URI dir = (TestService.class.getClassLoader().getResource("checkstyleResources")).toURI();
+			File path = new File(dir);
+			String[] files = path.list();
+			log.info("no of files found = " + files.length);
+			for (String file : files) {
+				String name = file.substring(0,file.length()-4);
+				testFiles.put(name, ConfigurationLoader.getConfig().getSeverity(name));
+			}
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally {
+			return testFiles;
+		} 
+	}
 }
