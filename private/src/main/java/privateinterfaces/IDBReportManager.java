@@ -1,5 +1,6 @@
 package privateinterfaces;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import publicinterfaces.Report;

@@ -47,7 +47,6 @@ public interface ITestService {
             throws NoSuchTestException;
 
     /**
-     * TODO: finish JavaDoc
      * Returns the most-recently generated report.
      * Note: this function returns the most recently generated report for a given crsID and tickID, not the report
      * associated with the newest commit, because these are not expected to be different.
@@ -88,6 +87,10 @@ public interface ITestService {
     @Path("/{tickId}/create")
 	public void createNewTest(@PathParam("tickId") String tickId /* , List<XMLTestSettings> checkstyleOpts */)
             throws TestIDAlreadyExistsException;
+
+    @GET
+    @Path("/test")
+    public void test() throws NoSuchTestException;
 
     //TODO: cancel test?
     //@DELETE

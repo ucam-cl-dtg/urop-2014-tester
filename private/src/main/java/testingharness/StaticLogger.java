@@ -3,6 +3,7 @@ package testingharness;
 import java.util.Map;
 
 import publicinterfaces.Report;
+
 import publicinterfaces.CategoryNotInReportException;
 import publicinterfaces.Report;
 
@@ -48,12 +49,10 @@ public class StaticLogger implements AuditListener
         	String requiredFilePath = filePathMap.get(event.getFileName());
 			report.addDetail(testDef,requiredFilePath,event.getLine(),event.getMessage());
 		} catch (CategoryNotInReportException e) {
-			// TODO how to handle?
-			e.printStackTrace();
+            e.printStackTrace();
 		}
     }
 
-    //TODO: what is this???
     //as2388: If Checkstyle fails because of malformed java, it raises addException. Because we only run Checkstyle if
     //the dynamic tests were successful (and hence compiled), this shouldn't be raised, but just in case, this is here
     //to deal with it. So, TODO: update implementation to insert into new report

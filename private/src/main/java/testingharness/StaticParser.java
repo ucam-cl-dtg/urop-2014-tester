@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import publicinterfaces.Report;
-import publicinterfaces.Report;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.File;
