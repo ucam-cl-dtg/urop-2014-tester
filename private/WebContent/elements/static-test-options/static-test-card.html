@@ -46,6 +46,10 @@
                 margin-top: 23px;
                 margin-left: 8px;
             }
+            #cmdRestoreDefaults {
+                width: 200px;
+                margin: 0;
+            }
             #day, #month {
                 width: 50px;
             }
@@ -84,7 +88,14 @@
             <h4>STYLISTIC CHECKS</h4>
             <div class="checkboxContainer" layout horizontal>
                 <paper-checkbox checked="{{useDefaults}}" on-tap="{{toggleStylistic}}"></paper-checkbox>
-                <span flex style="padding-left: 15px; margin: 0;">Use Defaults</span>
+                <span flex style="padding-left: 15px; margin: 0; min-height: 35px;">Use Defaults</span>
+                <paper-button
+                        id="cmdRestoreDefaults"
+                        label="RESTORE DEFAULTS"
+                        raisedButton
+                        end-justified
+                        hidden?="{{useDefaults}}">
+                    </paper-button>
             </div>
             <core-collapse id="collapseStylistic">
                 <static-list-labels></static-list-labels>
