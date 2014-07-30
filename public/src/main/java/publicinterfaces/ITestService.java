@@ -1,6 +1,7 @@
 package publicinterfaces;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
@@ -95,7 +96,7 @@ public interface ITestService {
 
     @GET
     @Path("/testFiles")
-    public Map<String,Integer> getTestFiles();
+    public Response getTestFiles();
     
     //TODO: cancel test?
     //@DELETE

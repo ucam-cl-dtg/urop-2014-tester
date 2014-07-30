@@ -11,20 +11,21 @@
         <link rel="stylesheet" href="../../codemirror.css"> <!-- CodeMirror with some custom styles -->
 
         <span layout horizontal>
+             <core-icon-button
+                     id="cmdDelete"
+                     icon="close"
+                     ></core-icon-button>
+            <paper-input id="text" flex inputValue="{{text}}" label="Test Category Name..."></paper-input>
             <core-icon-button
                     id="cmdToggleCode"
                     icon="unfold-more"
                     on-tap="{{toggle}}"></core-icon-button>
-            <paper-input id="text" flex inputValue="{{text}}"></paper-input>
             <paper-radio-group>
                 <paper-radio-button id="none"    name="none"    checked?="{{checkedIndex == 0}}"></paper-radio-button>
                 <paper-radio-button id="warning" name="warning" checked?="{{checkedIndex == 1}}"></paper-radio-button>
                 <paper-radio-button id="error"   name="error"   checked?="{{checkedIndex == 2}}"></paper-radio-button>
             </paper-radio-group>
         </span>
-        <!-- <span style="margin-left: 50px">
-            <paper-input multiline label="XML Code..."></paper-input>
-        </span>-->
 
         <core-collapse id="collapse">
             <textarea id="edit">

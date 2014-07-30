@@ -11,6 +11,14 @@
             }
         </style>
 
+        <core-ajax
+                id="ajaxLoadDefaults"
+                auto
+                url="{{'http://localhost:8080/TestingSystem/rest/testerAPI/v2/testFiles'}}"
+                handleAs="json"
+                on-core-response="{{defaultsLoaded}}">
+        </core-ajax>
+
         <div layout vertical center>
             <template repeat="{{staticOption, i in staticOptions}}">
                 <static-list-item
@@ -18,17 +26,22 @@
                         checkedIndex="{{staticOption.checkedIndex}}">
                 </static-list-item>
             </template>
+            <core-icon-button
+                    id="cmdAddTest"
+                    icon="add"
+                    on-tap="{{addTest}}"></core-icon-button>
         </div>
     </template>
     <script>
         Polymer('static-list', {
-            ready: function() {
+            created: function() {
                 this.staticOptions = [];
-                this.staticOptions[3] = { text: "Illegal catches",             checkedIndex: 2};
-                this.staticOptions[2] = { text: "Indentation",                 checkedIndex: 1};
-                this.staticOptions[0] = { text: "TODO or FIXME",               checkedIndex: 2};
-                this.staticOptions[1] = { text: "Unused imports",              checkedIndex: 1};
-                this.staticOptions[4] = { text: "Whitespace around operators", checkedIndex: 1};
+            },
+            addTest: function() {
+                this.staticOptions[this.staticOptions.length] = {text: "",     checkedIndex: 1};
+            },
+            defaultsLoaded: function() {
+                this.staticOptions = this.$.ajaxLoadDefaults.response;//.slice(0);
             }
         });
     </script>

@@ -2,14 +2,24 @@
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/core-collapse/core-collapse.html">
+<link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
 <polymer-element name="static-test-card">
     <template>
         <style>
             #checkboxContainer {
-                padding: 20px;
+                padding: 20px 20px 20px 0;
+                margin: 0;
             }
-
+            h4 {
+                padding: 0;
+                margin-bottom: -10px;
+            }
+            #mainContainer {
+                margin-top: 0;
+                padding: 0 0 0 20px;
+            }
             paper-checkbox::shadow #ink {
                 top: -16px;
                 left: -16px;
@@ -32,7 +42,12 @@
             }
         </style>
 
-        <div id="checkboxContainer" layout horizontal>
+        <div id="mainContainer">
+        <h4>CORRECTNESS CHECKS</h4>
+        <paper-input label="Repository Address" floatinglabel="true"></paper-input>
+
+        <h4>STYLISTIC CHECKS</h4>
+            <div id="checkboxContainer" layout horizontal>
             <paper-checkbox checked="{{useDefaults}}" on-tap="{{toggle}}"></paper-checkbox>
             <span flex style="padding-left: 15px; margin: 0;">Use Defaults</span>
             <paper-button raisedButton class="colored" label="SUBMIT"></paper-button>
@@ -41,6 +56,7 @@
             <static-list-labels></static-list-labels>
             <static-list></static-list>
         </core-collapse>
+        </div>
     </template>
     <script>
         Polymer('static-test-card', {

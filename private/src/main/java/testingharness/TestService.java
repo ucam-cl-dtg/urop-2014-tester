@@ -15,21 +15,13 @@ import org.slf4j.LoggerFactory;
 import configuration.ConfigurationLoader;
 import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
-import publicinterfaces.ITestService;
-import publicinterfaces.NoSuchTestException;
-import publicinterfaces.Report;
-import publicinterfaces.Severity;
-import publicinterfaces.Status;
-import publicinterfaces.TestIDAlreadyExistsException;
-import publicinterfaces.TestIDNotFoundException;
-import publicinterfaces.TestStillRunningException;
-import publicinterfaces.TickNotInDBException;
-import publicinterfaces.UserNotInDBException;
+import publicinterfaces.*;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
 
 import java.io.File;
 import java.io.IOException;
@@ -216,8 +208,9 @@ public class TestService implements ITestService {
     }
 
 	@Override
-	public Map<String,Integer> getTestFiles() {
-		Map<String,Integer> testFiles = new HashMap<>();
+	public Response getTestFiles() {
+	    log.info("get test files request received");
+		List<StaticOptions> toReturn = new LinkedList<>();
 		try {
 			URI dir = (TestService.class.getClassLoader().getResource("checkstyleResources")).toURI();
 			File path = new File(dir);
@@ -225,14 +218,14 @@ public class TestService implements ITestService {
 			log.info("no of files found = " + files.length);
 			for (String file : files) {
 				String name = file.substring(0,file.length()-4);
-				testFiles.put(name, ConfigurationLoader.getConfig().getSeverity(name));
+                toReturn.add(new StaticOptions(name, ConfigurationLoader.getConfig().getSeverity(name)));
 			}
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally {
-			return testFiles;
+			return Response.ok().entity(toReturn).build();
 		} 
 	}
 }
