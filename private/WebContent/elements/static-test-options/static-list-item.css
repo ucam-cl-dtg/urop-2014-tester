@@ -5,11 +5,10 @@
     background-color: white;
     font-size: 1.2rem;
     font-weight: 300;
-    margin-left: 15px;
 }
 paper-radio-button {
-    margin-left: 10px;
-    margin-right: 20px;
+    margin-left: 20px;
+    margin-right: 10px;
 }
 polyfill-next-selector { shadow: '#error #ink[checked]'; }
 #error::shadow #ink[checked] {

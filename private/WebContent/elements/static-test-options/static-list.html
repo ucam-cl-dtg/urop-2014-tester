@@ -20,7 +20,7 @@
         </core-ajax>
 
         <div layout vertical center>
-            <template repeat="{{staticOption, i in staticOptions}}">
+            <template repeat="{{staticOption in staticOptions}}">
                 <static-list-item
                         text="{{staticOption.text}}"
                         checkedIndex="{{staticOption.checkedIndex}}">
@@ -29,7 +29,8 @@
             <core-icon-button
                     id="cmdAddTest"
                     icon="add"
-                    on-tap="{{addTest}}"></core-icon-button>
+                    on-tap="{{addTest}}">
+            </core-icon-button>
         </div>
     </template>
     <script>

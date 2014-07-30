@@ -3,12 +3,13 @@
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/core-collapse/core-collapse.html">
 <link rel="import" href="../../bower_components/core-ajax/core-ajax.html">
+<link rel="import" href="../../bower_components/paper-toggle-button/paper-toggle-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 
 <polymer-element name="static-test-card">
     <template>
         <style>
-            #checkboxContainer {
+            .checkboxContainer {
                 padding: 20px 20px 20px 0;
                 margin: 0;
             }
@@ -18,7 +19,7 @@
             }
             #mainContainer {
                 margin-top: 0;
-                padding: 0 0 0 20px;
+                padding: 0 20px;
             }
             paper-checkbox::shadow #ink {
                 top: -16px;
@@ -32,7 +33,8 @@
                 height: 15px;
             }
             paper-button {
-                margin-top: -10px;
+                margin: 20px;
+
                 width: 10em;
                 height: 35px; /* Firefox/IE compatibility */
             }
@@ -40,22 +42,62 @@
                 background: #009933;
                 color: #fff;
             }
+            paper-toggle-button {
+                margin-top: 23px;
+                margin-left: 8px;
+            }
+            #day, #month {
+                width: 50px;
+            }
+            #year {
+                width: 100px;
+            }
         </style>
 
         <div id="mainContainer">
-        <h4>CORRECTNESS CHECKS</h4>
-        <paper-input label="Repository Address" floatinglabel="true"></paper-input>
+            <h4>CODE TEMPLATE (optional)</h4>
+            <br>
+            <span layout horizontal>
+                <paper-input flex label="Repository Address" floatinglabel></paper-input>
+            </span>
 
-        <h4>STYLISTIC CHECKS</h4>
-            <div id="checkboxContainer" layout horizontal>
-            <paper-checkbox checked="{{useDefaults}}" on-tap="{{toggle}}"></paper-checkbox>
-            <span flex style="padding-left: 15px; margin: 0;">Use Defaults</span>
-            <paper-button raisedButton class="colored" label="SUBMIT"></paper-button>
-        </div>
-        <core-collapse id="collapse">
-            <static-list-labels></static-list-labels>
-            <static-list></static-list>
-        </core-collapse>
+            <div layout horizontal>
+                <h4>DEADLINE</h4>
+                <paper-toggle-button id="deadlineSwitch" on-up="{{toggleDeadline}}"></paper-toggle-button>
+            </div>
+            <core-collapse id="collapseDeadline">
+                <br>
+                <span layout horizontal>
+                    <paper-input id="day" label="DD" floatinglabel="true"></paper-input>
+                    <paper-input id="month" label="MM" floatinglabel="true"></paper-input>
+                    <paper-input id="year" label="YYYY" floatinglabel="true"></paper-input>
+                </span>
+            </core-collapse>
+            <br>
+
+
+            <h4>CORRECTNESS CHECKS</h4>
+            <br>
+            <span layout horizontal>
+                <paper-input flex label="Repository Address" floatinglabel></paper-input>
+            </span>
+
+            <h4>STYLISTIC CHECKS</h4>
+            <div class="checkboxContainer" layout horizontal>
+                <paper-checkbox checked="{{useDefaults}}" on-tap="{{toggleStylistic}}"></paper-checkbox>
+                <span flex style="padding-left: 15px; margin: 0;">Use Defaults</span>
+            </div>
+            <core-collapse id="collapseStylistic">
+                <static-list-labels></static-list-labels>
+                <static-list></static-list>
+            </core-collapse>
+
+            <!-- SAVE button -->
+            <span layout horizontal>
+                <span flex></span>
+                <paper-button raisedButton class="colored" label="SAVE"></paper-button>
+                <span flex></span>
+            </span>
         </div>
     </template>
     <script>
@@ -63,8 +105,13 @@
             ready: function() {
                 this.useDefaults = true;
             },
-            toggle: function() {
-                this.$.collapse.toggle();
+            toggleStylistic: function() {
+                this.$.collapseStylistic.toggle();
+            },
+            toggleDeadline: function() {
+                //fix for slider bug
+                var that = this.$;
+                setTimeout(function(){that.collapseDeadline.opened = that.deadlineSwitch.checked;}, 100);
             }
         });
     </script>
