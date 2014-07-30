@@ -38,12 +38,9 @@
                     on-tap="{{toggle}}"></core-icon-button>
             <paper-input id="text" flex inputValue="{{text}}"></paper-input>
             <paper-radio-group>
-                <!--<paper-radio-button id="none"    name="none"    checked?="{{checkedIndex == 0}}"></paper-radio-button>
+                <paper-radio-button id="none"    name="none"    checked?="{{checkedIndex == 0}}"></paper-radio-button>
                 <paper-radio-button id="warning" name="warning" checked?="{{checkedIndex == 1}}"></paper-radio-button>
-                <paper-radio-button id="error"   name="error"   checked?="{{checkedIndex == 2}}"></paper-radio-button>-->
-                <paper-radio-button id="none"    name="none"    ></paper-radio-button>
-                <paper-radio-button id="warning" name="warning" checked></paper-radio-button>
-                <paper-radio-button id="error"   name="error"   ></paper-radio-button>
+                <paper-radio-button id="error"   name="error"   checked?="{{checkedIndex == 2}}"></paper-radio-button>
             </paper-radio-group>
         </span>
         <!-- <span style="margin-left: 50px">
@@ -73,16 +70,28 @@
             ready: function() {
                 //Initialise code mirror (provides xml syntax highlighting of a textarea)
                 CodeMirror.fromTextArea(this.$.edit);
-                //this.$.warning.checked =true;
+            },
+            /**
+             * Work around for a paper-radio-button bug. Without this, the initially selected button would
+             * remain selected until it has been clicked at least once, no matter how many times the other
+             * buttons in the group have been clicked
+             */
+            domReady: function() {
+                switch (this.checkedIndex) {
+                    case 0:
+                        this.$.none.tap();
+                        break;
+                    case 1:
+                        this.$.warning.tap();
+                        break;
+                    case 2:
+                        this.$.error.tap();
+                        break;
+                }
             },
             toggle: function() {
                 this.$.collapse.toggle();
                 this.$.input = this.text;
-                /*if (this.$.cmdToggleCode.icon == "unfold-more") {
-                    this.$.cmdToggleCode.icon = "unfold-less";
-                } else {
-                    this.$.cmdToggleCode.icon = "unfold-more";
-                }*/
             }
         });
     </script>
