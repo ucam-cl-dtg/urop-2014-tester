@@ -13,10 +13,15 @@ import java.util.Collections;
  * @author kls82
  */
 public class Report{
-	private ReportResult result = ReportResult.PASS;
+	/* students should only be allowed on signups if testResult = PASS */
+	private ReportResult testResult = ReportResult.UNDEFINED;
+	private ReportResult tickerResult = ReportResult.UNDEFINED;
+	private ReportResult reportResult = ReportResult.UNDEFINED;
+	private String tickerComments = null;
     private List<Problem> problemsTestedFor = new LinkedList<>(); //list storing all problems looked for (also see what each Problem holds)
     private Date creationDate = new Date();
     private int noOfTests;
+    private String commitId;
     
     //for JSON
     public Report() {}
@@ -46,11 +51,11 @@ public class Report{
 	}
 
 	public void setReportResult(ReportResult result) {
-		this.result = result;
+		this.reportResult = result;
 	}
 	
 	public ReportResult getReportResult() {
-		return result;
+		return reportResult;
 	}
 	
 	
@@ -67,6 +72,7 @@ public class Report{
         		t.addDetail(filename, lineNumber, details);
 
                 if (t.getSeverity() == Severity.ERROR) {
+                    setTestResult(ReportResult.FAIL);
                     setReportResult(ReportResult.FAIL);
                 }
         	}
@@ -114,5 +120,46 @@ public class Report{
 		    }
 		}
 		Collections.sort(problemsTestedFor);
+		if (this.testResult != ReportResult.FAIL) {
+			this.testResult = ReportResult.PASS;
+		}
     }
+
+	public void setTickerResult(ReportResult tickerResult) {
+		this.tickerResult = tickerResult;
+		if (this.tickerResult == ReportResult.PASS & this.testResult == ReportResult.PASS) {
+			this.reportResult = ReportResult.PASS;
+		}
+		else {
+			this.reportResult = ReportResult.FAIL;
+		}
+	}
+
+	public ReportResult getTickerResult() {
+		return this.tickerResult;
+	}
+	
+	public ReportResult getTestResult() {
+		return testResult;
+	}
+
+	public void setTestResult(ReportResult testResult) {
+		this.testResult = testResult;
+	}
+
+	public String getTickerComments() {
+		return tickerComments;
+	}
+
+	public void setTickerComments(String tickerComments) {
+		this.tickerComments = tickerComments;
+	}
+
+	public String getCommitId() {
+		return commitId;
+	}
+
+	public void setCommitId(String commitId) {
+		this.commitId = commitId;
+	}
 }

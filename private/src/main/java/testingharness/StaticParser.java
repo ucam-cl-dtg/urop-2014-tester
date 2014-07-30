@@ -48,14 +48,16 @@ public class StaticParser {
      * @throws IOException              
      * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    public static void test(XMLTestSettings test, List<String> files, Report report, String repoName) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException{
+    public static void test(XMLTestSettings test, List<String> files, Report report, String repoName, String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException{
         //must be in list for .process to work
     	Map<String,String> filePathMap = new HashMap<>();
     	log.info("starting to run test with URL " + test.getTestFile());
         LinkedList<File> fileList = new LinkedList<>();
 
         for (String file : files) {
-	        String contents = TestService.gitProxy.getFile(file, repoName);
+        	log.info("obtaining " + file + " version " + commitId + " from " + repoName + " to test");
+	        String contents = TestService.gitProxy.getFile(file, commitId, repoName);
+	        log.info("obtained file " + file + " version " + commitId + " from " + repoName + " to test");
 	        String fileName = file.substring(0,file.lastIndexOf("."));
 	        
 	        File javaFile = File.createTempFile(fileName,".java"); 

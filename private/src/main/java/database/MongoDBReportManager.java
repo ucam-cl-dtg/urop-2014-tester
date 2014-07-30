@@ -1,6 +1,7 @@
 package database;
 
 import com.mongodb.DB;
+import com.mongodb.DBObject;
 
 import configuration.ConfigurationLoader;
 
@@ -10,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import privateinterfaces.IDBReportManager;
 import publicinterfaces.Report;
+import publicinterfaces.ReportResult;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
@@ -102,4 +104,15 @@ public class MongoDBReportManager implements IDBReportManager {
 
         return user;
     }
+
+	@Override
+	public void editReportTickerResult(String crsid, String tickId,
+			ReportResult tickerResult, String tickerComments) throws UserNotInDBException, TickNotInDBException {
+		DBUser user = getValidUser(crsid);
+		Report report = user.getLastReport(tickId);
+		report.setTickerResult(tickerResult);
+		report.setTickerComments(tickerComments);
+		System.out.println("tickerResult changed to " + tickerResult);
+		DBUserColl.save(user);
+	}
 }

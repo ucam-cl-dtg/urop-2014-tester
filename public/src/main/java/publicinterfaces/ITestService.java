@@ -97,6 +97,13 @@ public interface ITestService {
     @Path("/testFiles")
     public Map<String,Integer> getTestFiles();
     
+    @POST
+    @Path("/{crsid}/{tickId}/setTickerResult")
+    @Consumes("application/json")
+    public void setTickerResult( @PathParam("crsid") String crsid , @PathParam("tickId") String tickId ,  
+    		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments) 
+    				throws UserNotInDBException, TickNotInDBException;
+    
     //TODO: cancel test?
     //@DELETE
     //@Path("/{crsid}/{tickid}/running")
