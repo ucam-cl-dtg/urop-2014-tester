@@ -5,14 +5,14 @@
     background-color: white;
     font-size: 1.2rem;
     font-weight: 300;
-    margin-left: 20px;
+    margin-left: 15px;
 }
 paper-radio-button {
     margin-top: 10px;
     margin-left: 10px;
     margin-right: 20px;
 }
-polyfill-next-selector { content: '#error shadow #ink[checked]'; }
+/*polyfill-next-selector { content: '#error shadow #ink[checked]'; }*/
 #error::shadow #ink[checked] {
     color: #e51c23; <!-- Material design Red 500 -->
 }
@@ -35,6 +35,10 @@ polyfill-next-selector{ content: '#warning shadow'; }
 polyfill-next-selector{ content: '#none shadow'; }
 #none::shadow #onRadio {
     background-color: #9e9e9e; <!-- Material design Grey 500 -->
+}
+
+paper-input {
+    height: 40px;
 }
 
 /*@media (min-width: 690px) {

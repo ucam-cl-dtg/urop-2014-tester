@@ -1,6 +1,7 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-checkbox/paper-checkbox.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/core-collapse/core-collapse.html">
 
 <polymer-element name="static-test-card">
     <template>
@@ -8,36 +9,46 @@
             #checkboxContainer {
                 padding: 20px;
             }
+
             paper-checkbox::shadow #ink {
                 top: -16px;
                 left: -16px;
                 width: 50px;
                 height: 50px;
             }
+            paper-checkbox {
+                /* Firefox/IE compatibility */
+                width: 15px;
+                height: 15px;
+            }
             paper-button {
                 margin-top: -10px;
                 width: 10em;
+                height: 35px; /* Firefox/IE compatibility */
             }
             paper-button.colored {
                 background: #009933;
                 color: #fff;
             }
         </style>
+
         <div id="checkboxContainer" layout horizontal>
-            <paper-checkbox checked="{{useDefaults}}"></paper-checkbox>
+            <paper-checkbox checked="{{useDefaults}}" on-tap="{{toggle}}"></paper-checkbox>
             <span flex style="padding-left: 15px; margin: 0;">Use Defaults</span>
             <paper-button raisedButton class="colored" label="SUBMIT"></paper-button>
         </div>
-
-        <span hidden?="{{useDefaults}}">
+        <core-collapse id="collapse">
             <static-list-labels></static-list-labels>
             <static-list></static-list>
-        </span>
+        </core-collapse>
     </template>
     <script>
         Polymer('static-test-card', {
             ready: function() {
                 this.useDefaults = true;
+            },
+            toggle: function() {
+                this.$.collapse.toggle();
             }
         });
     </script>

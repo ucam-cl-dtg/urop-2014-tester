@@ -1,21 +1,89 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../../bower_components/paper-radio-button/paper-radio-button.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/core-input/core-input.html">
+<link rel="import" href="../../bower_components/core-collapse/core-collapse.html">
+<link rel="import" href="../../bower_components/core-icon-button/core-icon-button.html">
 
-<polymer-element name="static-list-item" attributes="text checkedIndex">
+<polymer-element name="static-list-item" attributes="text checkedIndex isDefault">
     <template>
-        <link rel="stylesheet" type="text/css" href="static-list-item.css">
+        <link rel="stylesheet" href="static-list-item.css" >
+        <link rel="stylesheet" href="../../codemirror.css"> <!-- CodeMirror -->
+
+        <style>
+            textarea {
+                /* set to source code pro */
+
+            }
+            #edit {
+                background-color: red;
+                border-color: blue;
+            }
+            core-collapse{
+                margin-left: 50px;
+            }
+            #cmdToggleCode::shadow core-icon {
+                /* cmdToggleCode's icon is the content expander symbol rotated 90 deg */
+                transform:rotate(90deg);
+                -ms-transform:rotate(90deg); /* IE 9 */
+                -webkit-transform:rotate(90deg); /* Opera, Chrome, and Safari */
+            }
+        </style>
 
         <span layout horizontal>
-            <p flex>{{text}}</p>
+            <core-icon-button
+                    id="cmdToggleCode"
+                    icon="unfold-more"
+                    on-tap="{{toggle}}"></core-icon-button>
+            <paper-input id="text" flex inputValue="{{text}}"></paper-input>
             <paper-radio-group>
-                <paper-radio-button id="none"    name="none"    checked?="{{checkedIndex == 0}}"></paper-radio-button>
+                <!--<paper-radio-button id="none"    name="none"    checked?="{{checkedIndex == 0}}"></paper-radio-button>
                 <paper-radio-button id="warning" name="warning" checked?="{{checkedIndex == 1}}"></paper-radio-button>
-                <paper-radio-button id="error"   name="error"   checked?="{{checkedIndex == 2}}"></paper-radio-button>
+                <paper-radio-button id="error"   name="error"   checked?="{{checkedIndex == 2}}"></paper-radio-button>-->
+                <paper-radio-button id="none"    name="none"    ></paper-radio-button>
+                <paper-radio-button id="warning" name="warning" checked></paper-radio-button>
+                <paper-radio-button id="error"   name="error"   ></paper-radio-button>
             </paper-radio-group>
         </span>
+        <!-- <span style="margin-left: 50px">
+            <paper-input multiline label="XML Code..."></paper-input>
+        </span>-->
+
+        <core-collapse id="collapse">
+            <textarea id="edit">
+<module name="Checker">
+    <module name="TreeWalker">
+        <!-- Checks for empty catch, do, if else, finally. try, for, while, and init blocks, but NOT empty exception declarations.
+        Commented blocks do not count as empty -->
+        <module name="EmptyBlock">
+            <property name="tokens" value="LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, INSTANCE_INIT, STATIC_INIT"/>
+            <property name="option" value="text"/> <!-- Without this, blocks containing only comments would count as being empty -->
+            <message key="block.empty" value="Empty ''{0}'' block ~ if it should never run, a justifying comment in the block is required" />
+        </module>
+    </module>
+</module>
+            </textarea>
+        </core-collapse>
     </template>
+    <script src="../../codemirror-4.4/lib/codemirror.js"></script> <!-- CodeMirror -->
+    <script src="../../codemirror-4.4/mode/xml/xml.js"></script> <!-- CodeMirror -->
     <script>
-        Polymer({});
+        Polymer('static-list-item', {
+            ready: function() {
+                //Initialise code mirror (provides xml syntax highlighting of a textarea)
+                CodeMirror.fromTextArea(this.$.edit);
+                //this.$.warning.checked =true;
+            },
+            toggle: function() {
+                this.$.collapse.toggle();
+                this.$.input = this.text;
+                /*if (this.$.cmdToggleCode.icon == "unfold-more") {
+                    this.$.cmdToggleCode.icon = "unfold-less";
+                } else {
+                    this.$.cmdToggleCode.icon = "unfold-more";
+                }*/
+            }
+        });
     </script>
 </polymer-element>
