@@ -39,9 +39,10 @@ public class Tester {
     /**
      * Creates a new Tester
      */
-    public Tester(Map<XMLTestSettings, LinkedList<String>> testingQueue, String repoName)  {
+    public Tester(Map<XMLTestSettings, LinkedList<String>> testingQueue, String repoName, String commitId)  {
         this.testingQueue = testingQueue;
         this.report = new Report();
+        report.setCommitId(commitId);
         this.repoName = repoName;
     }
 
@@ -63,7 +64,7 @@ public class Tester {
 
             if (dynamicPass())
             {
-                runStaticTests();
+                runStaticTests(commitId);
             }           
             
             report.calculateProblemStatuses();
@@ -73,7 +74,7 @@ public class Tester {
         catch (CheckstyleException | IOException | RepositoryNotFoundException e)
         {
             log.error("Tick analysis failed. Exception message: " + e.getMessage());
-            report.setReportResult(ReportResult.UNDEFINED);
+            report.setTestResult(ReportResult.UNDEFINED);
             failCause = e;
         }
         finally
@@ -105,7 +106,7 @@ public class Tester {
      * @throws IOException
      * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    private void runStaticTests() throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException
+    private void runStaticTests(String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException
     {
         log.info("Starting static analysis");
         //get static tests from testingQueue
@@ -114,7 +115,7 @@ public class Tester {
         for (Map.Entry<XMLTestSettings, LinkedList<String>> e : staticTests.entrySet()) {
             // delay(3000);
             status.addProgress();
-            runStaticAnalysis(e.getKey(), e.getValue());
+            runStaticAnalysis(e.getKey(), e.getValue(), commitId);
         }
         log.info("Static analysis complete");
     }
@@ -170,8 +171,8 @@ public class Tester {
      * @throws IOException 
      * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
-    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames) throws CheckstyleException, IOException, uk.ac.cam.cl.git.api.RepositoryNotFoundException {
-           StaticParser.test(configFileName, fileNames, report, repoName);
+    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames, String commitId) throws CheckstyleException, IOException, uk.ac.cam.cl.git.api.RepositoryNotFoundException {
+           StaticParser.test(configFileName, fileNames, report, repoName, commitId);
     }
 
 

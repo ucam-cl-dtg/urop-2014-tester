@@ -98,6 +98,14 @@ public interface ITestService {
     @Path("/testFiles")
     public Response getTestFiles();
     
+    @POST
+    @Path("/{crsid}/{tickId}/set/tickerResult")
+    @Consumes("application/json")
+    public void setTickerResult( @PathParam("crsid") String crsid , @PathParam("tickId") String tickId ,  
+    		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments,
+    		 	@QueryParam("commitId") String commitId) 
+    				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
+    
     //TODO: cancel test?
     //@DELETE
     //@Path("/{crsid}/{tickid}/running")

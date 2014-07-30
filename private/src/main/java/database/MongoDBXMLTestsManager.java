@@ -24,63 +24,66 @@ import java.util.List;
 public class MongoDBXMLTestsManager implements IDBXMLTestsManager {
     // initialise slf4j logger
     private static Logger log = LoggerFactory.getLogger(MongoDBXMLTestsManager.class);
-    private final JacksonDBCollection<ListWrapper, String> XMLTetsSettingsColl;
+    private final JacksonDBCollection<ListWrapper, String> XMLTestSettingsColl;
 
     public MongoDBXMLTestsManager(DB database) {
-        XMLTetsSettingsColl = JacksonDBCollection.wrap(
+        XMLTestSettingsColl = JacksonDBCollection.wrap(
                 database.getCollection(ConfigurationLoader.getConfig().getMongoXMLSettingsCollectionName()),
                 ListWrapper.class, String.class);
     }
     
     public MongoDBXMLTestsManager() {
-        XMLTetsSettingsColl = null;
+        XMLTestSettingsColl = null;
     }
     
     /** {@inheritDoc} */
 	@Override
 	public void addNewTest(String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDAlreadyExistsException {
         //if XMLTestSettings for the given tickId are already in the database, throw an exception
-        if (XMLTetsSettingsColl.findOneById(tickId) != null) {
+        if (XMLTestSettingsColl.findOneById(tickId) != null) {
             throw new TestIDAlreadyExistsException(tickId);
         }
 
-        XMLTetsSettingsColl.save(new ListWrapper(tickId, staticTestSettings));
+        XMLTestSettingsColl.save(new ListWrapper(tickId, staticTestSettings));
 	}
 
     /** {@inheritDoc} */
     @Override
     public void update(@PathParam("tickId") String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDNotFoundException {
-        if (XMLTetsSettingsColl.findOneById(tickId) == null) {
+        if (XMLTestSettingsColl.findOneById(tickId) == null) {
             throw new TestIDNotFoundException(tickId);
         }
 
-        deleteTest(tickId);
+        //hopefully this overwrites automatically
+        XMLTestSettingsColl.save(new ListWrapper(tickId,staticTestSettings));
+        
+        /* deleteTest(tickId);
         try {
             addNewTest(tickId, staticTestSettings);
         }
         catch (TestIDAlreadyExistsException e) {
             //because addNewTest() is preceded by deleteTest(), this should not happen
-        }
+        } */
     }
 
     /** {@inheritDoc} */
 	@Override
 	public void deleteTest(String tickId) throws TestIDNotFoundException {
-        if (XMLTetsSettingsColl.findOneById(tickId) == null) {
+        if (XMLTestSettingsColl.findOneById(tickId) == null) {
             throw new TestIDNotFoundException(tickId);
         }
 
-        XMLTetsSettingsColl.removeById(tickId);
+        XMLTestSettingsColl.removeById(tickId);
 	}
 
     /** (@inheritDoc} */
 	@Override
 	public List<XMLTestSettings> getTestSettings(String tickId) throws TestIDNotFoundException {
-        if (XMLTetsSettingsColl.findOneById(tickId) == null) {
+        if (XMLTestSettingsColl.findOneById(tickId) == null) {
             throw new TestIDNotFoundException(tickId);
         }
 
-        ListWrapper listWrapper = XMLTetsSettingsColl.findOneById(tickId);
+        ListWrapper listWrapper = XMLTestSettingsColl.findOneById(tickId);
         return listWrapper.getElements();
 	}
 }

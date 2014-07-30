@@ -15,11 +15,24 @@ import org.slf4j.LoggerFactory;
 import configuration.ConfigurationLoader;
 import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
-import publicinterfaces.*;
+import publicinterfaces.ITestService;
+import publicinterfaces.NoSuchTestException;
+import publicinterfaces.Report;
+import publicinterfaces.ReportNotFoundException;
+import publicinterfaces.ReportResult;
+import publicinterfaces.Severity;
+import publicinterfaces.StaticOptions;
+import publicinterfaces.Status;
+import publicinterfaces.TestIDAlreadyExistsException;
+import publicinterfaces.TestIDNotFoundException;
+import publicinterfaces.TestStillRunningException;
+import publicinterfaces.TickNotInDBException;
+import publicinterfaces.UserNotInDBException;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 
@@ -42,13 +55,10 @@ public class TestService implements ITestService {
     private static Map<String, Tester> ticksInProgress = new HashMap<>();
 
     public TestService() {
-    	System.out.println("setting up proxies");
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 	    
 	    ResteasyWebTarget forGit = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
 	    gitProxy = forGit.proxy(WebInterface.class);
-	   
-	    System.out.println("git proxy set up");
     }
 
     /** {@inheritDoc} */
@@ -57,14 +67,15 @@ public class TestService implements ITestService {
                            @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException {
     	Map<XMLTestSettings, LinkedList<String>> tests = new HashMap<>();
-        
+        final String commitId = gitProxy.resolveCommit(repoName, "HEAD");
+    	
         LinkedList<String> filesToTest = new LinkedList<>();
         
         //collect files to test from git
-        log.info(crsId + " " + tickId
+        log.info(crsId + " " + tickId + " " + commitId 
                 + ": runNewTest: Connecting to git API to obtain list of files in repo");
-        List<String> fileListFromGit = gitProxy.listFiles(repoName);
-        log.info(crsId + " " + tickId + ": request successful");
+        List<String> fileListFromGit = gitProxy.listFiles(repoName , commitId);
+        log.info(crsId + " " + tickId + " " + commitId + ": request successful");
 
         for (String file : fileListFromGit) {
            if (FilenameUtils.getExtension(file).equals("java"))
@@ -76,7 +87,7 @@ public class TestService implements ITestService {
         //obtain static tests to run on files according to what tick it is
         List<XMLTestSettings> staticTests = dbXMLTests.getTestSettings(tickId);
         
-        log.info(crsId + " " + tickId + ": runNewTest: creating Tester object");
+        log.info(crsId + " " + tickId + " " + commitId + " runNewTest: creating Tester object");
     	
         for (XMLTestSettings test : staticTests) {
             tests.put(test, filesToTest);
@@ -84,7 +95,7 @@ public class TestService implements ITestService {
         }
 
         // create a new Tester object
-        final Tester tester = new Tester(tests, repoName);
+        final Tester tester = new Tester(tests, repoName, commitId);
 
         // add the object to the list of in-progress tests
         //this key should be unique as they shouldn't be able to run the same tests more than once
@@ -99,7 +110,7 @@ public class TestService implements ITestService {
         // start the test in an asynchronous thread
         new Thread(new Runnable() {
             public void run() {
-                asyncTestRunner(tester, crsId, tickId, "//TODO: set commit Id");
+                asyncTestRunner(tester, crsId, tickId, commitId);
             }
         }).start();
 
@@ -227,5 +238,14 @@ public class TestService implements ITestService {
 		finally {
 			return Response.ok().entity(toReturn).build();
 		} 
+	}
+
+	@Override
+	public void setTickerResult(String crsid, String tickId,
+			ReportResult tickerResult, String tickerComments, String commitId)
+			throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
+		log.info("setting ticker result");
+		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId);
+		log.info("result set");
 	}
 }

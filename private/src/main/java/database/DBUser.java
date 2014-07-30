@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import publicinterfaces.Report;
+import publicinterfaces.ReportNotFoundException;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
@@ -128,4 +129,14 @@ class DBUser {
     public void setTicks(Map<String, DBTick> ticks) {
         this.ticks = ticks;
     }
+
+	public Report getReport(String tickId, String commitId) throws ReportNotFoundException {
+		List<Report> reports = this.ticks.get(tickId).getReports();
+		for (Report report : reports) {
+			if (report.getCommitId().equals(commitId)) {
+				return report;
+			}
+		}
+		throw new ReportNotFoundException("report with commit Id " + commitId + " for " + tickId + " was not found");
+	}
 }
