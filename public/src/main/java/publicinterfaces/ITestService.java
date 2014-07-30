@@ -6,6 +6,7 @@ import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Interface for all API functions provided by UROP TestingSystem project
@@ -92,6 +93,10 @@ public interface ITestService {
     @Path("/test")
     public void test() throws NoSuchTestException;
 
+    @GET
+    @Path("/testFiles")
+    public Map<String,Integer> getTestFiles();
+    
     //TODO: cancel test?
     //@DELETE
     //@Path("/{crsid}/{tickid}/running")
