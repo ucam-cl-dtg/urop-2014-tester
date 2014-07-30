@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import privateinterfaces.IDBReportManager;
 import publicinterfaces.Report;
+import publicinterfaces.ReportNotFoundException;
 import publicinterfaces.ReportResult;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
@@ -107,12 +108,12 @@ public class MongoDBReportManager implements IDBReportManager {
 
 	@Override
 	public void editReportTickerResult(String crsid, String tickId,
-			ReportResult tickerResult, String tickerComments) throws UserNotInDBException, TickNotInDBException {
+			ReportResult tickerResult, String tickerComments, String commitId) 
+					throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
 		DBUser user = getValidUser(crsid);
-		Report report = user.getLastReport(tickId);
+		Report report = user.getReport(tickId,commitId);
 		report.setTickerResult(tickerResult);
 		report.setTickerComments(tickerComments);
-		System.out.println("tickerResult changed to " + tickerResult);
 		DBUserColl.save(user);
 	}
 }

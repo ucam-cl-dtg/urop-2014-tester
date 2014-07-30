@@ -18,8 +18,10 @@ import privateinterfaces.IDBXMLTestsManager;
 import publicinterfaces.ITestService;
 import publicinterfaces.NoSuchTestException;
 import publicinterfaces.Report;
+import publicinterfaces.ReportNotFoundException;
 import publicinterfaces.ReportResult;
 import publicinterfaces.Severity;
+import publicinterfaces.StaticOptions;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDAlreadyExistsException;
 import publicinterfaces.TestIDNotFoundException;
@@ -32,6 +34,7 @@ import uk.ac.cam.cl.git.interfaces.WebInterface;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Response;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,13 +55,10 @@ public class TestService implements ITestService {
     private static Map<String, Tester> ticksInProgress = new HashMap<>();
 
     public TestService() {
-    	System.out.println("setting up proxies");
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 	    
 	    ResteasyWebTarget forGit = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
 	    gitProxy = forGit.proxy(WebInterface.class);
-	   
-	    System.out.println("git proxy set up");
     }
 
     /** {@inheritDoc} */
@@ -219,8 +219,9 @@ public class TestService implements ITestService {
     }
 
 	@Override
-	public Map<String,Integer> getTestFiles() {
-		Map<String,Integer> testFiles = new HashMap<>();
+	public Response getTestFiles() {
+	    log.info("get test files request received");
+		List<StaticOptions> toReturn = new LinkedList<>();
 		try {
 			URI dir = (TestService.class.getClassLoader().getResource("checkstyleResources")).toURI();
 			File path = new File(dir);
@@ -228,21 +229,23 @@ public class TestService implements ITestService {
 			log.info("no of files found = " + files.length);
 			for (String file : files) {
 				String name = file.substring(0,file.length()-4);
-				testFiles.put(name, ConfigurationLoader.getConfig().getSeverity(name));
+                toReturn.add(new StaticOptions(name, ConfigurationLoader.getConfig().getSeverity(name)));
 			}
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally {
-			return testFiles;
+			return Response.ok().entity(toReturn).build();
 		} 
 	}
 
 	@Override
 	public void setTickerResult(String crsid, String tickId,
-			ReportResult tickerResult, String tickerComments)
-			throws UserNotInDBException, TickNotInDBException {
-		TestService.dbReport.editReportTickerResult(crsid,"testTick",tickerResult,tickerComments);
+			ReportResult tickerResult, String tickerComments, String commitId)
+			throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
+		log.info("setting ticker result");
+		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId);
+		log.info("result set");
 	}
 }

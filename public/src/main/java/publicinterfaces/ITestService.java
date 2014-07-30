@@ -1,6 +1,7 @@
 package publicinterfaces;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
 
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
@@ -95,14 +96,15 @@ public interface ITestService {
 
     @GET
     @Path("/testFiles")
-    public Map<String,Integer> getTestFiles();
+    public Response getTestFiles();
     
     @POST
-    @Path("/{crsid}/{tickId}/setTickerResult")
+    @Path("/{crsid}/{tickId}/set/tickerResult")
     @Consumes("application/json")
     public void setTickerResult( @PathParam("crsid") String crsid , @PathParam("tickId") String tickId ,  
-    		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments) 
-    				throws UserNotInDBException, TickNotInDBException;
+    		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments,
+    		 	@QueryParam("commitId") String commitId) 
+    				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
     
     //TODO: cancel test?
     //@DELETE

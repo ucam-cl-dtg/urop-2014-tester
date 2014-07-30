@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import publicinterfaces.Report;
+import publicinterfaces.ReportNotFoundException;
 import publicinterfaces.ReportResult;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
@@ -70,6 +71,7 @@ public interface IDBReportManager {
     public void removeUserTickReports(String crsId, String tickId) throws UserNotInDBException, TestIDNotFoundException;
 
 	public void editReportTickerResult(String crsid, String tickId,
-			ReportResult tickerResult, String tickerComments) throws UserNotInDBException, TickNotInDBException;
+			ReportResult tickerResult, String tickerComments, String commitId) 
+					throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
 
 }
