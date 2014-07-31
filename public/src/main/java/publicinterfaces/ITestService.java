@@ -98,13 +98,20 @@ public interface ITestService {
     /**
      * create a new test referred to by the given tickId with all the settings passed in
      * @param tickId                Unique Id of the new test being created
-     * @throws TestIDAlreadyExistsException       Thrown when the tickId supplied has been used before i.e
-     * 											  is not unique
+     * @param checkstyleOpts        list containing xml files and settings for checkstyles
+     * @throws TestIDAlreadyExistsException       Thrown when the tickId supplied has been used before in
+     * 											  the database, but something went wrong and the files
+     * 											  aren't stored so add to database is called instead
+     * 											  of update - really shouldn't happen but just in case
+     * @throws FailedToMakeTestException       Thrown if I/O goes wrong when setting up the test files
+     * @throws TestIDNotFoundException 		Thrown when this is called in update mode and the tickId can't be
+     * 										found
      */
-    @GET
+    @POST
     @Path("/{tickId}/create")
-	public void createNewTest(@PathParam("tickId") String tickId /* , List<XMLTestSettings> checkstyleOpts */)
-            throws TestIDAlreadyExistsException;
+    @Consumes("application/json")
+	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts)
+            throws TestIDAlreadyExistsException, FailedToMakeTestException, TestIDNotFoundException;
 
     //TODO: REMOVE?
     @GET

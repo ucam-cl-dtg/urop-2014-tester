@@ -18,9 +18,14 @@ public class XMLTestSetting {
 	//defines what the test checks for in a human readable way
 	private String testDefinition;
 	
-	public XMLTestSetting(String testFile,Severity severity,String definition) {
-		this.testFile = ConfigurationLoader.getConfig().getCheckstyleResourcesPath() + testFile + ".xml";
-		this.severity = severity;
+	public XMLTestSetting(String testFile,int severityInt,String definition) {
+		this.testFile = testFile;
+		if (severityInt == 1) {
+			this.severity = Severity.WARNING;
+		}
+		else {
+			this.severity = Severity.ERROR;
+		}
 		this.testDefinition = definition;
 	}
 

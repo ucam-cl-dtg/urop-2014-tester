@@ -11,9 +11,12 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.puppycrawl.tools.checkstyle.Main;
+
 import configuration.ConfigurationLoader;
 import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
+import publicinterfaces.FailedToMakeTestException;
 import publicinterfaces.ITestService;
 import publicinterfaces.NoSuchTestException;
 import publicinterfaces.Report;
@@ -34,8 +37,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -188,27 +193,86 @@ public class TestService implements ITestService {
         dbReport.removeUserTickReports(crsId, tickId);
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc} 
+     * @throws FailedToMakeTestException 
+     * @throws TestIDNotFoundException */
     @Override
-	public void createNewTest(@PathParam("tickId") String tickId /* List<XMLTestSettings> checkstyleOpts */)
-            throws TestIDAlreadyExistsException {
+	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts)
+            throws TestIDAlreadyExistsException, FailedToMakeTestException, TestIDNotFoundException {
     	log.info("adding tests for " + tickId);
-		List<XMLTestSetting> checkstyleOptsTemp = new LinkedList<>();
-		checkstyleOptsTemp.add(new XMLTestSetting("emptyBlocks",Severity.ERROR,"Empty blocks"));
-		checkstyleOptsTemp.add(new XMLTestSetting("unusedImports",Severity.WARNING,"Unused Imports"));
-		checkstyleOptsTemp.add(new XMLTestSetting("TODOorFIXME",Severity.ERROR,"TODOs and FIXMEs"));
-        checkstyleOptsTemp.add(new XMLTestSetting("illegalCatch",Severity.ERROR,"Illegal catches"));
-        checkstyleOptsTemp.add(new XMLTestSetting("illegalThrow",Severity.ERROR,"Illegal throws"));
-        checkstyleOptsTemp.add(new XMLTestSetting("indentation",Severity.WARNING,"Indentation"));
-        checkstyleOptsTemp.add(new XMLTestSetting("noProblem", Severity.WARNING, "No problem"));
-        checkstyleOptsTemp.add(new XMLTestSetting("longVariableDeclaration",Severity.WARNING,"Lower case long assignment"));
-		log.info("all tests added for " + tickId);
-		
-		//add to database
-	    dbXMLTests.addNewTest(tickId, checkstyleOptsTemp);
-	    log.info("added test to database");
+    	List<XMLTestSetting> staticTests = new LinkedList<>();
+		int testNo = 0;
+    	File dir = new File(ConfigurationLoader.getConfig().getFilePath() + "/" + tickId);
+		if (dir.mkdirs()) {
+			log.info("directory made at " + dir.getAbsolutePath());
+			for (StaticOptions testOption : checkstyleOpts) {
+				if (testOption.getCheckedIndex() != 0) {
+					XMLTestSetting testSetting;
+					try {
+						testSetting = writeFile(dir.getAbsolutePath() , testOption , testNo);
+					} 
+					catch (IOException e) {
+						throw new FailedToMakeTestException("Writing to file for " + tickId + " failed");
+					}
+					staticTests.add(testSetting);
+		    		testNo++;
+				}
+			}
+			TestService.dbXMLTests.addNewTest(tickId, staticTests);
+			log.info("Added " + tickId + " to database");
+		}
+		else {
+			if (dir.exists()) {
+				//edit mode
+				//delete old files
+				log.info("overwriting files in " + dir);
+				File[] files = dir.listFiles();
+				for(File f : files) {
+					if(f.delete()) {
+						log.info("deleted " + f.getName() + " successfully");
+					}
+					else {
+						log.info("failed to delete " + f.getName());
+						throw new FailedToMakeTestException("While overwriting " + tickId + "deleting old files failed");
+					}
+				}
+				//save new ones
+				for (StaticOptions testOption : checkstyleOpts) {
+					if (testOption.getCheckedIndex() != 0) {
+						XMLTestSetting testSetting;
+						try {
+							testSetting = writeFile(dir.getAbsolutePath() , testOption , testNo);
+							staticTests.add(testSetting);
+				    		testNo++;
+						} 
+						catch (IOException e) {
+							throw new FailedToMakeTestException("Writing to file for " + tickId + " failed");
+						}
+					}
+				}
+				//TODO: check this will overwrite in the database
+				TestService.dbXMLTests.update(tickId, staticTests);
+				log.info("Added " + tickId + " to database");
+			}
+			else {
+				throw new FailedToMakeTestException("Saving test " + tickId + " failed");
+			}
+		}
 	}
 	
+    public static XMLTestSetting writeFile(String dir , StaticOptions testOption, int testNo) throws IOException {
+	    String content = testOption.getCode();
+	    
+		BufferedWriter b = new BufferedWriter(new FileWriter(dir + "/" + testNo + ".xml"));
+		b.write(content);
+		b.flush();
+		b.close();
+		log.info("wrote file contents of " + testOption.getText() + " to " + dir + "/" + testNo + ".xml");
+	    XMLTestSetting testSetting = new XMLTestSetting(dir + "/" + testNo + ".xml" ,
+	    		testOption.getCheckedIndex(), testOption.getText());
+	    return testSetting;
+    }
+    
     public static IDBReportManager getDatabase() {
     	return TestService.dbReport;
     }
