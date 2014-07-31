@@ -46,6 +46,10 @@
                 margin-top: 23px;
                 margin-left: 8px;
             }
+            #cmdRestoreDefaults {
+                width: 200px;
+                margin: 0;
+            }
             #day, #month {
                 width: 50px;
             }
@@ -58,7 +62,7 @@
             <h4>CODE TEMPLATE (optional)</h4>
             <br>
             <span layout horizontal>
-                <paper-input flex label="Repository Address" floatinglabel></paper-input>
+                <paper-input id="inputTemplateRepo" flex label="Repository Address" floatinglabel></paper-input>
             </span>
 
             <div layout horizontal>
@@ -75,27 +79,33 @@
             </core-collapse>
             <br>
 
-
             <h4>CORRECTNESS CHECKS</h4>
             <br>
             <span layout horizontal>
-                <paper-input flex label="Repository Address" floatinglabel></paper-input>
+                <paper-input id="inputCorrectnessRepo" flex label="Repository Address" floatinglabel></paper-input>
             </span>
 
             <h4>STYLISTIC CHECKS</h4>
             <div class="checkboxContainer" layout horizontal>
                 <paper-checkbox checked="{{useDefaults}}" on-tap="{{toggleStylistic}}"></paper-checkbox>
-                <span flex style="padding-left: 15px; margin: 0;">Use Defaults</span>
+                <span flex style="padding-left: 15px; margin: 0; min-height: 35px;">Use Defaults</span>
+                <paper-button
+                        id="cmdRestoreDefaults"
+                        label="RESTORE DEFAULTS"
+                        raisedButton
+                        end-justified
+                        hidden?="{{useDefaults}}">
+                    </paper-button>
             </div>
             <core-collapse id="collapseStylistic">
                 <static-list-labels></static-list-labels>
-                <static-list></static-list>
+                <static-list id="staticList"></static-list>
             </core-collapse>
 
             <!-- SAVE button -->
             <span layout horizontal>
                 <span flex></span>
-                <paper-button raisedButton class="colored" label="SAVE"></paper-button>
+                <paper-button raisedButton class="colored" label="SAVE" on-tap="{{saveTick}}"></paper-button>
                 <span flex></span>
             </span>
         </div>
@@ -109,9 +119,41 @@
                 this.$.collapseStylistic.toggle();
             },
             toggleDeadline: function() {
-                //fix for slider bug
+                //work around for slider bug
                 var that = this.$;
                 setTimeout(function(){that.collapseDeadline.opened = that.deadlineSwitch.checked;}, 100);
+            },
+            saveTick: function () {
+                //TODO: actually save the tick. For now, print all required data to console
+                console.log();
+                console.log("Code template repo: " + this.$.inputTemplateRepo.inputValue);
+
+                console.log("Deadline? " + this.$.deadlineSwitch.checked);
+                if (this.$.deadlineSwitch.checked) {
+                    var year = this.$.year.inputValue;
+                    var month = this.$.month.inputValue;
+                    var day = this.$.day.inputValue;
+                    var date = new Date(year, month - 1, day);
+                    console.log(date.toISOString());
+                    console.log(date.toDateString());
+                }
+
+                console.log("Correctness tests repo: " + this.$.inputCorrectnessRepo.inputValue);
+
+                console.log("Use defaults? " + this.useDefaults);
+                if (!this.useDefaults) {
+                    var saveOptions = [];
+                    for (var i = 0; i < this.$.staticList.staticOptions.length; i++) {
+                        if (!(this.$.staticList.staticOptions.closed)) {
+                            saveOptions[saveOptions.length] = {text: this.$.staticList.staticOptions[i].text,
+                                checkedIndex: this.$.staticList.staticOptions[i].checkedIndex};
+                        }
+                    }
+
+                    for (var i = 0; i < saveOptions.length; i++) {
+                        console.log(saveOptions[i]);
+                    }
+                }
             }
         });
     </script>
