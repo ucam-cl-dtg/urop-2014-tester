@@ -113,7 +113,7 @@ public class Tester {
         Map<XMLTestSettings, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
         for (Map.Entry<XMLTestSettings, LinkedList<String>> e : staticTests.entrySet()) {
-            // delay(3000);
+            delay(3000);
             status.addProgress();
             runStaticAnalysis(e.getKey(), e.getValue(), commitId);
         }

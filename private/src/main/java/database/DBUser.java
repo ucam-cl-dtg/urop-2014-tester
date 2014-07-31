@@ -79,7 +79,7 @@ class DBUser {
     @JsonIgnore
     public Status getStatus(String tickId) throws TickNotInDBException {
         Report report = getValidTick(tickId).getLast();
-        return new Status(report.getNoOfTests());
+        return new Status(report.getNoOfTests()+1);
     }
 
     /**
