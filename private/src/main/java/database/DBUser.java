@@ -103,9 +103,9 @@ class DBUser {
      * @param tickId                    Id of report to remove
      * @throws TestIDNotFoundException  Thrown if the tick wasn't found
      */
-    public void removeTick(String tickId) throws TestIDNotFoundException {
+    public void removeTick(String tickId) throws TickNotInDBException {
         if (!(ticks.containsKey(tickId))) {
-            throw new TestIDNotFoundException(tickId);
+            throw new TickNotInDBException(tickId);
         }
         ticks.remove(tickId);
     }

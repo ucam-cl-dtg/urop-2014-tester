@@ -33,13 +33,13 @@ public class Tester {
     private Exception failCause; //if the report fails, save it here so that it can be thrown when the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
-    private Map<XMLTestSettings, LinkedList<String>> testingQueue;
+    private Map<XMLTestSetting, LinkedList<String>> testingQueue;
 
 
     /**
      * Creates a new Tester
      */
-    public Tester(Map<XMLTestSettings, LinkedList<String>> testingQueue, String repoName, String commitId)  {
+    public Tester(Map<XMLTestSetting, LinkedList<String>> testingQueue, String repoName, String commitId)  {
         this.testingQueue = testingQueue;
         this.report = new Report();
         report.setCommitId(commitId);
@@ -49,7 +49,6 @@ public class Tester {
     /**
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
-     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
      */
     public void runTests(String crsId, String tickId, String commitId)
     {
@@ -79,9 +78,7 @@ public class Tester {
         }
         finally
         {
-        	//TODO: should we make another interface?
             Report reportToAdd = this.report;
-            //TODO: should we add the report even if it failed to generate?
             TestService.getDatabase().addReport(crsId, tickId, reportToAdd);
             this.status.complete();
         }   
@@ -102,17 +99,16 @@ public class Tester {
 
     /**
      * Runs all static analysis tests required by the tick
-     * @throws CheckstyleException
-     * @throws IOException
-     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
+     * @throws CheckstyleException	Thrown if Checkstyle fails to run
+     * @throws IOException 			Thrown if creating/making temp files fails
+     * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    private void runStaticTests(String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException
-    {
+    private void runStaticTests(String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException    {
         log.info("Starting static analysis");
         //get static tests from testingQueue
-        Map<XMLTestSettings, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
+        Map<XMLTestSetting, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
-        for (Map.Entry<XMLTestSettings, LinkedList<String>> e : staticTests.entrySet()) {
+        for (Map.Entry<XMLTestSetting, LinkedList<String>> e : staticTests.entrySet()) {
             delay(3000);
             status.addProgress();
             runStaticAnalysis(e.getKey(), e.getValue(), commitId);
@@ -151,10 +147,10 @@ public class Tester {
      * @param testingQueue   Map from which to extract .xml tests
      * @return               Map containing only .xml tests
      */
-    public HashMap<XMLTestSettings, LinkedList<String>> getStaticTestItems(Map<XMLTestSettings, LinkedList<String>> testingQueue)
+    public HashMap<XMLTestSetting, LinkedList<String>> getStaticTestItems(Map<XMLTestSetting, LinkedList<String>> testingQueue)
     {
-        HashMap<XMLTestSettings, LinkedList<String>> mapReturn = new HashMap<>();
-        for (Map.Entry<XMLTestSettings, LinkedList<String>> e : testingQueue.entrySet()) {
+        HashMap<XMLTestSetting, LinkedList<String>> mapReturn = new HashMap<>();
+        for (Map.Entry<XMLTestSetting, LinkedList<String>> e : testingQueue.entrySet()) {
             if ("xml".equals(FilenameUtils.getExtension(e.getKey().getTestFile()))) {
                 mapReturn.put(e.getKey(), e.getValue());
             }
@@ -167,11 +163,11 @@ public class Tester {
      * 
      * @param configFileName		Path to the config file needed by CheckStyle
      * @param fileNames				A list of paths to the files on which the static analyses tests are to be performed
-     * @throws CheckstyleException	
-     * @throws IOException 
-     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
+     * @throws CheckstyleException	Thrown if Checkstyle fails to run
+     * @throws IOException 			Thrown if creating/making temp files fails
+     * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    public void runStaticAnalysis(XMLTestSettings configFileName, List<String> fileNames, String commitId) throws CheckstyleException, IOException, uk.ac.cam.cl.git.api.RepositoryNotFoundException {
+    public void runStaticAnalysis(XMLTestSetting configFileName, List<String> fileNames, String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException {
            StaticParser.test(configFileName, fileNames, report, repoName, commitId);
     }
 

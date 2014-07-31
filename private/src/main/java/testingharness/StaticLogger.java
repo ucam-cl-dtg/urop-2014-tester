@@ -28,7 +28,7 @@ public class StaticLogger implements AuditListener
      * @param report Report where generated report items will go.
      * @param test   Checkstyle config data
      */
-    public StaticLogger(Report report, XMLTestSettings test, Map<String,String> filePathMap)
+    public StaticLogger(Report report, XMLTestSetting test, Map<String,String> filePathMap)
     {
         this.report = report;
         this.testDef = test.getTestDefinition();

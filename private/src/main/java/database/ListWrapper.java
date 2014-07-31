@@ -2,7 +2,7 @@ package database;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import testingharness.XMLTestSettings;
+import testingharness.XMLTestSetting;
 
 import java.util.List;
 
@@ -13,21 +13,21 @@ import java.util.List;
  */
 public class ListWrapper {
     private String tickId;
-    private List<XMLTestSettings> elements;
+    private List<XMLTestSetting> elements;
 
     @JsonCreator
-    public ListWrapper(@JsonProperty("_id") String tickId, @JsonProperty("elements") List<XMLTestSettings> elements) {
+    public ListWrapper(@JsonProperty("_id") String tickId, @JsonProperty("elements") List<XMLTestSetting> elements) {
         this.tickId = tickId;
         this.elements = elements;
     }
 
     public ListWrapper() {}
 
-    public List<XMLTestSettings> getElements() {
+    public List<XMLTestSetting> getElements() {
         return elements;
     }
 
-    public void setElements(List<XMLTestSettings> elements) {
+    public void setElements(List<XMLTestSetting> elements) {
         this.elements = elements;
     }
 

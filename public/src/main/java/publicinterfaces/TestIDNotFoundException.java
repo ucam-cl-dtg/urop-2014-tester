@@ -1,9 +1,9 @@
 package publicinterfaces;
 
 /**
- * Thrown when users of TestServiceInterface poll or get a report
- * using an id which does not map to a test available to retrieve
- * from memory.
+ * Thrown when a test with a given Id can't be found in the database
+ * i.e. it hasn't been created yet
+ * @author kls82
  * @author as2388
  */
 public class TestIDNotFoundException extends Exception {

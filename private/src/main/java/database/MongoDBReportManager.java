@@ -83,7 +83,7 @@ public class MongoDBReportManager implements IDBReportManager {
 
     /** {@inheritDoc} */
     @Override
-    public void removeUserTickReports(String crsId, String tickId) throws UserNotInDBException, TestIDNotFoundException {
+    public void removeUserTickReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException {
         DBUser user = getValidUser(crsId);
         user.removeTick(tickId);
     }

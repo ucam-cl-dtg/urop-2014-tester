@@ -2,24 +2,29 @@ package testingharness;
 
 import publicinterfaces.Severity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import configuration.ConfigurationLoader;
 
-public class XMLTestSettings {
+/**
+ * Stores the settings for an xml static test file to be used in a particular tick
+ * 
+ * @author kls82
+ */
+
+public class XMLTestSetting {
+	//Stores path of the xml file
 	private String testFile;
-	//use this severity instead of the one in the xml files if defaultSettings is not true
+	//Stores the severity incase the corresponding problem the test checks for is found 
 	private Severity severity;
+	//defines what the test checks for in a human readable way
 	private String testDefinition;
-	private boolean defaultSettings;
 	
-	public XMLTestSettings(String testFile,Severity severity,String definition) {
+	public XMLTestSetting(String testFile,Severity severity,String definition) {
 		this.testFile = ConfigurationLoader.getConfig().getCheckstyleResourcesPath() + testFile + ".xml";
 		this.severity = severity;
 		this.testDefinition = definition;
-		this.defaultSettings = false;
 	}
 
+	//Constuctor and getter/setters for json serialisation
 	public String getTestFile() {
 		return testFile;
 	}
@@ -32,21 +37,7 @@ public class XMLTestSettings {
 		return testDefinition;
 	}
 
-    @JsonIgnore
-	public boolean isDefault() {
-		return defaultSettings;
-	}
-
-    //for JSON serialisation
-    public XMLTestSettings() {}
-
-    public boolean getDefaultSettings() {
-        return defaultSettings;
-    }
-
-    public void setDefaultSettings(boolean defaultSettings) {
-        this.defaultSettings = defaultSettings;
-    }
+    public XMLTestSetting() {}
 
     public void setSeverity(Severity severity) {
         this.severity = severity;

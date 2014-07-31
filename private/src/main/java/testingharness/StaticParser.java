@@ -7,13 +7,6 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 import com.puppycrawl.tools.checkstyle.api.Configuration;
 
-
-
-
-
-import org.jboss.resteasy.client.jaxrs.ResteasyClient;
-import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
-import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,12 +21,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/* import uk.ac.cam.cl.git.public_interfaces.WebInterface; */
-
 /**
  * Provides function for running Checkstyle with a given config file and .java file
  * @author kls82
- *
  */
 public class StaticParser {
     static Logger log = LoggerFactory.getLogger(StaticParser.class);
@@ -44,11 +34,11 @@ public class StaticParser {
      * @param files                     Paths to .java file on which to run Checkstyle
      * @param report                    Reference to Report object into which found problems should go
      * @param repoName                  Name of git repository in which {@code file} is located
-     * @throws CheckstyleException      
-     * @throws IOException              
-     * @throws uk.ac.cam.cl.git.api.RepositoryNotFoundException 
+     * @throws CheckstyleException      Thrown if Checkstyle fails to run
+     * @throws IOException              Thrown if creating/making temp files fails
+     * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    public static void test(XMLTestSettings test, List<String> files, Report report, String repoName, String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException, uk.ac.cam.cl.git.api.RepositoryNotFoundException{
+    public static void test(XMLTestSetting test, List<String> files, Report report, String repoName, String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException {
         //must be in list for .process to work
     	Map<String,String> filePathMap = new HashMap<>();
     	log.info("starting to run test with URL " + test.getTestFile());
