@@ -47,8 +47,9 @@
                 margin-left: 8px;
             }
             #cmdRestoreDefaults {
-                width: 200px;
+                width: 165px;
                 margin: 0;
+                font-size: 15px;
             }
             #day, #month {
                 width: 50px;
@@ -58,16 +59,31 @@
             }
         </style>
 
+        <core-ajax
+                url="http://urop2014.dtg.cl.cam.ac.uk/UROP_UI/api/user/AUTHOR/">
+
+        </core-ajax>
+
         <div id="mainContainer">
-            <h4>CODE TEMPLATE (optional)</h4>
+            <h4>DIPLAY NAME</h4>
             <br>
-            <span layout horizontal>
-                <paper-input id="inputTemplateRepo" flex label="Repository Address" floatinglabel></paper-input>
-            </span>
+            <div layout horizontal>
+                <div hidden id="divDisplayName" flex>Programming in Java Tick 1</div>
+                <paper-input  id="inputTemplateRepo" flex label="e.g. Programming in Java Tick 1" floatinglabel></paper-input>
+            </div>
+
+            <core-collapse id="collapseCodeTemplate" opened="true">
+                <h4>CORRECTNESS CHECKS</h4>
+                <br>
+                <div layout horizontal>
+                    <div style="color: #808080">Repository Address:&nbsp;</div>
+                    <div id="codeTemplateAddress" flex>http://stuff</div>
+                </div>
+            </core-collapse>
 
             <div layout horizontal>
                 <h4>DEADLINE</h4>
-                <paper-toggle-button id="deadlineSwitch" on-up="{{toggleDeadline}}"></paper-toggle-button>
+                <paper-toggle-button id="deadlineSwitch" on-change="{{toggleDeadline}}"></paper-toggle-button>
             </div>
             <core-collapse id="collapseDeadline">
                 <br>
@@ -79,11 +95,29 @@
             </core-collapse>
             <br>
 
-            <h4>CORRECTNESS CHECKS</h4>
+            <div layout horizontal>
+                <h4>ADD TO GROUPS</h4>
+                <paper-toggle-button id="groupsSwitch" on-change="{{toggleGroups}}"></paper-toggle-button>
+            </div>
+            <core-collapse id="collapseGroups">
+                <br>
+                <template repeat="{{group in groups}}">
+                    <span layout horizontal style="margin-left: 20px;">
+                        <paper-checkbox checked="{{group.selected}}"></paper-checkbox>
+                        <span flex style="padding-left: 15px; margin: 0; min-height: 35px;">{{group.text}}</span>
+                    </span>
+                </template>
+            </core-collapse>
             <br>
-            <span layout horizontal>
-                <paper-input id="inputCorrectnessRepo" flex label="Repository Address" floatinglabel></paper-input>
-            </span>
+
+            <core-collapse id="collapseCorrectness" opened="true">
+                <h4>CORRECTNESS CHECKS</h4>
+                <br>
+                <div layout horizontal>
+                    <div style="color: #808080">Repository Address:&nbsp;</div>
+                    <div id="correctnessAddress" flex>http://stuff</div>
+                </div>
+            </core-collapse>
 
             <h4>STYLISTIC CHECKS</h4>
             <div class="checkboxContainer" layout horizontal>
@@ -114,14 +148,22 @@
         Polymer('static-test-card', {
             ready: function() {
                 this.useDefaults = true;
+                this.groups = [];
+                this.groups[0] = {selected: false, text: "Tick 1"}
+                this.groups[1] = {selected: false, text: "Tick 2"}
+                this.groups[2] = {selected: false, text: "Tick 3"}
             },
             toggleStylistic: function() {
                 this.$.collapseStylistic.toggle();
             },
+            toggleCodeTemplate: function() {
+                this.$.collapseCodeTemplate.opened = this.$.codeTemplateSwitch.checked;
+            },
             toggleDeadline: function() {
-                //work around for slider bug
-                var that = this.$;
-                setTimeout(function(){that.collapseDeadline.opened = that.deadlineSwitch.checked;}, 100);
+                this.$.collapseDeadline.opened = this.$.deadlineSwitch.checked;
+            },
+            toggleGroups: function() {
+                this.$.collapseGroups.opened = this.$.groupsSwitch.checked;
             },
             saveTick: function () {
                 //TODO: actually save the tick. For now, print all required data to console
@@ -150,7 +192,7 @@
                         }
                     }
 
-                    for (var i = 0; i < saveOptions.length; i++) {
+                    for (i = 0; i < saveOptions.length; i++) {
                         console.log(saveOptions[i]);
                     }
                 }

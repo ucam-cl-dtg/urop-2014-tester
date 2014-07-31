@@ -5,6 +5,7 @@
 <link rel="import" href="../../bower_components/core-collapse/core-collapse.html">
 <link rel="import" href="../../bower_components/core-icon-button/core-icon-button.html">
 
+
 <polymer-element name="static-list-item" attributes="text checkedIndex closed">
     <template>
         <link rel="stylesheet" href="static-list-item.css" shim-shadowdom>
@@ -27,21 +28,17 @@
             </paper-radio-group>
         </span>
 
-        <core-collapse id="collapse">
+        <div layout horizontal>
+        <core-collapse id="collapse" flex>
             <textarea id="edit">
 <module name="Checker">
     <module name="TreeWalker">
-        <!-- Checks for empty catch, do, if else, finally. try, for, while, and init blocks, but NOT empty exception declarations.
-        Commented blocks do not count as empty -->
-        <module name="EmptyBlock">
-            <property name="tokens" value="LITERAL_CATCH, LITERAL_DO, LITERAL_ELSE, LITERAL_FINALLY, LITERAL_IF, LITERAL_FOR, LITERAL_TRY, LITERAL_WHILE, INSTANCE_INIT, STATIC_INIT"/>
-            <property name="option" value="text"/> <!-- Without this, blocks containing only comments would count as being empty -->
-            <message key="block.empty" value="Empty ''{0}'' block ~ if it should never run, a justifying comment in the block is required" />
-        </module>
+
     </module>
 </module>
             </textarea>
         </core-collapse>
+        </div>
     </template>
     <script src="../../codemirror-4.4/lib/codemirror.js"></script> <!-- CodeMirror -->
     <script src="../../codemirror-4.4/mode/xml/xml.js"></script> <!-- CodeMirror -->
@@ -49,7 +46,7 @@
         Polymer('static-list-item', {
             ready: function() {
                 //Initialise code mirror (provides xml syntax highlighting of a textarea)
-                CodeMirror.fromTextArea(this.$.edit);
+                this.cmInstance = CodeMirror.fromTextArea(this.$.edit);
             },
             /**
              * Work around for a paper-radio-button bug. Without this, the initially selected button would
@@ -68,13 +65,16 @@
                         this.$.error.tap();
                         break;
                 }
+                this.$.edit.tap();
             },
             toggle: function() {
                 this.$.collapse.toggle();
-                this.$.input = this.text;
             },
             close: function() {
                 this.closed = true;
+                this.$.collapse.hidden = true;
+                //console.log(this.$.edit.value);
+                //console.log(this.cmInstance.myCodeMirror.getValue());
             }
         });
     </script>
