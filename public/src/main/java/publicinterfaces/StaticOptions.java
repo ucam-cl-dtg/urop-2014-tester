@@ -7,10 +7,12 @@ package publicinterfaces;
 public class StaticOptions {
     private String text;      //problem category description
     private int checkedIndex; //for ignore, warning, or error
+    private String code; //xml code
 
-    public StaticOptions(String text, int checkedIndex) {
+    public StaticOptions(String text, int checkedIndex, String code) {
         this.text = text;
         this.checkedIndex = checkedIndex;
+        this.code = code;
     }
 
     //For JSON serialisation
@@ -31,4 +33,12 @@ public class StaticOptions {
     public void setText(String text) {
         this.text = text;
     }
+
+	public String getCode() {
+		return code;
+	}
+
+	public void setCode(String code) {
+		this.code = code;
+	}
 }

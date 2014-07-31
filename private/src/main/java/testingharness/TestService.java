@@ -33,7 +33,9 @@ import uk.ac.cam.cl.git.interfaces.WebInterface;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -232,10 +234,30 @@ public class TestService implements ITestService {
 			URI dir = (TestService.class.getClassLoader().getResource("checkstyleResources")).toURI();
 			File path = new File(dir);
 			String[] files = path.list();
+			File[] filesToRead = path.listFiles();
 			log.info("no of files found = " + files.length);
-			for (String file : files) {
+			int i = 0;
+			for (String file : files) {		
+				BufferedReader b = new BufferedReader(new FileReader(filesToRead[i]));
+				String line;
+				String fileContents = "";
+				try {
+					while ((line = b.readLine()) != null) {
+						fileContents += line + System.getProperty("line.separator");
+					}
+				} 
+				catch (IOException e) {
+					//TODO
+					b.close();
+					e.printStackTrace();
+				} 
+				b.close();
 				String name = file.substring(0,file.length()-4);
-                toReturn.add(new StaticOptions(name, ConfigurationLoader.getConfig().getSeverity(name)));
+	            toReturn.add(new StaticOptions
+	              		(ConfigurationLoader.getConfig().getDescription(name), 
+	               				ConfigurationLoader.getConfig().getSeverity(name),
+	               						fileContents));
+	            i++;
 			}
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
