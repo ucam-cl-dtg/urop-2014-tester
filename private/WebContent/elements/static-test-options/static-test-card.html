@@ -34,7 +34,6 @@
             }
             paper-button {
                 margin: 20px;
-
                 width: 10em;
                 height: 35px; /* Firefox/IE compatibility */
             }
@@ -59,17 +58,32 @@
             }
         </style>
 
+        <!-- GET all possible groups a tick can be in -->
         <core-ajax
                 url="http://urop2014.dtg.cl.cam.ac.uk/UROP_UI/api/user/AUTHOR/">
 
         </core-ajax>
 
+        <!-- get all other existing tick data -->
+        <core-ajax
+                id="ajaxLoadTickData"
+                auto
+                url="http://urop2014.dtg.cl.cam.ac.uk/UROP_UI/api/tick/tester"
+                handleAs="json"
+                on-core-response="{{tickDataLoaded}}">
+        </core-ajax>
+
+       <!-- <core-ajax
+                url="{{'http://urop2014.dtg.cl.cam.ac.uk/UROP_UI/api/tick/' + tickId}}"> -->
+
+
+
         <div id="mainContainer">
             <h4>DIPLAY NAME</h4>
             <br>
             <div layout horizontal>
-                <div hidden id="divDisplayName" flex>Programming in Java Tick 1</div>
-                <paper-input  id="inputTemplateRepo" flex label="e.g. Programming in Java Tick 1" floatinglabel></paper-input>
+                <div id="divDisplayName" flex>{{tickName}}</div>
+                <paper-input hidden id="inputTemplateRepo" flex label="e.g. Programming in Java Tick 1" inputValue="{{tickName}}"></paper-input>
             </div>
 
             <core-collapse id="collapseCodeTemplate" opened="true">
@@ -148,10 +162,15 @@
         Polymer('static-test-card', {
             ready: function() {
                 this.useDefaults = true;
+                this.tickName="Test";
                 this.groups = [];
+
                 this.groups[0] = {selected: false, text: "Tick 1"}
                 this.groups[1] = {selected: false, text: "Tick 2"}
                 this.groups[2] = {selected: false, text: "Tick 3"}
+            },
+            tickDataLoaded: function() {
+                console.log(this.$.ajaxLoadTickData.response);
             },
             toggleStylistic: function() {
                 this.$.collapseStylistic.toggle();
