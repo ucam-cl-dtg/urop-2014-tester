@@ -111,7 +111,7 @@ public interface ITestService {
     @POST
     @Path("/{tickId}/create")
     @Consumes("application/json")
-	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts);
+	public Response createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts);
 
     //TODO: REMOVE?
     @GET

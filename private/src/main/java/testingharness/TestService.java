@@ -200,22 +200,23 @@ public class TestService implements ITestService {
         dbReport.removeUserTickReports(crsId, tickId);
     }
 
-    /** {@inheritDoc} 
-     * @throws FailedToMakeTestException 
-     * @throws TestIDNotFoundException */
+    /** {@inheritDoc} */
     @Override
-	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts) {
+	public Response createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts) {
     	log.info("adding tests for " + tickId);
     	try {
     		TestService.dbXMLTests.addNewTest(tickId, checkstyleOpts);
     		log.info("new test created with id " + tickId);
+    		return Response.ok().build();
     	}
     	catch (TestIDAlreadyExistsException e1) {
     		try {
 	    		TestService.dbXMLTests.update(tickId, checkstyleOpts);
 	    		log.info(tickId + "has been updated");
+	    		return Response.ok().build();
     		}
     		catch (TestIDNotFoundException e2) {
+    			return Response.status(418).build();
     			//should never happen!
     		}
     	}
