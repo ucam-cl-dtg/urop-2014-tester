@@ -3,9 +3,11 @@ package testingharness;
 import java.util.Map;
 
 import publicinterfaces.Report;
-
 import publicinterfaces.CategoryNotInReportException;
 import publicinterfaces.Report;
+import publicinterfaces.ReportResult;
+import publicinterfaces.Severity;
+import publicinterfaces.StaticOptions;
 
 import com.puppycrawl.tools.checkstyle.api.AuditEvent;
 import com.puppycrawl.tools.checkstyle.api.AuditListener;
@@ -28,13 +30,17 @@ public class StaticLogger implements AuditListener
      * @param report Report where generated report items will go.
      * @param test   Checkstyle config data
      */
-    public StaticLogger(Report report, XMLTestSetting test, Map<String,String> filePathMap)
+    public StaticLogger(Report report, StaticOptions test, Map<String,String> filePathMap)
     {
         this.report = report;
-        this.testDef = test.getTestDefinition();
+        this.testDef = test.getText();
         this.filePathMap = filePathMap;
         System.out.println("added " + testDef + " to report");
-        report.addProblem(this.testDef, test.getSeverity());
+        Severity severity = Severity.WARNING;
+        if (test.getCheckedIndex() == 2){
+        	severity = Severity.ERROR;
+        }
+        report.addProblem(this.testDef, severity);
     }
 
     /**

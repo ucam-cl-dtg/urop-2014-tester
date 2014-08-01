@@ -96,22 +96,22 @@ public interface ITestService {
             throws TickNotInDBException, UserNotInDBException;
 
     /**
-     * create a new test referred to by the given tickId with all the settings passed in
+     * create a new test referred to by the given tickId with all the settings passed in, or if the test
+     * already exists in the database, update its settings
      * @param tickId                Unique Id of the new test being created
      * @param checkstyleOpts        list containing xml files and settings for checkstyles
      * @throws TestIDAlreadyExistsException       Thrown when the tickId supplied has been used before in
      * 											  the database, but something went wrong and the files
      * 											  aren't stored so add to database is called instead
-     * 											  of update - really shouldn't happen but just in case
+     * 											  of update - shouldn't happen but just in case
      * @throws FailedToMakeTestException       Thrown if I/O goes wrong when setting up the test files
      * @throws TestIDNotFoundException 		Thrown when this is called in update mode and the tickId can't be
-     * 										found
+     * 										found in the database
      */
     @POST
     @Path("/{tickId}/create")
     @Consumes("application/json")
-	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts)
-            throws TestIDAlreadyExistsException, FailedToMakeTestException, TestIDNotFoundException;
+	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts);
 
     //TODO: REMOVE?
     @GET
@@ -125,6 +125,16 @@ public interface ITestService {
     @GET
     @Path("/testFiles")
     public Response getTestFiles();
+    
+    /**
+     * returns all static test settings that are available for the specified tick (for updating purposes)
+     * @param tickId                Unique Id of the test with the test files being asked for
+     * @return 		List of the names and settings of the static tests for the tick
+     * @throws TestIDNotFoundException        Thrown if tick doesn't exist
+     */
+    @GET
+    @Path("{tickId}/testFiles")
+    public Response getTestFiles(@PathParam("tickId") String tickId) throws TestIDNotFoundException;
     
     /**
      * Allows ticker to pass/fail a student's tick by adding a tickerResult and tickerComment to one of their

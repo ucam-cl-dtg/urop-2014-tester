@@ -4,7 +4,7 @@ package publicinterfaces;
  * Used for transmitting static option data in a format that is easy to use with Polymer
  * @author as2388
  */
-public class StaticOptions {
+public class StaticOptions implements ITestSetting {
     private String text;      //problem category description
     private int checkedIndex; //for ignore, warning, or error
     private String code; //xml code

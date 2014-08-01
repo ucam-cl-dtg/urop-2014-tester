@@ -18,6 +18,7 @@ import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
 import publicinterfaces.FailedToMakeTestException;
 import publicinterfaces.ITestService;
+import publicinterfaces.ITestSetting;
 import publicinterfaces.NoSuchTestException;
 import publicinterfaces.Report;
 import publicinterfaces.ReportNotFoundException;
@@ -39,6 +40,7 @@ import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -77,7 +79,8 @@ public class TestService implements ITestService {
     public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException {
-    	Map<XMLTestSetting, LinkedList<String>> tests = new HashMap<>();
+    	
+    	Map<ITestSetting, LinkedList<String>> tests = new HashMap<>();
         final String commitId = gitProxy.resolveCommit(repoName, "HEAD");
     	
         LinkedList<String> filesToTest = new LinkedList<>();
@@ -96,11 +99,11 @@ public class TestService implements ITestService {
             }
         }
         //obtain static tests to run on files according to what tick it is
-        List<XMLTestSetting> staticTests = dbXMLTests.getTestSettings(tickId);
+        List<StaticOptions> staticTests = dbXMLTests.getTestSettings(tickId);
         
         log.info(crsId + " " + tickId + " " + commitId + " runNewTest: creating Tester object");
     	
-        for (XMLTestSetting test : staticTests) {
+        for (StaticOptions test : staticTests) {
             tests.put(test, filesToTest);
             log.info("test added: " + test );
         }
@@ -197,82 +200,23 @@ public class TestService implements ITestService {
      * @throws FailedToMakeTestException 
      * @throws TestIDNotFoundException */
     @Override
-	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts)
-            throws TestIDAlreadyExistsException, FailedToMakeTestException, TestIDNotFoundException {
+	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts) {
     	log.info("adding tests for " + tickId);
-    	List<XMLTestSetting> staticTests = new LinkedList<>();
-		int testNo = 0;
-    	File dir = new File(ConfigurationLoader.getConfig().getFilePath() + "/" + tickId);
-		if (dir.mkdirs()) {
-			log.info("directory made at " + dir.getAbsolutePath());
-			for (StaticOptions testOption : checkstyleOpts) {
-				if (testOption.getCheckedIndex() != 0) {
-					XMLTestSetting testSetting;
-					try {
-						testSetting = writeFile(dir.getAbsolutePath() , testOption , testNo);
-					} 
-					catch (IOException e) {
-						throw new FailedToMakeTestException("Writing to file for " + tickId + " failed");
-					}
-					staticTests.add(testSetting);
-		    		testNo++;
-				}
-			}
-			TestService.dbXMLTests.addNewTest(tickId, staticTests);
-			log.info("Added " + tickId + " to database");
-		}
-		else {
-			if (dir.exists()) {
-				//edit mode
-				//delete old files
-				log.info("overwriting files in " + dir);
-				File[] files = dir.listFiles();
-				for(File f : files) {
-					if(f.delete()) {
-						log.info("deleted " + f.getName() + " successfully");
-					}
-					else {
-						log.info("failed to delete " + f.getName());
-						throw new FailedToMakeTestException("While overwriting " + tickId + "deleting old files failed");
-					}
-				}
-				//save new ones
-				for (StaticOptions testOption : checkstyleOpts) {
-					if (testOption.getCheckedIndex() != 0) {
-						XMLTestSetting testSetting;
-						try {
-							testSetting = writeFile(dir.getAbsolutePath() , testOption , testNo);
-							staticTests.add(testSetting);
-				    		testNo++;
-						} 
-						catch (IOException e) {
-							throw new FailedToMakeTestException("Writing to file for " + tickId + " failed");
-						}
-					}
-				}
-				//TODO: check this will overwrite in the database
-				TestService.dbXMLTests.update(tickId, staticTests);
-				log.info("Added " + tickId + " to database");
-			}
-			else {
-				throw new FailedToMakeTestException("Saving test " + tickId + " failed");
-			}
-		}
+    	try {
+    		TestService.dbXMLTests.addNewTest(tickId, checkstyleOpts);
+    		log.info("new test created with id " + tickId);
+    	}
+    	catch (TestIDAlreadyExistsException e1) {
+    		try {
+	    		TestService.dbXMLTests.update(tickId, checkstyleOpts);
+	    		log.info(tickId + "has been updated");
+    		}
+    		catch (TestIDNotFoundException e2) {
+    			//should never happen!
+    		}
+    	}
 	}
-	
-    public static XMLTestSetting writeFile(String dir , StaticOptions testOption, int testNo) throws IOException {
-	    String content = testOption.getCode();
-	    
-		BufferedWriter b = new BufferedWriter(new FileWriter(dir + "/" + testNo + ".xml"));
-		b.write(content);
-		b.flush();
-		b.close();
-		log.info("wrote file contents of " + testOption.getText() + " to " + dir + "/" + testNo + ".xml");
-	    XMLTestSetting testSetting = new XMLTestSetting(dir + "/" + testNo + ".xml" ,
-	    		testOption.getCheckedIndex(), testOption.getText());
-	    return testSetting;
-    }
-    
+
     public static IDBReportManager getDatabase() {
     	return TestService.dbReport;
     }
@@ -340,5 +284,13 @@ public class TestService implements ITestService {
 		log.info("setting ticker result");
 		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId);
 		log.info("result set");
+	}
+
+	@Override
+	public Response getTestFiles(String tickId) throws TestIDNotFoundException {
+		log.info("get test files request received for " + tickId);
+		List<StaticOptions> toReturn = TestService.dbXMLTests.getTestSettings(tickId);
+		log.info("no of files found = " + toReturn.size());
+		return Response.status(200).entity(toReturn).build(); 
 	}
 }

@@ -6,8 +6,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import publicinterfaces.ITestSetting;
 import publicinterfaces.Report;
 import publicinterfaces.ReportResult;
+import publicinterfaces.StaticOptions;
 import publicinterfaces.Status;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
@@ -33,13 +35,13 @@ public class Tester {
     private Exception failCause; //if the report fails, save it here so that it can be thrown when the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
-    private Map<XMLTestSetting, LinkedList<String>> testingQueue;
+    private Map<ITestSetting, LinkedList<String>> testingQueue;
 
 
     /**
      * Creates a new Tester
      */
-    public Tester(Map<XMLTestSetting, LinkedList<String>> testingQueue, String repoName, String commitId)  {
+    public Tester(Map<ITestSetting, LinkedList<String>> testingQueue, String repoName, String commitId)  {
         this.testingQueue = testingQueue;
         this.report = new Report();
         report.setCommitId(commitId);
@@ -106,9 +108,9 @@ public class Tester {
     private void runStaticTests(String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException    {
         log.info("Starting static analysis");
         //get static tests from testingQueue
-        Map<XMLTestSetting, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
+        Map<StaticOptions, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
-        for (Map.Entry<XMLTestSetting, LinkedList<String>> e : staticTests.entrySet()) {
+        for (Map.Entry<StaticOptions, LinkedList<String>> e : staticTests.entrySet()) {
             delay(3000);
             status.addProgress();
             runStaticAnalysis(e.getKey(), e.getValue(), commitId);
@@ -147,12 +149,12 @@ public class Tester {
      * @param testingQueue   Map from which to extract .xml tests
      * @return               Map containing only .xml tests
      */
-    public HashMap<XMLTestSetting, LinkedList<String>> getStaticTestItems(Map<XMLTestSetting, LinkedList<String>> testingQueue)
+    public HashMap<StaticOptions, LinkedList<String>> getStaticTestItems(Map<ITestSetting, LinkedList<String>> testingQueue)
     {
-        HashMap<XMLTestSetting, LinkedList<String>> mapReturn = new HashMap<>();
-        for (Map.Entry<XMLTestSetting, LinkedList<String>> e : testingQueue.entrySet()) {
-            if ("xml".equals(FilenameUtils.getExtension(e.getKey().getTestFile()))) {
-                mapReturn.put(e.getKey(), e.getValue());
+        HashMap<StaticOptions, LinkedList<String>> mapReturn = new HashMap<>();
+        for (Map.Entry<ITestSetting, LinkedList<String>> e : testingQueue.entrySet()) {
+            if (e.getKey().getClass() == StaticOptions.class) {
+                mapReturn.put((StaticOptions) e.getKey(), e.getValue());
             }
         }
         return mapReturn;
@@ -167,7 +169,7 @@ public class Tester {
      * @throws IOException 			Thrown if creating/making temp files fails
      * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    public void runStaticAnalysis(XMLTestSetting configFileName, List<String> fileNames, String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException {
+    public void runStaticAnalysis(StaticOptions configFileName, List<String> fileNames, String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException {
            StaticParser.test(configFileName, fileNames, report, repoName, commitId);
     }
 
