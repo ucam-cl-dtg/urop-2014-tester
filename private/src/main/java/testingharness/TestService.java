@@ -8,14 +8,17 @@ import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
-import org.jboss.resteasy.client.jaxrs.internal.proxy.extractors.ClientContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.puppycrawl.tools.checkstyle.Main;
 
 import configuration.ConfigurationLoader;
 import privateinterfaces.IDBReportManager;
 import privateinterfaces.IDBXMLTestsManager;
+import publicinterfaces.FailedToMakeTestException;
 import publicinterfaces.ITestService;
+import publicinterfaces.ITestSetting;
 import publicinterfaces.NoSuchTestException;
 import publicinterfaces.Report;
 import publicinterfaces.ReportNotFoundException;
@@ -32,19 +35,29 @@ import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.client.Client;
 import javax.ws.rs.core.Response;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+/**
+ * Implementation of the interface ITestService
+ * 
+ * @author as2388
+ * @author kls82
+ *
+ */
 
 public class TestService implements ITestService {
     // initialise log4j logger
@@ -66,7 +79,8 @@ public class TestService implements ITestService {
     public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException {
-    	Map<XMLTestSettings, LinkedList<String>> tests = new HashMap<>();
+    	
+    	Map<ITestSetting, LinkedList<String>> tests = new HashMap<>();
         final String commitId = gitProxy.resolveCommit(repoName, "HEAD");
     	
         LinkedList<String> filesToTest = new LinkedList<>();
@@ -89,11 +103,11 @@ public class TestService implements ITestService {
             }
         }
         //obtain static tests to run on files according to what tick it is
-        List<XMLTestSettings> staticTests = dbXMLTests.getTestSettings(tickId);
+        List<StaticOptions> staticTests = dbXMLTests.getTestSettings(tickId);
         
         log.info(crsId + " " + tickId + " " + commitId + " runNewTest: creating Tester object");
     	
-        for (XMLTestSettings test : staticTests) {
+        for (StaticOptions test : staticTests) {
             tests.put(test, filesToTest);
             log.info("test added: " + test );
         }
@@ -182,35 +196,36 @@ public class TestService implements ITestService {
     /** {@inheritDoc} */
     @Override
     public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
-            throws TestIDNotFoundException, UserNotInDBException {
+            throws TickNotInDBException, UserNotInDBException {
         dbReport.removeUserTickReports(crsId, tickId);
     }
 
-    /** {@inheritDoc} */
+    /** {@inheritDoc} 
+     * @throws FailedToMakeTestException 
+     * @throws TestIDNotFoundException */
     @Override
-	public void createNewTest(@PathParam("tickId") String tickId /* List<XMLTestSettings> checkstyleOpts */)
-            throws TestIDAlreadyExistsException {
+	public void createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts) {
     	log.info("adding tests for " + tickId);
-		List<XMLTestSettings> checkstyleOptsTemp = new LinkedList<>();
-		checkstyleOptsTemp.add(new XMLTestSettings("emptyBlocks",Severity.ERROR,"Empty blocks"));
-		checkstyleOptsTemp.add(new XMLTestSettings("unusedImports",Severity.WARNING,"Unused Imports"));
-		checkstyleOptsTemp.add(new XMLTestSettings("TODOorFIXME",Severity.ERROR,"TODOs and FIXMEs"));
-        checkstyleOptsTemp.add(new XMLTestSettings("illegalCatch",Severity.ERROR,"Illegal catches"));
-        checkstyleOptsTemp.add(new XMLTestSettings("illegalThrow",Severity.ERROR,"Illegal throws"));
-        checkstyleOptsTemp.add(new XMLTestSettings("indentation",Severity.WARNING,"Indentation"));
-        checkstyleOptsTemp.add(new XMLTestSettings("noProblem", Severity.WARNING, "No problem"));
-        checkstyleOptsTemp.add(new XMLTestSettings("longVariableDeclaration",Severity.WARNING,"Lower case long assignment"));
-		log.info("all tests added for " + tickId);
-		
-		//add to database
-	    dbXMLTests.addNewTest(tickId, checkstyleOptsTemp);
-	    log.info("added test to database");
+    	try {
+    		TestService.dbXMLTests.addNewTest(tickId, checkstyleOpts);
+    		log.info("new test created with id " + tickId);
+    	}
+    	catch (TestIDAlreadyExistsException e1) {
+    		try {
+	    		TestService.dbXMLTests.update(tickId, checkstyleOpts);
+	    		log.info(tickId + "has been updated");
+    		}
+    		catch (TestIDNotFoundException e2) {
+    			//should never happen!
+    		}
+    	}
 	}
-	
+
     public static IDBReportManager getDatabase() {
     	return TestService.dbReport;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void test() throws NoSuchTestException {
         ResteasyClient rc = new ResteasyClientBuilder().build();
@@ -222,6 +237,7 @@ public class TestService implements ITestService {
         System.out.println("done");
     }
 
+    /** {@inheritDoc} */
 	@Override
 	public Response getTestFiles() {
 	    log.info("get test files request received");
@@ -230,20 +246,41 @@ public class TestService implements ITestService {
 			URI dir = (TestService.class.getClassLoader().getResource("checkstyleResources")).toURI();
 			File path = new File(dir);
 			String[] files = path.list();
+			File[] filesToRead = path.listFiles();
 			log.info("no of files found = " + files.length);
-			for (String file : files) {
+			int i = 0;
+			for (String file : files) {		
+				BufferedReader b = new BufferedReader(new FileReader(filesToRead[i]));
+				String line;
+				String fileContents = "";
+				try {
+					while ((line = b.readLine()) != null) {
+						fileContents += line + System.getProperty("line.separator");
+					}
+				} 
+				catch (IOException e) {
+					//TODO
+					b.close();
+					e.printStackTrace();
+				} 
+				b.close();
 				String name = file.substring(0,file.length()-4);
-                toReturn.add(new StaticOptions(name, ConfigurationLoader.getConfig().getSeverity(name)));
+	            toReturn.add(new StaticOptions
+	              		(ConfigurationLoader.getConfig().getDescription(name), 
+	               				ConfigurationLoader.getConfig().getSeverity(name),
+	               						fileContents));
+	            i++;
 			}
 		} catch (URISyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		finally {
-			return Response.ok().entity(toReturn).build();
+			return Response.status(200).entity(toReturn).build();
 		} 
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public void setTickerResult(String crsid, String tickId,
 			ReportResult tickerResult, String tickerComments, String commitId)
@@ -251,5 +288,13 @@ public class TestService implements ITestService {
 		log.info("setting ticker result");
 		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId);
 		log.info("result set");
+	}
+
+	@Override
+	public Response getTestFiles(String tickId) throws TestIDNotFoundException {
+		log.info("get test files request received for " + tickId);
+		List<StaticOptions> toReturn = TestService.dbXMLTests.getTestSettings(tickId);
+		log.info("no of files found = " + toReturn.size());
+		return Response.status(200).entity(toReturn).build(); 
 	}
 }

@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory;
 import privateinterfaces.IDBXMLTestsManager;
 import publicinterfaces.TestIDAlreadyExistsException;
 import publicinterfaces.TestIDNotFoundException;
-import testingharness.XMLTestSettings;
+
+import publicinterfaces.StaticOptions;
 
 import javax.ws.rs.PathParam;
 
@@ -38,7 +39,7 @@ public class MongoDBXMLTestsManager implements IDBXMLTestsManager {
     
     /** {@inheritDoc} */
 	@Override
-	public void addNewTest(String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDAlreadyExistsException {
+	public void addNewTest(String tickId, List<StaticOptions> staticTestSettings) throws TestIDAlreadyExistsException {
         //if XMLTestSettings for the given tickId are already in the database, throw an exception
         if (XMLTestSettingsColl.findOneById(tickId) != null) {
             throw new TestIDAlreadyExistsException(tickId);
@@ -49,7 +50,7 @@ public class MongoDBXMLTestsManager implements IDBXMLTestsManager {
 
     /** {@inheritDoc} */
     @Override
-    public void update(@PathParam("tickId") String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDNotFoundException {
+    public void update(@PathParam("tickId") String tickId, List<StaticOptions> staticTestSettings) throws TestIDNotFoundException {
         if (XMLTestSettingsColl.findOneById(tickId) == null) {
             throw new TestIDNotFoundException(tickId);
         }
@@ -78,7 +79,7 @@ public class MongoDBXMLTestsManager implements IDBXMLTestsManager {
 
     /** (@inheritDoc} */
 	@Override
-	public List<XMLTestSettings> getTestSettings(String tickId) throws TestIDNotFoundException {
+	public List<StaticOptions> getTestSettings(String tickId) throws TestIDNotFoundException {
         if (XMLTestSettingsColl.findOneById(tickId) == null) {
             throw new TestIDNotFoundException(tickId);
         }

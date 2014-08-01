@@ -79,7 +79,7 @@ class DBUser {
     @JsonIgnore
     public Status getStatus(String tickId) throws TickNotInDBException {
         Report report = getValidTick(tickId).getLast();
-        return new Status(report.getNoOfTests());
+        return new Status(report.getNoOfTests()+1);
     }
 
     /**
@@ -103,9 +103,9 @@ class DBUser {
      * @param tickId                    Id of report to remove
      * @throws TestIDNotFoundException  Thrown if the tick wasn't found
      */
-    public void removeTick(String tickId) throws TestIDNotFoundException {
+    public void removeTick(String tickId) throws TickNotInDBException {
         if (!(ticks.containsKey(tickId))) {
-            throw new TestIDNotFoundException(tickId);
+            throw new TickNotInDBException(tickId);
         }
         ticks.remove(tickId);
     }

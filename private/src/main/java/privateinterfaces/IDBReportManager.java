@@ -40,6 +40,8 @@ public interface IDBReportManager {
      * @param crsId     Id of user whose report is to be looked up
      * @param tickId    Id of user's tick to look up
      * @return          The status of the tick
+     * @throws UserNotInDBException Thrown if user with id crsId was not found in the database
+     * @throws TickNotInDBException Thrown if tick with id tickId was not found for the user with id crsId
      */
     public Status getLastStatus(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
 
@@ -68,8 +70,20 @@ public interface IDBReportManager {
      * @throws UserNotInDBException     Thrown if the user is not in the database
      * @throws TestIDNotFoundException  Thrown if the tick for the given user is not in the database
      */
-    public void removeUserTickReports(String crsId, String tickId) throws UserNotInDBException, TestIDNotFoundException;
+    public void removeUserTickReports(String crsId, String tickId) throws UserNotInDBException, TickNotInDBException;
 
+    /**
+     * Allows ticker to pass/fail a student's tick by adding a tickerResult and tickerComment to one of their
+     * reports
+     * @param crsId        Id of user whose reports should be edited
+     * @param tickId                Id of tick for which a report will be edited
+     * @param tickerResult			ReportResult defining PASS or FAIL according to the ticker
+     * @param tickerComments		String containing any comments the ticker may have
+     * @param commitId				commitId corresponding to the report that the ticker wants to edit
+     * @throws UserNotInDBException   Thrown if user record can't be found for the given crsid
+     * @throws TickNotInDBException   Thrown if user's reports for given tickId can't be found
+     * @throws ReportNotFoundException   Thrown if report with the commitId doesn't exist
+     */
 	public void editReportTickerResult(String crsid, String tickId,
 			ReportResult tickerResult, String tickerComments, String commitId) 
 					throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;

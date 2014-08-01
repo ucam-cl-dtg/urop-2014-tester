@@ -1,9 +1,8 @@
 package privateinterfaces;
 
-import testingharness.XMLTestSettings;
-
 import java.util.List;
 
+import publicinterfaces.StaticOptions;
 import publicinterfaces.TestIDAlreadyExistsException;
 import publicinterfaces.TestIDNotFoundException;
 
@@ -17,7 +16,7 @@ public interface IDBXMLTestsManager {
      * @param tickId	            unique Id of the tick being created
      * @param staticTestSettings    settings to insert into database
      */
-    public void addNewTest(String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDAlreadyExistsException;
+    public void addNewTest(String tickId, List<StaticOptions> staticTestSettings) throws TestIDAlreadyExistsException;
 
 	/**
      * edits an existing test if it is stored - if it is not found an exception is thrown
@@ -26,7 +25,7 @@ public interface IDBXMLTestsManager {
      * @param staticTestSettings            settings to insert into database
      * @throws TestIDNotFoundException		if testId doesn't exist
      */
-    public void update(String tickId, List<XMLTestSettings> staticTestSettings) throws TestIDNotFoundException;
+    public void update(String tickId, List<StaticOptions> staticTestSettings) throws TestIDNotFoundException;
 
     /**
      * deletes an existing test if it is stored - if it is not found an exception is thrown
@@ -43,7 +42,7 @@ public interface IDBXMLTestsManager {
      * @return settings		List containing the settings for each static test to be run for this test
      * @throws TestIDNotFoundException		if testId doesn't exist
      */
-    public List<XMLTestSettings> getTestSettings (String tickId) throws TestIDNotFoundException;
+    public List<StaticOptions> getTestSettings (String tickId) throws TestIDNotFoundException;
     
     
 }

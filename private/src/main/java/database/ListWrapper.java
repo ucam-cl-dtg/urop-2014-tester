@@ -2,9 +2,10 @@ package database;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import testingharness.XMLTestSettings;
 
 import java.util.List;
+
+import publicinterfaces.StaticOptions;
 
 /**
  * Wrapper class for Java.util.List. Needed to store List<XMLTestSettings> in mongoDB, because the JacksonDB wrapper
@@ -13,21 +14,21 @@ import java.util.List;
  */
 public class ListWrapper {
     private String tickId;
-    private List<XMLTestSettings> elements;
+    private List<StaticOptions> elements;
 
     @JsonCreator
-    public ListWrapper(@JsonProperty("_id") String tickId, @JsonProperty("elements") List<XMLTestSettings> elements) {
+    public ListWrapper(@JsonProperty("_id") String tickId, @JsonProperty("elements") List<StaticOptions> elements) {
         this.tickId = tickId;
         this.elements = elements;
     }
 
     public ListWrapper() {}
 
-    public List<XMLTestSettings> getElements() {
+    public List<StaticOptions> getElements() {
         return elements;
     }
 
-    public void setElements(List<XMLTestSettings> elements) {
+    public void setElements(List<StaticOptions> elements) {
         this.elements = elements;
     }
 

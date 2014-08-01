@@ -1,18 +1,22 @@
 package publicinterfaces;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
  * Stores basic information about the progress of a test.
  * @author kls82
  */
 public class Status {
-    private int progress; //number of completed tests
-    private int maxProgress; //total number of tests which wil be run
+	//current level in the progress bar
+    private int progress;
+    //number of sections the progress bar should be split into
+    private int maxProgress; 
+    //string describing progress e.g. running test 1 of 3
     private String info; //string describing progress e.g. running test 1 of 3
 
 
+    /**
+     * Constructor for use when a new test begins to run
+     * @param init    String describing current progress
+     * @param maxProgress   Total number of tests which are to be run + 1 (as "Done" is an extra state)
+     */
     public Status(String init, int maxProg) {
         this.progress = 0;
         this.maxProgress = maxProg;
@@ -21,25 +25,31 @@ public class Status {
 
     /**
      * Use for creation of Status objects for finished tests
-     * @param maxProgress   Total number of tests which were run
+     * @param maxProgress   Total number of tests which were run + 1 (as "Done" is an extra state)
      */
-    //@JsonCreator
     public Status(int maxProgress) {
         this.progress = maxProgress;
         this.maxProgress = maxProgress;
         info = "Done";
     }
 
+    /**
+     * Increment current test progress by 1
+     */
     public void addProgress() {
         this.progress += 1;
         this.info = "running test " + this.progress + " of " + (this.maxProgress - 1);
     }
 
+    /**
+     * set to complete
+     */
     public void complete() {
         this.progress = maxProgress;
         this.info = "complete";
     }
 
+    //Constructor and getters/setters for json serialisation
     public Status() {}
 
     public int getProgress() {

@@ -12,6 +12,8 @@ public class ConfigurationFile {
     private String mongoXMLSettingsCollectionName;
     private int mongoPort;
     private Map<String,Integer> xmlTestSettings;
+	private Map<String, String> xmlTestReadable;
+	private String filePath;
     
     public String getGitAPIPath()
     {
@@ -88,6 +90,24 @@ public class ConfigurationFile {
 	public int getSeverity(String test) {
 		return this.xmlTestSettings.get(test);
 	}
+
+	public String getDescription(String test) {
+		return this.xmlTestReadable.get(test);
+	}
+
+	public void setXmlTestReadable(Map<String, String> xmlTestReadable) {
+		this.xmlTestReadable = xmlTestReadable;
+	}
+
+	public String getFilePath() {
+		return filePath;
+	}
+
+	public void setFilePath(String filePath) {
+		this.filePath = filePath;
+	}
+    
+	
 	
 }
 
