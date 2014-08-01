@@ -68,7 +68,7 @@
         <core-ajax
                 id="ajaxLoadTickData"
                 auto
-                url="http://urop2014.dtg.cl.cam.ac.uk/UROP_UI/api/tick/tester"
+                url="http://localhost:8000/testTickData"
                 handleAs="json"
                 on-core-response="{{tickDataLoaded}}">
         </core-ajax>
@@ -162,15 +162,27 @@
         Polymer('tick-creator-card', {
             ready: function() {
                 this.useDefaults = true;
-                this.tickName="Test";
+                this.tickName="";
                 this.groups = [];
 
-                this.groups[0] = {selected: false, text: "Tick 1"}
-                this.groups[1] = {selected: false, text: "Tick 2"}
-                this.groups[2] = {selected: false, text: "Tick 3"}
+                this.groups[0] = {selected: false, text: "Tick 1"};
+                this.groups[1] = {selected: false, text: "Tick 2"};
+                this.groups[2] = {selected: false, text: "Tick 3"};
             },
+            /**
+             * Once the ajax get request is complete, bind the fields on this card to the received data
+             */
             tickDataLoaded: function() {
                 console.log(this.$.ajaxLoadTickData.response);
+
+                var tickData = this.$.ajaxLoadTickData.response;
+
+                //Otherwise,
+                if (tickData.name.valueOf() === "") {
+                    //if the tick name is blank, then a new tick is being created, so show the tick naming input
+
+                }
+
             },
             toggleStylistic: function() {
                 this.$.collapseStylistic.toggle();
