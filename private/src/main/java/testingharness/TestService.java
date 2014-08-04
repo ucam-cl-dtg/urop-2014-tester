@@ -246,7 +246,8 @@ public class TestService implements ITestService {
 	    log.info("get test files request received");
 		List<StaticOptions> toReturn = new LinkedList<>();
 		try {
-			URI dir = (TestService.class.getClassLoader().getResource("checkstyleResources")).toURI();
+			URI dir = (TestService.class.getClassLoader().getResource("checkstyleFiles")).toURI();
+			System.out.println(dir);
 			File path = new File(dir);
 			String[] files = path.list();
 			File[] filesToRead = path.listFiles();
