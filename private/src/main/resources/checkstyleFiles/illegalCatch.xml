@@ -1,0 +1,8 @@
+<module name="Checker">
+	<module name="TreeWalker">
+		<!-- checks for Exception, RuntimeException, and Throwable being caught -->
+		<module name="IllegalCatch">
+			<message key="illegal.catch" value="Catching ''{0}'' is bad practice" />
+		</module>		
+	</module>
+</module>
