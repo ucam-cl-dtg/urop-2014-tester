@@ -43,8 +43,7 @@ public class Tester {
      */
     public Tester(Map<ITestSetting, LinkedList<String>> testingQueue, String repoName, String commitId)  {
         this.testingQueue = testingQueue;
-        this.report = new Report();
-        report.setCommitId(commitId);
+        this.report = new Report(repoName, commitId);
         this.repoName = repoName;
     }
 

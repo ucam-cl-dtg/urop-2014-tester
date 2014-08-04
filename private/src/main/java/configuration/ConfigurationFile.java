@@ -14,6 +14,7 @@ public class ConfigurationFile {
     private Map<String,Integer> xmlTestSettings;
 	private Map<String, String> xmlTestReadable;
 	private String filePath;
+	private String header;
     
     public String getGitAPIPath()
     {
@@ -105,6 +106,14 @@ public class ConfigurationFile {
 
 	public void setFilePath(String filePath) {
 		this.filePath = filePath;
+	}
+
+	public String getHeader() {
+		return header;
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
 	}
     
 	

@@ -30,6 +30,17 @@ public class Report{
     private int noOfTests;
     // commitId defining when the java files tested for this report were committed
     private String commitId;
+    //Name of the repo the java files tested have come from
+    private String repoName;
+
+    /** Constructor for use in code
+     * @param repoName    Name of the repo you can find the corresponding test files in
+     * @param commitId    Id of the commit version of the repo the files come from
+     */
+    public Report(String repoName, String commitId) {
+    	this.setRepoName(repoName);
+    	this.setCommitId(commitId);
+    }
     
     /**
      * Initializes a new problem category that is being tested for and adds it to problemsTestedFor. This
@@ -175,5 +186,11 @@ public class Report{
 
 	public void setCommitId(String commitId) {
 		this.commitId = commitId;
+	}
+	public String getRepoName() {
+		return repoName;
+	}
+	public void setRepoName(String repoName) {
+		this.repoName = repoName;
 	}
 }

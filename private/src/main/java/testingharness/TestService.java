@@ -104,8 +104,10 @@ public class TestService implements ITestService {
         log.info(crsId + " " + tickId + " " + commitId + " runNewTest: creating Tester object");
     	
         for (StaticOptions test : staticTests) {
-            tests.put(test, filesToTest);
-            log.info("test added: " + test );
+        	if (test.getCheckedIndex() != 0) {
+        		tests.put(test, filesToTest);
+        		log.info("test added: " + test );
+        	}
         }
 
         // create a new Tester object
@@ -220,6 +222,10 @@ public class TestService implements ITestService {
 
     public static IDBReportManager getDatabase() {
     	return TestService.dbReport;
+    }
+    
+    public static IDBXMLTestsManager getTestsDatabase() {
+    	return TestService.dbXMLTests;
     }
 
     /** {@inheritDoc} */
