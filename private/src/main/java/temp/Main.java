@@ -29,9 +29,9 @@ public class Main {
 	    ResteasyWebTarget p = rc.target("http://localhost:8080/TestingSystem/rest");
 	    ITestService proxy = p.proxy(ITestService.class);
 	    
-	    StaticOptions a = new StaticOptions("Unused imports",1,getCode("emptyBlocks"));
-	    StaticOptions b = new StaticOptions("TODO or FIXME",1,getCode("indentation"));
-	    StaticOptions c = new StaticOptions("Indentation",2,getCode("unusedImports"));
+	    StaticOptions a = new StaticOptions("Unused imports",0,getCode("unusedImports"));
+	    StaticOptions b = new StaticOptions("Indentation",1,getCode("indentation"));
+	    StaticOptions c = new StaticOptions("Empty blocks",2,getCode("emptyBlocks"));
 	    
 	    List<StaticOptions> x = new LinkedList<>();
 	    x.add(a);
