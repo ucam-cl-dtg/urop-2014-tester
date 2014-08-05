@@ -19,6 +19,7 @@ import privateinterfaces.IDBXMLTestsManager;
 import publicinterfaces.FailedToMakeTestException;
 import publicinterfaces.ITestService;
 import publicinterfaces.ITestSetting;
+import publicinterfaces.NoCommitsToRepoException;
 import publicinterfaces.NoSuchTestException;
 import publicinterfaces.Report;
 import publicinterfaces.ReportNotFoundException;
@@ -78,11 +79,15 @@ public class TestService implements ITestService {
     @Override
     public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
-            throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException {
+            throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException, NoCommitsToRepoException {
     	
     	Map<ITestSetting, LinkedList<String>> tests = new HashMap<>();
         final String commitId = gitProxy.resolveCommit(repoName, "HEAD");
     	
+        if (commitId == null) {
+        	throw new NoCommitsToRepoException();
+        }
+        
         LinkedList<String> filesToTest = new LinkedList<>();
         
         //collect files to test from git
