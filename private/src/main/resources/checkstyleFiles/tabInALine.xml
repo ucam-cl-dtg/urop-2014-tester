@@ -1,0 +1,8 @@
+<module name="Checker">
+	<!-- check for tabs in lines -->
+	<module name="RegexpSingleline">
+	    <property name="format"  value="\S\t" />
+	    <property name="message" value='Tab in line ~ tabs should only be used as whitespace at the beginning of lines'/>
+	    <property name="severity" value="warning" />
+	</module>
+</module>

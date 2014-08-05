@@ -1,0 +1,8 @@
+<module name="Checker">
+	<module name="TreeWalker">
+		<!-- Checks that strings are not compared with == or != -->
+		<module name="StringLiteralEquality">
+			<message key="string.literal.equality" value="String comparison with ''{0}'' ~ in Java, .equals() should be used" />
+		</module>		
+	</module>
+</module>

@@ -1,0 +1,9 @@
+<module name="Checker">
+	<module name="TreeWalker">
+		<!-- Checks for unused imports -->
+		<module name="UnusedImports">
+			<message key="import.unused" value="Unused import ~ ''{0}''" />
+			<property name="severity" value="warning" />
+		</module>
+	</module>
+</module>

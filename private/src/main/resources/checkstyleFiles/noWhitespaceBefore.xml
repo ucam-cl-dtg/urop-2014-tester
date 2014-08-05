@@ -1,0 +1,9 @@
+<module name="Checker">
+	<module name="TreeWalker">
+    	<!-- Checks that there is no whitespace before ; . - - ++ -->
+    	<module name="NoWhitespaceBefore">
+    		<message key="ws.preceded" value="Preceding whitespace ~ ''{0}'' should not be preceded by whitespace" />
+    		<property name="severity" value="warning" />
+    	</module>
+	</module>
+</module>
