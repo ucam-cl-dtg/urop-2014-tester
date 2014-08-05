@@ -28,12 +28,13 @@ public interface ITestService {
      * @throws RepositoryNotFoundException  Thrown if the repository allegedly containing the student's code couldn't be
      *                                      found, thrown by gitAPI
      * @throws TestIDNotFoundException      Thrown if a test doesn't exist with the given Id
+     * @throws NoCommitsToRepoException     Thrown if repo hasn't been commited to yet i.e. there is no code
      */
     @GET
     @Path("/{crsId}/{tickId}/{repoName}")
     public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
-            throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException;
+            throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException, NoCommitsToRepoException;
 
     /**
      * Returns the status of the latest test running/ran for a given user's tick
