@@ -14,23 +14,24 @@ public class Status {
 
     /**
      * Constructor for use when a new test begins to run
-     * @param init    String describing current progress
+     * @param init          String describing current progress
      * @param maxProgress   Total number of tests which are to be run + 1 (as "Done" is an extra state)
      */
-    public Status(String init, int maxProg) {
+    public Status(String init, int maxProgress) {
         this.progress = 0;
-        this.maxProgress = maxProg;
+        this.maxProgress = maxProgress;
         this.info = init;
     }
 
     /**
      * Use for creation of Status objects for finished tests
      * @param maxProgress   Total number of tests which were run + 1 (as "Done" is an extra state)
+     * @param reportResult  Whether or not the user passed or failed the automated tests
      */
-    public Status(int maxProgress) {
+    public Status(int maxProgress, ReportResult reportResult) {
         this.progress = maxProgress;
         this.maxProgress = maxProgress;
-        info = "Done";
+        info = reportResult.toString();
     }
 
     /**
@@ -38,7 +39,7 @@ public class Status {
      */
     public void addProgress() {
         this.progress += 1;
-        this.info = "running test " + this.progress + " of " + (this.maxProgress - 1);
+        this.info = "Running test " + this.progress + " of " + (this.maxProgress - 1);
     }
 
     /**
