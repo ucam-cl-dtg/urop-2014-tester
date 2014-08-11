@@ -293,10 +293,12 @@ public class TestService implements ITestService {
 	/** {@inheritDoc} */
 	@Override
 	public void setTickerResult(String crsid, String tickId,
-			ReportResult tickerResult, String tickerComments, String commitId, Date date)
+			ReportResult tickerResult, String tickerComments, String commitId, long date)
 			throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
 		log.info("setting ticker result");
-		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId, date);
+		Date d = new Date(date);
+		log.info("transformed date to: " + d);
+		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId, d);
 		log.info("result set");
 	}
 

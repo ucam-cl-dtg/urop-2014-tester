@@ -155,7 +155,7 @@ public interface ITestService {
     @Consumes("application/json")
     public void setTickerResult( @PathParam("crsid") String crsid , @PathParam("tickId") String tickId ,  
     		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments,
-    		 	@QueryParam("commitId") String commitId, @QueryParam("date") Date date) 
+    		 	@QueryParam("commitId") String commitId, @QueryParam("date") long date) 
     				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
     
     //TODO: cancel test
