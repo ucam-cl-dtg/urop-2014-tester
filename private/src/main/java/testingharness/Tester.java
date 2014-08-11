@@ -110,7 +110,7 @@ public class Tester {
         Map<StaticOptions, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
         for (Map.Entry<StaticOptions, LinkedList<String>> e : staticTests.entrySet()) {
-            delay(3000);
+            delay(500);
             status.addProgress();
             runStaticAnalysis(e.getKey(), e.getValue(), commitId);
         }
