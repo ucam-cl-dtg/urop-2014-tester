@@ -6,6 +6,7 @@ import javax.ws.rs.core.Response;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -154,7 +155,7 @@ public interface ITestService {
     @Consumes("application/json")
     public void setTickerResult( @PathParam("crsid") String crsid , @PathParam("tickId") String tickId ,  
     		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments,
-    		 	@QueryParam("commitId") String commitId) 
+    		 	@QueryParam("commitId") String commitId, @QueryParam("date") Date date) 
     				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
     
     //TODO: cancel test

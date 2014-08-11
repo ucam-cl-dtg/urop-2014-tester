@@ -18,6 +18,7 @@ import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
 import publicinterfaces.UserNotInDBException;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -108,10 +109,10 @@ public class MongoDBReportManager implements IDBReportManager {
 
 	@Override
 	public void editReportTickerResult(String crsid, String tickId,
-			ReportResult tickerResult, String tickerComments, String commitId) 
+			ReportResult tickerResult, String tickerComments, String commitId, Date date) 
 					throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
 		DBUser user = getValidUser(crsid);
-		Report report = user.getReport(tickId,commitId);
+		Report report = user.getReport(tickId,commitId,date);
 		report.setTickerResult(tickerResult);
 		report.setTickerComments(tickerComments);
 		DBUserColl.save(user);

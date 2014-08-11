@@ -47,6 +47,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -292,10 +293,10 @@ public class TestService implements ITestService {
 	/** {@inheritDoc} */
 	@Override
 	public void setTickerResult(String crsid, String tickId,
-			ReportResult tickerResult, String tickerComments, String commitId)
+			ReportResult tickerResult, String tickerComments, String commitId, Date date)
 			throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
 		log.info("setting ticker result");
-		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId);
+		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId, date);
 		log.info("result set");
 	}
 

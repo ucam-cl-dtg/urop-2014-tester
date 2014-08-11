@@ -13,6 +13,7 @@ import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TickNotInDBException;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -130,10 +131,10 @@ class DBUser {
         this.ticks = ticks;
     }
 
-	public Report getReport(String tickId, String commitId) throws ReportNotFoundException {
+	public Report getReport(String tickId, String commitId, Date date) throws ReportNotFoundException {
 		List<Report> reports = this.ticks.get(tickId).getReports();
 		for (Report report : reports) {
-			if (report.getCommitId().equals(commitId)) {
+			if (report.getCommitId().equals(commitId) && report.getCreationDate().equals(date)) {
 				return report;
 			}
 		}

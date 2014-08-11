@@ -1,5 +1,6 @@
 package privateinterfaces;
 
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -85,7 +86,7 @@ public interface IDBReportManager {
      * @throws ReportNotFoundException   Thrown if report with the commitId doesn't exist
      */
 	public void editReportTickerResult(String crsid, String tickId,
-			ReportResult tickerResult, String tickerComments, String commitId) 
+			ReportResult tickerResult, String tickerComments, String commitId, Date date) 
 					throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
 
 }
