@@ -15,7 +15,6 @@ import publicinterfaces.TickNotInDBException;
 
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,22 +39,24 @@ class DBUser {
      * @param newReport Report to add
      */
     public void addReport(String tickId, Report newReport) {
+        log.debug("crsId: " + crsId + " tickId: " + tickId + " Adding new report");
         //if there is no tick object with the id of tickId, create one
         if (!(ticks.containsKey(tickId))) {
+            log.debug("crsId: " + crsId + " tickId: " + tickId + ": DBTick object does not yet exist for this user/tick combination, creating one..." );
             ticks.put(tickId, new DBTick());
         }
 
         //add the new report
         ticks.get(tickId).addReport(newReport);
         
-        System.out.println("Report added? " + ticks.containsKey(tickId));
+        log.debug("crsId: " + crsId + " tickId: " + tickId + ": Report added: " + ticks.containsKey(tickId));
     }
 
     /**
      * Returns the last report added to a given tick.
      * @param tickId                Unique identifier of tick to look up last report from
      * @return                      Last report added
-     * @throws publicinterfaces.TickNotInDBException Thrown if the tick wasn't found in the database
+     * @throws TickNotInDBException Thrown if the tick wasn't found in the database
      */
     @JsonIgnore
     public Report getLastReport(String tickId) throws TickNotInDBException {
@@ -90,9 +91,10 @@ class DBUser {
      * @throws TickNotInDBException Thrown if the tick wasn't found
      */
     private DBTick getValidTick(String tickId) throws TickNotInDBException {
+        log.debug("crsId: " + crsId + " tickId: " + tickId + ": Validating tickId");
         if (!(ticks.containsKey(tickId)))
         {
-            log.error("Request for non-existent tick made. crsId: " + crsId + " tickId: " + tickId);
+            log.warn("Request for non-existent tick made. crsId: " + crsId + " tickId: " + tickId);
             throw new TickNotInDBException(tickId);
         }
 
@@ -105,7 +107,9 @@ class DBUser {
      * @throws TestIDNotFoundException  Thrown if the tick wasn't found
      */
     public void removeTick(String tickId) throws TickNotInDBException {
+        log.debug("crsId: " + crsId + " tickId: " + tickId + ": removing tick");
         if (!(ticks.containsKey(tickId))) {
+            log.warn("crsId: " + crsId + " tickId: " + tickId + ": Tick not found, throwing TickNotInDBException");
             throw new TickNotInDBException(tickId);
         }
         ticks.remove(tickId);
