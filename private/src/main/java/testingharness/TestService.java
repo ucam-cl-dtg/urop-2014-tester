@@ -32,6 +32,8 @@ import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TestStillRunningException;
 import publicinterfaces.TickNotInDBException;
 import publicinterfaces.UserNotInDBException;
+import threadcontroller.MyExecutor;
+import threadcontroller.TesterThread;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
@@ -49,10 +51,16 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Implementation of the interface ITestService
  * 
@@ -64,17 +72,23 @@ import java.util.Map;
 public class TestService implements ITestService {
     // initialise log4j logger
     private static Logger log = LoggerFactory.getLogger(TestService.class);
+    private static final ExecutorService threadExecutor = MyExecutor.newFixedThreadPool(ConfigurationLoader.getConfig().getThreadNumber());
+    // private static final ExecutorService threadExecutor = Executors.newFixedThreadPool(ConfigurationLoader.getConfig().getThreadNumber());
     private static final IDBReportManager dbReport = new MongoDBReportManager(Mongo.getDb());
     private static final IDBXMLTestsManager dbXMLTests = new MongoDBXMLTestsManager(Mongo.getDb());
-    public static WebInterface gitProxy;
-    private static Map<String, Tester> ticksInProgress = new HashMap<>();
+    private WebInterface gitProxy;
+    private static final ConcurrentMap<String, TesterThread> ticksInProgress = new ConcurrentHashMap<>();
+
+    public static ConcurrentMap<String, TesterThread> getTicksInProgress() {
+		return ticksInProgress;
+	}
 
     public TestService() {
         log.debug("Initialising TestService (including proxy to git service)");
 
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 	    
-	    ResteasyWebTarget forGit = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
+	    ResteasyWebTarget forGit = rc.target(ConfigurationLoader.getConfig().getGitAPIPath());
 	    gitProxy = forGit.proxy(WebInterface.class);
 
         log.debug("TestService initialised");
@@ -85,7 +99,6 @@ public class TestService implements ITestService {
     public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
                            @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException, NoCommitsToRepoException {
-
         log.debug(crsId + " " + tickId + ": Preparing test suite");
 
         log.debug(crsId + " " + tickId + ": Querying git API for SHA of head of repository: " + repoName);
@@ -104,6 +117,7 @@ public class TestService implements ITestService {
         log.debug(crsId + " " + tickId + " " + commitId
                 + ": Connecting to git API to obtain list of files in repo");
         List<String> fileListFromGit = gitProxy.listFiles(repoName , commitId);
+        
         log.debug(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
 
         for (String file : fileListFromGit) {
@@ -127,47 +141,27 @@ public class TestService implements ITestService {
         // create a new Tester object
         final Tester tester = new Tester(tests, repoName, commitId);
 
-        // add the object to the list of in-progress tests
+        TesterThread thread = new TesterThread(tester, crsId, tickId, commitId, gitProxy);
+        
+        // add the object to the list of in-progress tests atomically
         //this key should be unique as they shouldn't be able to run the same tests more than once
         //at the same time
-        //TODO: move this to top of function?
-        if (!ticksInProgress.containsKey(crsId + tickId)) {
-        	ticksInProgress.put(crsId + tickId, tester);
-            log.debug(crsId + " " + tickId + ": Added to map of ticks in progress");
-        }
-        else {
-            log.warn(crsId + " " + tickId + ": Test is already running; throwing TestStillRunningException");
+        if (ticksInProgress.putIfAbsent(crsId + tickId, thread) != null) {
+        	log.warn(crsId + " " + tickId + ": Test is already running; throwing TestStillRunningException");
         	throw new TestStillRunningException("You can't submit this tick as you already have the same one running");
         }
         
         // start the test in an asynchronous thread
-        log.debug(crsId + " " + tickId + ": Creating async thread in which test will run");
-        new Thread(new Runnable() {
-            public void run() {
-                asyncTestRunner(tester, crsId, tickId, commitId);
-            }
-        }).start();
+        TestService.threadExecutor.execute(thread);
+        
+        if(MyExecutor.getWaitingQueue().contains(thread)) {
+        	Status status = new Status(getQueuePosition(crsId,tickId));
+        	thread.setStatus(status);
+        }
 
-        log.debug(crsId+ " " + tickId + ": Created async thread; returning");
+        log.info(crsId + " " + tickId + ": runNewTest: Test started");
+        
         return "Test Started";
-    }
-
-    /**
-     * Runs a test, then deletes the tester object from the map of in progress tests
-     * Note: named async because this function is expected to be run in a separate thread
-     * @param tester    The tester object configured to be run
-     * @param crsId     As required by tester.runTests()
-     * @param tickId    As required by tester.runTests()
-     * @param commitId  As required by tester.runTests()
-     */
-    private void asyncTestRunner(final Tester tester, final String crsId, final String tickId, final String commitId) {
-        tester.runTests(crsId, tickId, commitId);
-
-        //once tests have run, remove the tester from the map of in-progress tests
-        assert ticksInProgress.containsKey(crsId + tickId);
-        System.out.println("removing...");
-        ticksInProgress.remove(crsId + tickId);
-        log.debug(crsId+ " " + tickId + ": Removed test from map");
     }
 
     /** {@inheritDoc} */
@@ -177,6 +171,11 @@ public class TestService implements ITestService {
         log.debug(crsId+ " " + tickId + ": poll status request received");
         //if the test is currently running then return its status from memory
         if (ticksInProgress.containsKey(crsId + tickId)) {
+        	//if test is in queue then recalc position then return status
+        	TesterThread thread = ticksInProgress.get(crsId + tickId);
+        	if(MyExecutor.getWaitingQueue().contains(thread)) {
+        		thread.getStatus().updateQueueStatus(getQueuePosition(crsId,tickId));
+        	}
             log.debug(crsId+ " " + tickId + ": Found in map of ticks in progress, returning...");
             return ticksInProgress.get(crsId + tickId).getStatus();
         }
@@ -326,5 +325,18 @@ public class TestService implements ITestService {
 		List<StaticOptions> toReturn = TestService.dbXMLTests.getTestSettings(tickId);
 		log.debug("no of files found = " + toReturn.size());
 		return Response.status(200).entity(toReturn).build(); 
+	}
+	
+	public int getQueuePosition(String crsId, String tickId) {
+		Iterator<Runnable> iterator = MyExecutor.getWaitingQueue().iterator();
+		int i = 1;
+	       while (iterator.hasNext()) {
+	           TesterThread t = (TesterThread) iterator.next();
+	           if (t.getCrsId().equals(crsId) && t.getTickId().equals(tickId)) {
+	        	   return i;
+	           }
+	           i++;
+	        }
+	    return 0;
 	}
 }

@@ -12,6 +12,7 @@ import publicinterfaces.ReportResult;
 import publicinterfaces.StaticOptions;
 import publicinterfaces.Status;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
+import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -31,7 +32,6 @@ public class Tester {
     static Logger log = LoggerFactory.getLogger(Tester.class); //initialise log4j logger
 
     private Report report; //Report object into which all the report items will ultimately go
-    private Status status; 
     private Exception failCause; //if the report fails, save it here so that it can be thrown when the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
@@ -51,20 +51,22 @@ public class Tester {
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
      */
-    public void runTests(String crsId, String tickId, String commitId)
+    public void runTests(String crsId, String tickId, String commitId, WebInterface gitProxy, Status status)
     {
         log.info("Tick analysis started");	     
 
         try {
             int noOfTests = testingQueue.size();
             report.setNoOfTests(noOfTests);
-            this.status = new Status("loading tests", noOfTests + 1);            
+            status.setCurrentPositionInQueue(0);
+            status.setMaxProgress(noOfTests + 1);
+            status.setInfo("Loading tests");            
 
             runDynamicTests();
 
             if (dynamicPass())
             {
-                runStaticTests(commitId);
+                runStaticTests(commitId,gitProxy,status);
             }           
             
             report.calculateProblemStatuses();
@@ -81,7 +83,7 @@ public class Tester {
         {
             Report reportToAdd = this.report;
             TestService.getDatabase().addReport(crsId, tickId, reportToAdd);
-            this.status.complete();
+            status.complete();
         }   
     }
 
@@ -104,15 +106,15 @@ public class Tester {
      * @throws IOException 			Thrown if creating/making temp files fails
      * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    private void runStaticTests(String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException    {
+    private void runStaticTests(String commitId, WebInterface gitProxy, Status status) throws CheckstyleException, IOException, RepositoryNotFoundException    {
         log.info("Starting static analysis");
         //get static tests from testingQueue
         Map<StaticOptions, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
         for (Map.Entry<StaticOptions, LinkedList<String>> e : staticTests.entrySet()) {
-            delay(500);
+            delay(1000);
             status.addProgress();
-            runStaticAnalysis(e.getKey(), e.getValue(), commitId);
+            runStaticAnalysis(e.getKey(), e.getValue(), commitId, gitProxy);
         }
         log.info("Static analysis complete");
     }
@@ -168,11 +170,9 @@ public class Tester {
      * @throws IOException 			Thrown if creating/making temp files fails
      * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    public void runStaticAnalysis(StaticOptions configFileName, List<String> fileNames, String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException {
-           StaticParser.test(configFileName, fileNames, report, repoName, commitId);
+    public void runStaticAnalysis(StaticOptions configFileName, List<String> fileNames, String commitId, WebInterface gitProxy) throws CheckstyleException, IOException, RepositoryNotFoundException {
+           StaticParser.test(configFileName, fileNames, report, repoName, commitId, gitProxy);
     }
-
-
 
     //GETTERS
     public Exception getFailCause()
@@ -180,18 +180,8 @@ public class Tester {
         return this.failCause;
     }
 
-    public Status getStatus()
-    {
-        return this.status;
-    }
-
     public Report getReport() {
         return report;
-    }
-
-    //TODO: temporary, delete
-    public void setStatus(Status s) {
-        this.status = s;
     }
 
     private void delay(int timeMS) {

@@ -157,7 +157,7 @@ public interface ITestService {
     		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments,
     		 	@QueryParam("commitId") String commitId, @QueryParam("date") long date) 
     				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
-    
+
     //TODO: cancel test
     //@DELETE
     //@Path("/{crsid}/{tickid}/running")
