@@ -3,7 +3,7 @@
 		<!-- checks for Exception, RuntimeException, and Throwable, and Error being thrown -->
 		<module name="IllegalThrows">
 			<property name="illegalClassNames" value="java.lang.Throwable, java.lang.Error, java.lang.RuntimeException, java.lang.Exception" />
-			<message key="illegal.throw" value="Throwing ''{0}'' is bad practice" />
+			<message key="illegal.throw" value="Throwing ''{0}'' is bad practice." />
 		</module>	
 	</module>
 </module>

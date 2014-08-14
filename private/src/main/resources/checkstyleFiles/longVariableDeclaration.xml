@@ -2,7 +2,7 @@
 	<module name="TreeWalker">
 		<!-- checks that long variables are declared with an upper case L instead of a lower case l -->
 		<module name="UpperEll">
-			<message key="upperEll" value="Lower case long assignment ~ using upper case L instead of lower case l is much more readable" />
+			<message key="upperEll" value="Lower case long assignment (using upper case L instead of lower case l is much more readable)." />
 			<property name="severity" value="warning" />
 		</module>	
 	</module>

@@ -2,7 +2,7 @@
 	<!-- check for too much whitespace between anything (i.e. more than one space) -->
 	<module name="RegexpSingleline">
 	    <property name="format"  value="\S\s{2,}\S" />
-	    <property name="message" value='Multiple spaces ~ only single spaces should be used within lines'/>
+	    <property name="message" value='Multiple spaces. Only single spaces should be used within lines.'/>
 	    <property name="severity" value="warning" />
 	</module>
 </module>
