@@ -2,6 +2,9 @@ package testingharness;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import publicinterfaces.Report;
 import publicinterfaces.CategoryNotInReportException;
 import publicinterfaces.Report;
@@ -22,6 +25,7 @@ import com.puppycrawl.tools.checkstyle.api.AuditListener;
  */
 public class StaticLogger implements AuditListener
 {
+	private static Logger log = LoggerFactory.getLogger(StaticLogger.class);
     private Report report;	//reference to the list in the report containing the static report items
     private String testDef;
     private Map<String,String> filePathMap;
@@ -35,7 +39,6 @@ public class StaticLogger implements AuditListener
         this.report = report;
         this.testDef = test.getText();
         this.filePathMap = filePathMap;
-        System.out.println("added " + testDef + " to report");
         Severity severity = Severity.WARNING;
         if (test.getCheckedIndex() == 2){
         	severity = Severity.ERROR;
@@ -55,7 +58,7 @@ public class StaticLogger implements AuditListener
         	String requiredFilePath = filePathMap.get(event.getFileName());
 			report.addDetail(testDef,requiredFilePath,event.getLine(),event.getMessage());
 		} catch (CategoryNotInReportException e) {
-            e.printStackTrace();
+            log.warn(e.getMessage());
 		}
     }
 

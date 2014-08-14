@@ -47,8 +47,6 @@ class DBUser {
 
         //add the new report
         ticks.get(tickId).addReport(newReport);
-        
-        System.out.println("Report added? " + ticks.containsKey(tickId));
     }
 
     /**

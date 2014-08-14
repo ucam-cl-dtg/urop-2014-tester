@@ -42,33 +42,35 @@ public class StaticParser {
      */
     public static void test(StaticOptions test, List<String> files, Report report, String repoName, String commitId, WebInterface gitProxy) throws CheckstyleException, IOException, RepositoryNotFoundException {
     	Map<String,String> filePathMap = new HashMap<>();
-    	log.info("starting to run test for " + test.getText());
+    	log.debug("starting to run test: " + test.getText());
     	//must be in list for .process to work
         LinkedList<File> fileList = new LinkedList<>();
 
         //get .java files to test
         for (String file : files) {
-        	log.info("obtaining " + file + " version " + commitId + " from " + repoName + " to test");
+        	log.debug("obtaining " + file + " version " + commitId + " from " + repoName + " to test");
 	        String contents = gitProxy.getFile(file, commitId, repoName);
-	        log.info("obtained file " + file + " version " + commitId + " from " + repoName + " to test");
+	        log.debug("obtained file " + file + " version " + commitId + " from " + repoName + " to test");
 	        String fileName = file.substring(0,file.lastIndexOf("."));
 	        
 	        File javaFile = File.createTempFile(fileName,".java"); 
-	        log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
+	        log.debug("file temporarily stored at: " + javaFile.getAbsolutePath());
 	
 	        //write string to temp file
-	        log.info("writing data to " + javaFile.getAbsolutePath());
+	        log.debug("writing data to " + javaFile.getAbsolutePath());
 	        FileOutputStream output = new FileOutputStream(javaFile.getAbsolutePath());
 	        byte[] bytes = contents.getBytes();
 	        output.write(bytes);
 	        output.flush();
 	        output.close();
-	
+	        log.debug("Data transferred to " + javaFile.getAbsolutePath());
+	        
 	        if (javaFile.exists()){
 	            fileList.add(javaFile);
 	            filePathMap.put(javaFile.getAbsolutePath(),file);
 	        }
 	        else {
+	        	log.warn("could not find file " + javaFile.getAbsolutePath());
 	            throw new IOException("Could not find file: " + file);
 	        }
         }
@@ -76,13 +78,13 @@ public class StaticParser {
         //test the java file and use the listener to add each line with an error
         //in it to the linked list of static report items
         
-        log.info("Testing: java files");
-        log.info("creating temp file for test " + test.getText());
+        log.debug("Testing: java files");
+        log.debug("creating temp file for test " + test.getText());
         File testFile = File.createTempFile("testFile",".xml"); 
-	    log.info("file temporarily stored at: " + testFile.getAbsolutePath());
+	    log.debug("file temporarily stored at: " + testFile.getAbsolutePath());
 	
 	    //write xml test code string to a temp file
-	    log.info("writing test data to " + testFile.getAbsolutePath());
+	    log.debug("writing test data to " + testFile.getAbsolutePath());
 	    FileOutputStream output = new FileOutputStream(testFile.getAbsolutePath());
 	    byte[] codebytes = test.getCode().getBytes();
 	    byte[] headerbytes = configuration.ConfigurationLoader.getConfig().getHeader().getBytes();
@@ -97,20 +99,20 @@ public class StaticParser {
         c.process(fileList); 
         c.destroy();
         if (testFile.delete()) {
-        	log.info("Deleted temp test file: " + testFile.getAbsolutePath());
+        	log.debug("Deleted temp test file: " + testFile.getAbsolutePath());
         }
         else {
-           	log.error("Failed to delete temp test file: " + testFile.getAbsolutePath());
+           	log.warn("Failed to delete temp test file: " + testFile.getAbsolutePath());
         }
-        log.info("Finished");
+        log.debug("test for " + test.getText() + " complete");
         
         //try to delete all the temp files that were created
         for (File javaFile : fileList) {
 	        if( javaFile.delete()) {
-	            log.info("Deleted temp file: " + javaFile.getAbsolutePath());
+	            log.debug("Deleted temp file: " + javaFile.getAbsolutePath());
 	        }
 	        else {
-	            log.error("Failed to delete temp file: " + javaFile.getAbsolutePath());
+	            log.warn("Failed to delete temp file: " + javaFile.getAbsolutePath());
 	        }
         }
     }
@@ -122,7 +124,7 @@ public class StaticParser {
             c = new Checker();
         } 
         catch (CheckstyleException e) {
-            System.out.println(e.getMessage());
+            log.warn("when creating checker, checkstyle failed with message: " + e.getMessage());
         } 
         final ClassLoader moduleClassLoader = Checker.class.getClassLoader(); 
         c.setModuleClassLoader(moduleClassLoader); 

@@ -32,7 +32,7 @@ public class Tester {
     static Logger log = LoggerFactory.getLogger(Tester.class); //initialise log4j logger
 
     private Report report; //Report object into which all the report items will ultimately go
-    private Exception failCause; //if the report fails, save it here so that it can be thrown when the report is requested
+    private Exception failCause = null; //if the report fails, save it here so that it can be thrown when the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
     private Map<ITestSetting, LinkedList<String>> testingQueue;
@@ -53,7 +53,7 @@ public class Tester {
      */
     public void runTests(String crsId, String tickId, String commitId, WebInterface gitProxy, Status status)
     {
-        log.info("Tick analysis started");	     
+        log.debug(crsId + " " + tickId + " " + commitId + ": Tick analysis started");	     
 
         try {
             int noOfTests = testingQueue.size();
@@ -61,17 +61,24 @@ public class Tester {
             status.setCurrentPositionInQueue(0);
             status.setMaxProgress(noOfTests + 1);
             status.setInfo("Loading tests");            
-
+            
+            log.debug(crsId + " " + tickId + " " + commitId + ": Running dynamic tests");
             runDynamicTests();
-
+            log.debug(crsId + " " + tickId + " " + commitId + ": Dynamic tests complete");
+            
             if (dynamicPass())
             {
+            	log.debug(crsId + " " + tickId + " " + commitId + ": Running static checks");
                 runStaticTests(commitId,gitProxy,status);
-            }           
+                log.debug(crsId + " " + tickId + " " + commitId + ": Static checks complete");
+            }  
+            else {
+            	log.debug(crsId + " " + tickId + " " + commitId + ": Dynamic tests failed");
+            }
             
             report.calculateProblemStatuses();
 
-            log.info("Tick analysis finished successfully");
+            log.debug("Tick analysis finished successfully");
         }	
         catch (CheckstyleException | IOException | RepositoryNotFoundException e)
         {
@@ -81,6 +88,11 @@ public class Tester {
         }
         finally
         {
+        	//TODO: Is this a viable option? error will appear as ticker comment but won't be able to sign up so
+        	//shouldn't be overwritten
+        	if (this.failCause != null) {
+        		this.report.setTickerComments("Test failed to complete, error: " + this.failCause.getMessage());
+        	}
             Report reportToAdd = this.report;
             TestService.getDatabase().addReport(crsId, tickId, reportToAdd);
             status.complete();
@@ -107,7 +119,6 @@ public class Tester {
      * @throws RepositoryNotFoundException 		Thrown by git API
      */
     private void runStaticTests(String commitId, WebInterface gitProxy, Status status) throws CheckstyleException, IOException, RepositoryNotFoundException    {
-        log.info("Starting static analysis");
         //get static tests from testingQueue
         Map<StaticOptions, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
         //run Static analysis on each test
@@ -116,7 +127,6 @@ public class Tester {
             status.addProgress();
             runStaticAnalysis(e.getKey(), e.getValue(), commitId, gitProxy);
         }
-        log.info("Static analysis complete");
     }
 
     /**
