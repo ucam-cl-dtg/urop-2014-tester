@@ -123,21 +123,23 @@ public class TestService implements ITestService {
         for (String file : fileListFromGit) {
            if (FilenameUtils.getExtension(file).equals("java"))
             {
-                log.debug(crsId + " " + tickId + ": Adding java file to test: " + file);
+                log.debug(crsId + " " + tickId + " " + commitId + ": Adding java file to test: " + file);
                 filesToTest.add(file);
             }
         }
+        log.debug(crsId + " " + tickId + " " + commitId + ": all java files loaded");
         //obtain static tests to run on files according to what tick it is
-        log.debug(crsId + " " + tickId + ": Loading test settings for tickId");
+        log.debug(crsId + " " + tickId + " " + commitId + ": Loading test settings for tickId");
         List<StaticOptions> staticTests = dbXMLTests.getTestSettings(tickId);
     	
         for (StaticOptions test : staticTests) {
         	if (test.getCheckedIndex() != 0) {
         		tests.put(test, filesToTest);
-        		log.debug(crsId + " " + tickId + ": Added stylistic check: " + test.getText());
+        		log.debug(crsId + " " + tickId + " " + commitId + ": Added stylistic check: " + test.getText());
         	}
         }
-
+        log.debug(crsId + " " + tickId + " " + commitId + ": Tests loaded");
+        
         // create a new Tester object
         final Tester tester = new Tester(tests, repoName, commitId);
 
@@ -147,7 +149,7 @@ public class TestService implements ITestService {
         //this key should be unique as they shouldn't be able to run the same tests more than once
         //at the same time
         if (ticksInProgress.putIfAbsent(crsId + tickId, thread) != null) {
-        	log.warn(crsId + " " + tickId + ": Test is already running; throwing TestStillRunningException");
+        	log.warn(crsId + " " + tickId + " " + commitId + ": Test is already running; throwing TestStillRunningException");
         	throw new TestStillRunningException("You can't submit this tick as you already have the same one running");
         }
         
@@ -155,11 +157,10 @@ public class TestService implements ITestService {
         TestService.threadExecutor.execute(thread);
         
         if(MyExecutor.getWaitingQueue().contains(thread)) {
+        	log.debug(crsId + " " + tickId + " " + commitId + ": Is waiting in queue");
         	Status status = new Status(getQueuePosition(crsId,tickId));
         	thread.setStatus(status);
         }
-
-        log.info(crsId + " " + tickId + ": runNewTest: Test started");
         
         return "Test Started";
     }
@@ -172,17 +173,20 @@ public class TestService implements ITestService {
         //if the test is currently running then return its status from memory
         if (ticksInProgress.containsKey(crsId + tickId)) {
         	//if test is in queue then recalc position then return status
+        	log.debug(crsId+ " " + tickId + ": active thread found");
         	TesterThread thread = ticksInProgress.get(crsId + tickId);
         	if(MyExecutor.getWaitingQueue().contains(thread)) {
+        		log.debug(crsId+ " " + tickId + ": thread still in wait queue");
         		thread.getStatus().updateQueueStatus(getQueuePosition(crsId,tickId));
         	}
-            log.debug(crsId+ " " + tickId + ": Found in map of ticks in progress, returning...");
+            log.debug(crsId+ " " + tickId + ": returning status");
             return ticksInProgress.get(crsId + tickId).getStatus();
         }
         else {
             //the test is not currently in memory, so try to get it from the DB
+        	log.debug(crsId+ " " + tickId + ": thread no longer active, attempting to access database");
             try {
-                log.debug(crsId+ " " + tickId + ": If report exists in db, will return status from that");
+                log.debug(crsId+ " " + tickId + ": returning status from database");
                 return dbReport.getLastStatus(crsId, tickId);
             } catch (UserNotInDBException | TickNotInDBException e) {
                 log.warn(crsId+ " " + tickId + ": Report not in map of ticks in progress or db, throwing NoSuchTestException");
@@ -205,12 +209,12 @@ public class TestService implements ITestService {
             throws UserNotInDBException, TickNotInDBException {
         log.debug(crsId+ " " + tickId + ": get all reports request received...");
         return dbReport.getAllReports(crsId, tickId);
-        //return null;
     }
 
     /** {@inheritDoc} */
     @Override
     public void deleteStudentReportData(@PathParam("crsId") String crsId) throws UserNotInDBException {
+    	log.debug(crsId + ": delete request received");
         dbReport.removeUserReports(crsId);
     }
 
@@ -218,6 +222,7 @@ public class TestService implements ITestService {
     @Override
     public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
             throws TickNotInDBException, UserNotInDBException {
+    	log.debug(crsId+ " " + tickId + ": delete request received");
         dbReport.removeUserTickReports(crsId, tickId);
     }
 
@@ -286,7 +291,7 @@ public class TestService implements ITestService {
 					}
 				} 
 				catch (IOException e) {
-					//TODO
+					log.error("IO failed, unable to read from " + file);
 					b.close();
 					e.printStackTrace();
 				} 
@@ -299,10 +304,11 @@ public class TestService implements ITestService {
 	            i++;
 			}
 		} catch (URISyntaxException e) {
-			// TODO Auto-generated catch block
+			// this should never happen
 			e.printStackTrace();
 		}
 		finally {
+			log.debug("returning default tests poll status request received");
 			return Response.status(200).entity(toReturn).build();
 		} 
 	}
@@ -314,16 +320,16 @@ public class TestService implements ITestService {
 			throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
 		log.debug("setting ticker result...");
 		Date d = new Date(date);
-		log.debug("transformed date to: " + d);
+		log.debug("transformed recieved millisecond date to: " + d);
 		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId, d);
-		log.debug("result set; returning...");
+		log.debug("result set");
 	}
 
 	@Override
 	public Response getTestFiles(String tickId) throws TestIDNotFoundException {
 		log.debug("get test files request received for " + tickId);
 		List<StaticOptions> toReturn = TestService.dbXMLTests.getTestSettings(tickId);
-		log.debug("no of files found = " + toReturn.size());
+		log.info("no of files found = " + toReturn.size());
 		return Response.status(200).entity(toReturn).build(); 
 	}
 	

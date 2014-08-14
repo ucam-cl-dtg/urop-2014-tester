@@ -23,20 +23,22 @@ public class TesterThread implements Runnable {
 		this.tickId = tickId;
 		this.commitId = commitId;
 		this.gitProxy = gitProxy;
+		log.debug(crsId + " " + tickId + " " + commitId + ": Thread created");
 	}
 
 	@Override
 	public void run() {
 		if(this.status == null) {
+			log.debug(crsId + " " + tickId + " " + commitId + ": Test was put straight in pool, creating status");
 			this.status = new Status();
 		}
-		log.info("running new thread with crsId " + crsId);
+		log.debug(crsId + " " + tickId + " " + commitId + ": Thread starting to run");
 		tester.runTests(crsId, tickId, commitId,gitProxy,status);
-		log.info("tests end with crsId " + crsId);
+		log.debug(crsId + " " + tickId + " " + commitId + ": Tests finished in thread");
         assert TestService.getTicksInProgress().containsKey(crsId + tickId);
-        log.info("removing report from running map " + crsId);
+        log.debug(crsId + " " + tickId + " " + commitId + ": removing thread from current active threads");
         TestService.getTicksInProgress().remove(crsId + tickId);
-        log.info("removed " + crsId);
+        log.debug(crsId + " " + tickId + " " + commitId + ": Thread removed");
 	}
 
 	public String getCrsId() {

@@ -48,7 +48,6 @@ class DBUser {
 
         //add the new report
         ticks.get(tickId).addReport(newReport);
-        
         log.debug("crsId: " + crsId + " tickId: " + tickId + ": Report added: " + ticks.containsKey(tickId));
     }
 
