@@ -40,20 +40,23 @@ public class MongoDBReportManager implements IDBReportManager {
     /** {@inheritDoc} */
     @Override
     public void addReport(String crsId, String tickId, Report report) {
+        log.debug("Adding report for user " + crsId + " tickId " + tickId);
         //look up user by crsId
         DBUser user = DBUserColl.findOneById(crsId);
 
         //if user wasn't found, create them.
         if (user == null) {
+            log.debug("User " + crsId + " not found, creating");
             user = new DBUser(crsId);
             DBUserColl.insert(user);
         }
-
         //add report to the new user
         user.addReport(tickId, report);
 
         //save the user into the database
         DBUserColl.save(user);
+
+        log.debug("Saved user to database; restarting...");
     }
 
     /** {@inheritDoc} */
@@ -77,9 +80,13 @@ public class MongoDBReportManager implements IDBReportManager {
     /** {@inheritDoc} */
     @Override
     public void removeUserReports(String crsId) throws UserNotInDBException {
+        log.debug("Removing all reports for user " + crsId);
+
         getValidUser(crsId);
 
         DBUserColl.removeById(crsId);
+
+        log.debug("Reports removed, returning...");
     }
 
     /** {@inheritDoc} */
@@ -96,17 +103,20 @@ public class MongoDBReportManager implements IDBReportManager {
      * @throws UserNotInDBException If the user with id crsId does not exist in the database
      */
     private DBUser getValidUser(String crsId) throws UserNotInDBException {
+        log.debug("Checking if user" + crsId + " is in database...");
         //look up user by crsId
         DBUser user = DBUserColl.findOneById(crsId);
 
         if (user == null) {
-            log.error("User not found");
+            log.warn(crsId + " not found in database");
             throw new UserNotInDBException(crsId);
         }
 
+        log.debug("user " + crsId + " found, returning...");
         return user;
     }
 
+    //@author kls82, which is why there is no JavaDoc
 	@Override
 	public void editReportTickerResult(String crsid, String tickId,
 			ReportResult tickerResult, String tickerComments, String commitId, Date date) 

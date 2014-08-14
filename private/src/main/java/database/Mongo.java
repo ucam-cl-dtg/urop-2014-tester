@@ -14,11 +14,12 @@ public class Mongo {
     private static DB db;
 
     static {
-        log.info("Initialising MongoDB");
+        log.debug("Initialising MongoDB");
         ConfigurationFile config = ConfigurationLoader.getConfig();
         try {
             MongoClient client = new MongoClient(config.getMongoHost(), config.getMongoPort());
             db = client.getDB(config.getMongoReportDBName());
+            log.debug("MongoDB initialised");
         }
         catch (UnknownHostException e) {
             log.error("Couldn't connect to MongoDB");
