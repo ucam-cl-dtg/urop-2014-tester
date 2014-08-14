@@ -15,6 +15,7 @@ public class ConfigurationFile {
 	private Map<String, String> xmlTestReadable;
 	private String filePath;
 	private String header;
+	private int threadNumber;
     
     public String getGitAPIPath()
     {
@@ -115,8 +116,14 @@ public class ConfigurationFile {
 	public void setHeader(String header) {
 		this.header = header;
 	}
-    
-	
+
+	public int getThreadNumber() {
+		return threadNumber;
+	}
+
+	public void setThreadNumber(int threadNumber) {
+		this.threadNumber = threadNumber;
+	}
 	
 }
 

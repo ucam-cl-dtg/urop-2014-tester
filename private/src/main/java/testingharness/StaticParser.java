@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import publicinterfaces.Report;
 import publicinterfaces.StaticOptions;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
+import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,7 +40,7 @@ public class StaticParser {
      * @throws IOException              Thrown if creating/making temp files fails
      * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    public static void test(StaticOptions test, List<String> files, Report report, String repoName, String commitId) throws CheckstyleException, IOException, RepositoryNotFoundException {
+    public static void test(StaticOptions test, List<String> files, Report report, String repoName, String commitId, WebInterface gitProxy) throws CheckstyleException, IOException, RepositoryNotFoundException {
     	Map<String,String> filePathMap = new HashMap<>();
     	log.info("starting to run test for " + test.getText());
     	//must be in list for .process to work
@@ -48,7 +49,7 @@ public class StaticParser {
         //get .java files to test
         for (String file : files) {
         	log.info("obtaining " + file + " version " + commitId + " from " + repoName + " to test");
-	        String contents = TestService.gitProxy.getFile(file, commitId, repoName);
+	        String contents = gitProxy.getFile(file, commitId, repoName);
 	        log.info("obtained file " + file + " version " + commitId + " from " + repoName + " to test");
 	        String fileName = file.substring(0,file.lastIndexOf("."));
 	        

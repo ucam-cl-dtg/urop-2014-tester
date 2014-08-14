@@ -4,6 +4,10 @@ package publicinterfaces;
  * @author kls82
  */
 public class Status {
+	//stores original place of thread in queue (0 if straight into pool)
+	private int originalPositionInQueue;
+	//stores current place of thread in queue (0 when accepted in pool)
+	private int currentPositionInQueue;
 	//current level in the progress bar
     private int progress;
     //number of sections the progress bar should be split into
@@ -11,18 +15,12 @@ public class Status {
     //string describing progress e.g. running test 1 of 3
     private String info; //string describing progress e.g. running test 1 of 3
 
-
-    /**
-     * Constructor for use when a new test begins to run
-     * @param init          String describing current progress
-     * @param maxProgress   Total number of tests which are to be run + 1 (as "Done" is an extra state)
-     */
-    public Status(String init, int maxProgress) {
-        this.progress = 0;
-        this.maxProgress = maxProgress;
-        this.info = init;
+    public Status(int initQueuePos) {
+        this.setOriginalPositionInQueue(initQueuePos);
+        this.setCurrentPositionInQueue(initQueuePos);
+        this.info = "In queue position " + initQueuePos;
     }
-
+    
     /**
      * Use for creation of Status objects for finished tests
      * @param maxProgress   Total number of tests which were run + 1 (as "Done" is an extra state)
@@ -34,6 +32,11 @@ public class Status {
         info = reportResult.toString();
     }
 
+    public void updateQueueStatus(int newPos) {
+    	this.setCurrentPositionInQueue(newPos);
+    	this.info = "In queue position " + this.currentPositionInQueue;
+    }
+    
     /**
      * Increment current test progress by 1
      */
@@ -47,7 +50,7 @@ public class Status {
      */
     public void complete() {
         this.progress = maxProgress;
-        this.info = "complete";
+        this.info = "Complete";
     }
 
     //Constructor and getters/setters for json serialisation
@@ -76,4 +79,20 @@ public class Status {
     public void setProgress(int progress) {
         this.progress = progress;
     }
+
+	public int getOriginalPositionInQueue() {
+		return originalPositionInQueue;
+	}
+
+	public void setOriginalPositionInQueue(int originalPositionInQueue) {
+		this.originalPositionInQueue = originalPositionInQueue;
+	}
+
+	public int getCurrentPositionInQueue() {
+		return currentPositionInQueue;
+	}
+
+	public void setCurrentPositionInQueue(int currentPositionInQueue) {
+		this.currentPositionInQueue = currentPositionInQueue;
+	}
 }
