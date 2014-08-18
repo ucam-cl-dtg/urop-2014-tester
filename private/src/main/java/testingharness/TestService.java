@@ -171,7 +171,7 @@ public class TestService implements ITestService {
             throws NoSuchTestException {
         log.debug(crsId+ " " + tickId + ": poll status request received");
         //if the test is currently running then return its status from memory
-        if (ticksInProgress.containsKey(crsId + tickId)) {
+        if (ticksInProgress.containsKey(crsId + tickId) && !ticksInProgress.get(crsId + tickId).getStatus().getInfo().equals("Complete")) {
         	//if test is in queue then recalc position then return status
         	log.debug(crsId+ " " + tickId + ": active thread found");
         	TesterThread thread = ticksInProgress.get(crsId + tickId);
