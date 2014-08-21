@@ -65,7 +65,9 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/last")
-    public Report getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Report getLastReport(@QueryParam("securityToken") String securityToken,
+                                @PathParam("crsId") String crsId,
+                                @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException;
 
     /**
