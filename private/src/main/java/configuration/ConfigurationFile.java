@@ -16,6 +16,7 @@ public class ConfigurationFile {
 	private String filePath;
 	private String header;
 	private int threadNumber;
+    private String securityToken;
     
     public String getGitAPIPath()
     {
@@ -124,6 +125,13 @@ public class ConfigurationFile {
 	public void setThreadNumber(int threadNumber) {
 		this.threadNumber = threadNumber;
 	}
-	
+
+    public String getSecurityToken() {
+        return securityToken;
+    }
+
+    public void setSecurityToken(String securityToken) {
+        this.securityToken = securityToken;
+    }
 }
 

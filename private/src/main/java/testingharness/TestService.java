@@ -257,18 +257,6 @@ public class TestService implements ITestService {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public void test() throws NoSuchTestException {
-        ResteasyClient rc = new ResteasyClientBuilder().build();
-
-        ResteasyWebTarget t = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
-        ITestService proxy = t.proxy(ITestService.class);
-
-        proxy.pollStatus("as2388", "tick-test");
-        System.out.println("done");
-    }
-
-    /** {@inheritDoc} */
 	@Override
 	public Response getTestFiles() {
 	    log.debug("request received to get default java style settings");

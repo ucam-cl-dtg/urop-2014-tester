@@ -33,8 +33,10 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/{repoName}")
-    public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
-                           @PathParam("repoName") String repoName)
+    public String runNewTest(@QueryParam("securityToken") String securityToken,
+                             @PathParam("crsId") final String crsId,
+                             @PathParam("tickId") final String tickId,
+                             @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException, NoCommitsToRepoException;
 
     /**
@@ -46,7 +48,9 @@ public interface ITestService {
      */
     @GET
     @Path("{crsId}/{tickId}/poll")
-    public Status pollStatus(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Status pollStatus(@QueryParam("securityToken") String securityToken,
+                             @PathParam("crsId") String crsId,
+                             @PathParam("tickId") String tickId)
             throws NoSuchTestException;
 
     /**
@@ -74,7 +78,9 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/all")
-    public List<Report> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public List<Report> getAllReports(@QueryParam("securityToken") String securityToken,
+                                      @PathParam("crsId") String crsId,
+                                      @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException;
     /**
      * Deletes all student reports for every tick they have done
@@ -83,7 +89,9 @@ public interface ITestService {
      */
     @DELETE
     @Path("/{crsId}")
-    public void deleteStudentReportData(@PathParam("crsId") String crsId) throws UserNotInDBException;
+    public void deleteStudentReportData(@QueryParam("securityToken") String securityToken,
+                                        @PathParam("crsId") String crsId)
+            throws UserNotInDBException;
 
     /**
      * Deletes all generated reports for a given user and one of their ticks
@@ -94,7 +102,9 @@ public interface ITestService {
      */
     @DELETE
     @Path("/{crsId}/{tickId}")
-    public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public void deleteStudentTick(@QueryParam("securityToken") String securityToken,
+                                  @PathParam("crsId") String crsId,
+                                  @PathParam("tickId") String tickId)
             throws TickNotInDBException, UserNotInDBException;
 
     /**
@@ -102,23 +112,12 @@ public interface ITestService {
      * already exists in the database, update its settings
      * @param tickId                Unique Id of the new test being created
      * @param checkstyleOpts        list containing xml files and settings for checkstyles
-     * @throws TestIDAlreadyExistsException       Thrown when the tickId supplied has been used before in
-     * 											  the database, but something went wrong and the files
-     * 											  aren't stored so add to database is called instead
-     * 											  of update - shouldn't happen but just in case
-     * @throws FailedToMakeTestException       Thrown if I/O goes wrong when setting up the test files
-     * @throws TestIDNotFoundException 		Thrown when this is called in update mode and the tickId can't be
-     * 										found in the database
      */
     @POST
     @Path("/{tickId}/create")
     @Consumes("application/json")
-	public Response createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts);
-
-    //TODO: REMOVE?
-    @GET
-    @Path("/test")
-    public void test() throws NoSuchTestException;
+	public Response createNewTest(@QueryParam("securityToken") String securityToken,
+                                  @PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts);
 
     /**
      * returns all default static test settings that are available for tick setters to use
@@ -126,7 +125,7 @@ public interface ITestService {
      */
     @GET
     @Path("/testFiles")
-    public Response getTestFiles();
+    public Response getTestFiles(@QueryParam("securityToken") String securityToken);
     
     /**
      * returns all static test settings that are available for the specified tick (for updating purposes)
@@ -136,7 +135,9 @@ public interface ITestService {
      */
     @GET
     @Path("{tickId}/testFiles")
-    public Response getTestFiles(@PathParam("tickId") String tickId) throws TestIDNotFoundException;
+    public Response getTestFiles(@QueryParam("securityToken") String securityToken,
+                                 @PathParam("tickId") String tickId)
+            throws TestIDNotFoundException;
     
     /**
      * Allows ticker to pass/fail a student's tick by adding a tickerResult and tickerComment to one of their
@@ -153,9 +154,13 @@ public interface ITestService {
     @POST
     @Path("/{crsid}/{tickId}/set/tickerResult")
     @Consumes("application/json")
-    public void setTickerResult( @PathParam("crsid") String crsid , @PathParam("tickId") String tickId ,  
-    		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments,
-    		 	@QueryParam("commitId") String commitId, @QueryParam("date") long date) 
+    public void setTickerResult(@QueryParam("securityToken") String securityToken,
+                                @PathParam("crsid") String crsid ,
+                                @PathParam("tickId") String tickId ,
+    		                    @QueryParam("tickerResult") ReportResult tickerResult,
+                                @QueryParam("tickerComments") String tickerComments,
+    		 	                @QueryParam("commitId") String commitId,
+                                @QueryParam("date") long date)
     				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
 
     //TODO: cancel test
