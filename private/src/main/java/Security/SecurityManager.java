@@ -23,7 +23,7 @@ public class SecurityManager {
             log.error("No securityToken configuration option set!");
             throw new SecurityException("No securityToken configuration option set!");
         }
-        else if (!ConfigurationLoader.getConfig().getSecurityToken().equals(securityToken));
+        else if (!ConfigurationLoader.getConfig().getSecurityToken().equals(securityToken))
         {
             log.error("The given securityToken is invalid!");
             throw new SecurityException("The given securityToken is invalid!");
