@@ -27,7 +27,7 @@ import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 public class Main {
-	public static void main(String[] args) throws TestIDAlreadyExistsException, FailedToMakeTestException, TestIDNotFoundException, IOException {
+	/*public static void main(String[] args) throws TestIDAlreadyExistsException, FailedToMakeTestException, TestIDNotFoundException, IOException {
 
 		ResteasyClient rc = new ResteasyClientBuilder().build();
 	    ResteasyWebTarget p = rc.target("http://localhost:8080/TestingSystem/rest");
@@ -69,7 +69,7 @@ public class Main {
 	    x.add(c);
 	    proxy.createNewTest("testTickForDB", x);
 	    */
-	}
+	//}
 	
 	public static String getCode(String name) throws IOException {
 		String output = "";

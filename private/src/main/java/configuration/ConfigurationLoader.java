@@ -25,7 +25,7 @@ public class ConfigurationLoader
     // initialise log4j logger
     static Logger log = LoggerFactory.getLogger(ConfigurationLoader.class);
     
-    static public final String FILENAME = "UROP-Tester-config.json";   //location of config file
+    static public final String FILENAME = "UROP-Tester-config-secure.json";   //location of config file
     static private File file = new File(FILENAME);
     static private ObjectMapper mapper = new ObjectMapper();
     static long mTime;

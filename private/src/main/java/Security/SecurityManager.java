@@ -29,4 +29,8 @@ public class SecurityManager {
             throw new SecurityException("The given securityToken is invalid!");
         }
     }
+
+    public static String getSecurityToken() {
+        return ConfigurationLoader.getConfig().getSecurityToken();
+    }
 }

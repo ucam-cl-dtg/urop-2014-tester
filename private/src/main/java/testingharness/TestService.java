@@ -73,7 +73,7 @@ public class TestService implements ITestService {
         log.debug(crsId + " " + tickId + ": Preparing test suite");
 
         log.debug(crsId + " " + tickId + ": Querying git API for SHA of head of repository: " + repoName);
-        final String commitId = gitProxy.resolveCommit(repoName, "HEAD");
+        final String commitId = gitProxy.resolveCommit(SecurityManager.getSecurityToken(), repoName, "HEAD");
         log.debug(crsId + " " + tickId + ": SHA for repository: " + repoName + " is " + commitId);
     	
         if (commitId == null) {
@@ -87,7 +87,7 @@ public class TestService implements ITestService {
         //collect files to test from git
         log.debug(crsId + " " + tickId + " " + commitId
                 + ": Connecting to git API to obtain list of files in repo");
-        List<String> fileListFromGit = gitProxy.listFiles(repoName , commitId);
+        List<String> fileListFromGit = gitProxy.listFiles(SecurityManager.getSecurityToken(), repoName , commitId);
         
         log.debug(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
 
@@ -321,4 +321,9 @@ public class TestService implements ITestService {
 	        }
 	    return 0;
 	}
+
+    @Override
+    public Response test() {
+        return Response.ok().entity("hello world").build();
+    }
 }

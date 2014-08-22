@@ -121,6 +121,10 @@ public interface ITestService {
 	public Response createNewTest(@QueryParam("securityToken") String securityToken,
                                   @PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts);
 
+    @GET
+    @Path("/test")
+    public Response test();
+
     /**
      * returns all default static test settings that are available for tick setters to use
      * @return 		List of the names of the static tests available with their default severity
