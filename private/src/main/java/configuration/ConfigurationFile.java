@@ -19,6 +19,7 @@ public class ConfigurationFile {
 	private int threadNumber;
 	private String repoTemplate;
     private String securityToken;
+    private int testDelay;
  
     public String getGitAPIPath()
     {
@@ -150,5 +151,13 @@ public class ConfigurationFile {
     public void setSecurityToken(String securityToken) {
         this.securityToken = securityToken;
     }
+
+	public int getTestDelay() {
+		return testDelay;
+	}
+
+	public void setTestDelay(int testDelay) {
+		this.testDelay = testDelay;
+	}
 }
 

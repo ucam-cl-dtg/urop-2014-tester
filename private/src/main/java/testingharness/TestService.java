@@ -89,17 +89,21 @@ public class TestService implements ITestService {
 	}
 
     public TestService() {
-        log.info("Initialising TestService (including proxy to git service)");
+        log.info("Initialising TestService");
 
+        log.info("Initialising git proxy");
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 	    
 	    ResteasyWebTarget forGit = rc.target(ConfigurationLoader.getConfig().getGitAPIPath());
 	    gitProxy = forGit.proxy(WebInterface.class);
-
+	    log.info("Git proxy initialised");
+	    
+	    log.info("Initialising tester proxy");
 	    ResteasyClient rc2 = new ResteasyClientBuilder().build();
 	    
 	    ResteasyWebTarget forTester = rc2.target(ConfigurationLoader.getConfig().getTesterPath());
-	    testerProxyTest = forTester.proxy(TestsApi.class);	    
+	    testerProxyTest = forTester.proxy(TestsApi.class);	 
+	    log.info("tester proxy initialised");
         log.debug("TestService initialised");
     }
 
@@ -121,9 +125,6 @@ public class TestService implements ITestService {
         	throw new NoCommitsToRepoException();
         }
 
-        Map<ITestSetting, LinkedList<String>> tests = new HashMap<>();
-        LinkedList<String> filesToTest = new LinkedList<>();
-
         //collect files to test from git
         log.debug(crsId + " " + tickId + " " + commitId
                 + ": Connecting to git API to obtain list of files in repo");
@@ -131,30 +132,24 @@ public class TestService implements ITestService {
         
         log.debug(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
 
-        for (String file : fileListFromGit) {
-        	//TODO: add check for other types of file eg .c etc
-           if (FilenameUtils.getExtension(file).equals("java"))
-            {
-                log.debug(crsId + " " + tickId + " " + commitId + ": Adding java file to test: " + file);
-                filesToTest.add(file);
-            }
-        }
-        
         log.debug(crsId + " " + tickId + " " + commitId + ": all files loaded");
         //obtain static tests to run on files according to what tick it is
         log.debug(crsId + " " + tickId + " " + commitId + ": Loading test settings for tickId");
         List<StaticOptions> staticTests = dbTicks.getTestSettings(tickId);
     	
+        List<StaticOptions> tests = new LinkedList<>();
+        
         for (StaticOptions test : staticTests) {
         	if (test.getCheckedIndex() != 0) {
-        		tests.put(test, filesToTest);
+        		tests.add(test);
         		log.debug(crsId + " " + tickId + " " + commitId + ": Added stylistic check: " + test.getText());
         	}
         }
+        
         log.debug(crsId + " " + tickId + " " + commitId + ": Tests loaded");
         
         // create a new Tester object
-        final Tester tester = new Tester(tests, repoName, commitId);
+        final Tester tester = new Tester(tests, fileListFromGit, repoName, commitId);
 
         TesterThread thread = new TesterThread(tester, crsId, tickId, commitId, gitProxy, testerProxyTest);
         

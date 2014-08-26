@@ -41,45 +41,8 @@ public class StaticParser {
      * @throws IOException              Thrown if creating/making temp files fails
      * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    public static void test(StaticOptions test, List<String> files, Report report, String repoName, String commitId, WebInterface gitProxy) throws CheckstyleException, IOException, RepositoryNotFoundException {
-    	Map<String,String> filePathMap = new HashMap<>();
+    public static void test(StaticOptions test, List<File> fileList, Report report, String repoName, String commitId, Map<String,String> filePathMap) throws CheckstyleException, IOException, RepositoryNotFoundException {
     	log.info("starting to run test: " + test.getText());
-    	//must be in list for .process to work
-        LinkedList<File> fileList = new LinkedList<>();
-
-        //get .java files to test
-        for (String file : files) {
-
-        	log.debug("obtaining " + file + " version " + commitId + " from " + repoName + " to test");
-	        String contents = gitProxy.getFile(Security.SecurityManager.getSecurityToken(), file, commitId, repoName);
-	        log.debug("obtained file " + file + " version " + commitId + " from " + repoName + " to test");
-	        
-	        String fileName = file.substring(0,file.lastIndexOf("."));
-	        
-	        File javaFile = File.createTempFile(fileName,".java"); 
-	        log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
-	
-	        //write string to temp file
-	        log.info("writing data to " + javaFile.getAbsolutePath());
-	        FileOutputStream output = new FileOutputStream(javaFile.getAbsolutePath());
-	        byte[] bytes = contents.getBytes();
-	        output.write(bytes);
-	        output.flush();
-	        output.close();
-	        log.info("Data transferred to " + javaFile.getAbsolutePath());
-	        
-	        if (javaFile.exists()){
-	            fileList.add(javaFile);
-	            filePathMap.put(javaFile.getAbsolutePath(),file);
-	        }
-	        else {
-	        	log.warn("could not find file " + javaFile.getAbsolutePath());
-	            throw new IOException("Could not find file: " + file);
-	        }
-        }
-
-        //test the java file and use the listener to add each line with an error
-        //in it to the linked list of static report items
         
         log.info("Testing: java files");
         log.info("creating temp file for test " + test.getText());
@@ -108,16 +71,6 @@ public class StaticParser {
            	log.warn("Failed to delete temp test file: " + testFile.getAbsolutePath());
         }
         log.info("test for " + test.getText() + " complete");
-        
-        //try to delete all the temp files that were created
-        for (File javaFile : fileList) {
-	        if( javaFile.delete()) {
-	            log.info("Deleted temp file: " + javaFile.getAbsolutePath());
-	        }
-	        else {
-	            log.warn("Failed to delete temp file: " + javaFile.getAbsolutePath());
-	        }
-        }
     }
 
     private static Checker createChecker(Configuration config, AuditListener listener) throws CheckstyleException {

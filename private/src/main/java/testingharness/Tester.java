@@ -1,5 +1,6 @@
 package testingharness;
 
+import com.jcraft.jsch.JSchException;
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
 import configuration.ConfigurationLoader;
@@ -26,6 +27,8 @@ import uk.ac.cam.cl.dtg.teaching.exceptions.SerializableException;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -47,14 +50,16 @@ public class Tester {
     private Exception failCause = null; //if the report fails, save it here so that it can be thrown when the report is requested
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
-    private Map<ITestSetting, LinkedList<String>> testingQueue;
+    private List<String> filesToTest;
+    private List<StaticOptions> testingQueue;
     private boolean dynamicPass;
 
     /**
      * Creates a new Tester
      */
-    public Tester(Map<ITestSetting, LinkedList<String>> testingQueue, String repoName, String commitId)  {
-        this.testingQueue = testingQueue;
+    public Tester(List<StaticOptions> tests, List<String> filesToTest, String repoName, String commitId)  {
+        this.testingQueue = tests;
+        this.filesToTest = filesToTest;
         this.report = new Report(repoName, commitId);
         this.repoName = repoName;
     }
@@ -69,7 +74,7 @@ public class Tester {
 
         try {
             int noOfTests = testingQueue.size()+2;
-            report.setNoOfTests(noOfTests+2);
+            report.setNoOfTests(noOfTests);
             status.setCurrentPositionInQueue(0);
             status.setMaxProgress(noOfTests + 3);
             status.setInfo("Loading tests");            
@@ -78,7 +83,7 @@ public class Tester {
             
             if (dynamicContainerId != null && dynamicTestId != null) {
             	log.info(crsId + " " + tickId + " " + commitId + ": Running dynamic tests");
-            	runDynamicTests(testerProxyTest,crsId,tickId,dynamicContainerId,dynamicTestId,status,repo);
+            	runDynamicTests(testerProxyTest,crsId,tickId,dynamicContainerId,dynamicTestId,status,repo, gitProxy);
             	log.info(crsId + " " + tickId + " " + commitId + ": Dynamic tests complete");
             }
             //TODO: will need to fill in checkstyles error bit
@@ -87,10 +92,11 @@ public class Tester {
             	dynamicPass = true;
             }
             
-            if (dynamicPass)
+            //now run checkstyles if required
+            if (dynamicPass && testingQueue.size()>0)
             {
             	log.info(crsId + " " + tickId + " " + commitId + ": Running static checks");
-                runStaticTests(commitId,gitProxy,status);
+                runStaticJavaTests(commitId,gitProxy,status);
                 log.info(crsId + " " + tickId + " " + commitId + ": Static checks complete");
             }  
             else {
@@ -123,11 +129,18 @@ public class Tester {
     /**
      * Runs all dynamic analysis tests required by the tick
      */
-    private void runDynamicTests(TestsApi testerProxyTest, String crsId, String tickId, String dynamicContainerId, String dynamicTestId, Status status, String repo)
+    private void runDynamicTests(TestsApi testerProxyTest, String crsId, String tickId, String dynamicContainerId, String dynamicTestId, Status status, String repo, WebInterface gitProxy)
     {
+    	String privateKey = "";
+    	try {
+			privateKey = gitProxy.getPrivateKey(ConfigurationLoader.getConfig().getSecurityToken(),crsId);
+		} catch (IOException | JSchException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
     	log.info(tickId + " " + crsId +": started dynamic analysis");
         try {
-			TestInstance dynamicTest = testerProxyTest.startTest(crsId, dynamicContainerId, dynamicTestId, repo , "TODO: privateKey");
+			TestInstance dynamicTest = testerProxyTest.startTest(crsId, dynamicContainerId, dynamicTestId, repo , privateKey);
 			String dynamicTestStatus = testerProxyTest.getTestStatus(crsId, dynamicContainerId).getStatus();
 			int progress = 0;
 			status.setProgress(1);
@@ -212,52 +225,79 @@ public class Tester {
 	}
 
 	/**
-     * Runs all static analysis tests required by the tick
+     * Runs all static analysis tests required by the tick if files are .java
      * @throws CheckstyleException	Thrown if Checkstyle fails to run
      * @throws IOException 			Thrown if creating/making temp files fails
      * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    private void runStaticTests(String commitId, WebInterface gitProxy, Status status) throws CheckstyleException, IOException, RepositoryNotFoundException    {
-        //get static tests from testingQueue
-        Map<StaticOptions, LinkedList<String>> staticTests = getStaticTestItems(this.testingQueue);
-        //run Static analysis on each test
-        for (Map.Entry<StaticOptions, LinkedList<String>> e : staticTests.entrySet()) {
-            delay(1000);
+    private void runStaticJavaTests(String commitId, WebInterface gitProxy, Status status) throws CheckstyleException, IOException, RepositoryNotFoundException    {
+        List<String> javaFiles = getStaticTestFiles(this.filesToTest, "java");
+    	List<File> fileList = new LinkedList<>();
+    	Map<String,String> filePathMap = new HashMap<>();
+    	//create temp files to run checkstyles on
+    	for(String file : javaFiles) {
+            log.debug("obtaining " + file + " version " + commitId + " from " + repoName + " to test");
+    	    String contents = gitProxy.getFile(Security.SecurityManager.getSecurityToken(), file, commitId, repoName);
+    	    log.debug("obtained file " + file + " version " + commitId + " from " + repoName + " to test");
+    	       
+    	    String fileName = file.substring(0,file.lastIndexOf("."));
+    	        
+    	    File javaFile = File.createTempFile(fileName,".java"); 
+    	    log.info("file temporarily stored at: " + javaFile.getAbsolutePath());
+    	
+    	    //write string to temp file
+    	    log.info("writing data to " + javaFile.getAbsolutePath());
+    	    FileOutputStream output = new FileOutputStream(javaFile.getAbsolutePath());
+    	    byte[] bytes = contents.getBytes();
+    	    output.write(bytes);
+    	    output.flush();
+    	    output.close();
+    	    log.info("Data transferred to " + javaFile.getAbsolutePath());
+    	        
+    	    if (javaFile.exists()){
+    	        fileList.add(javaFile);
+    	        filePathMap.put(javaFile.getAbsolutePath(),file);
+    	    }
+    	    else {
+    	     	log.warn("could not find file " + javaFile.getAbsolutePath());
+    	        throw new IOException("Could not find file: " + file);
+    	    }
+      	}
+    	
+        //run static analysis on each file
+        for (StaticOptions o : this.testingQueue) {
+            delay(ConfigurationLoader.getConfig().getTestDelay());
             status.addProgress();
-            runStaticAnalysis(e.getKey(), e.getValue(), commitId, gitProxy);
+            runStaticAnalysis(o, fileList, commitId, filePathMap);
+        }
+        
+        //try to delete all the temp files that were created
+        for (File javaFile : fileList) {
+	        if( javaFile.delete()) {
+	            log.info("Deleted temp file: " + javaFile.getAbsolutePath());
+	        }
+	        else {
+	            log.warn("Failed to delete temp file: " + javaFile.getAbsolutePath());
+	        }
         }
     }
 
     /**
-     * Extracts only the tests with .java extensions from the testing queue
-     * @param testingQueue   Map from which to extract .java tests
-     * @return               Map containing only .java tests
+     * Extracts only the tests with .{ext} extensions for the static checks
+     * @param files   	list of files from the corresponding repo
+     * @param ext		extension used to filter the files to the ones required to be tested statically
+     * @return          List containing only .{ext} files
      */
-    public HashMap<String, LinkedList<String>> getDynamicTestItems(Map<String, LinkedList<String>> testingQueue)
+    public List<String> getStaticTestFiles(List<String> files, String ext)
     {
-        HashMap<String, LinkedList<String>> mapReturn = new HashMap<>();
-        for (Map.Entry<String, LinkedList<String>> e : testingQueue.entrySet()) {
-            if ("java".equals(FilenameUtils.getExtension(e.getKey()))) {
-                mapReturn.put(e.getKey(), e.getValue());
+        List<String> toReturn = new LinkedList<>();
+        for (String s : files) {
+        	//TODO check this is right
+            if (s.substring(s.length() - (ext.length())).equals(ext)) {
+                toReturn.add(s);
             }
         }
-        return mapReturn;
-    }
-
-    /**
-     * Extracts only the tests with .xml extensions from the testing queue
-     * @param testingQueue   Map from which to extract .xml tests
-     * @return               Map containing only .xml tests
-     */
-    public HashMap<StaticOptions, LinkedList<String>> getStaticTestItems(Map<ITestSetting, LinkedList<String>> testingQueue)
-    {
-        HashMap<StaticOptions, LinkedList<String>> mapReturn = new HashMap<>();
-        for (Map.Entry<ITestSetting, LinkedList<String>> e : testingQueue.entrySet()) {
-            if (e.getKey().getClass() == StaticOptions.class) {
-                mapReturn.put((StaticOptions) e.getKey(), e.getValue());
-            }
-        }
-        return mapReturn;
+        return toReturn;
     }
 
     /**
@@ -269,8 +309,8 @@ public class Tester {
      * @throws IOException 			Thrown if creating/making temp files fails
      * @throws RepositoryNotFoundException 		Thrown by git API
      */
-    public void runStaticAnalysis(StaticOptions configFileName, List<String> fileNames, String commitId, WebInterface gitProxy) throws CheckstyleException, IOException, RepositoryNotFoundException {
-           StaticParser.test(configFileName, fileNames, report, repoName, commitId, gitProxy);
+    public void runStaticAnalysis(StaticOptions configFileName, List<File> fileNames, String commitId, Map<String,String> filePathMap) throws CheckstyleException, IOException, RepositoryNotFoundException {
+           StaticParser.test(configFileName, fileNames, report, repoName, commitId, filePathMap);
     }
 
     //GETTERS
