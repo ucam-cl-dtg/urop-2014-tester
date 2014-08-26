@@ -38,9 +38,7 @@ public class Main {
 		
 		ResteasyClient rc = new ResteasyClientBuilder().build();
 		ResteasyWebTarget forTester = rc.target("http://localhost:8080/TestingSystem/rest");
-		ITestService proxy = forTester.proxy(ITestService.class);	
-		
-		
+		ITestService proxy = forTester.proxy(ITestService.class);
 	}
 	
 	public static String getCode(String file) throws FileNotFoundException, URISyntaxException {
