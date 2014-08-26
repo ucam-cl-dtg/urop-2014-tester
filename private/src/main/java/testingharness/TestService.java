@@ -98,9 +98,9 @@ public class TestService implements ITestService {
 
 	    ResteasyClient rc2 = new ResteasyClientBuilder().build();
 	    
-	    ResteasyWebTarget forTester = rc2.target(ConfigurationLoader.getConfig().getTesterPath());
-	    testerProxyTest = forTester.proxy(TestsApi.class);	    
-        log.debug("TestService initialised");
+//	    ResteasyWebTarget forTester = rc2.target(ConfigurationLoader.getConfig().getTesterPath());
+//	    testerProxyTest = forTester.proxy(TestsApi.class);	    
+//        log.debug("TestService initialised");
     }
 
     /** {@inheritDoc} */

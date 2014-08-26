@@ -13,6 +13,7 @@ public class MyExecutor {
 	private static final BlockingQueue<Runnable> waitingQueue = new LinkedBlockingQueue<>();
 	
 	public static ExecutorService newFixedThreadPool(int nThreads) {
+        System.out.println(nThreads);
 	    return new ThreadPoolExecutor(nThreads, nThreads,
 	                                  0L, TimeUnit.MILLISECONDS,
 	                                  waitingQueue);
