@@ -2,7 +2,7 @@
 	<module name="TreeWalker">
 		<!-- checks that the catch default is last -->
 		<module name="DefaultComesLast">
-			<message key="default.comes.last" value="Switch default label is not last ~ putting the default label at the end of a switch statement is recommended practice" />
+			<message key="default.comes.last" value="Switch default label is not last." />
 			<property name="severity" value="warning" />
 		</module>			
 	</module>

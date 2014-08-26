@@ -2,7 +2,7 @@
 	<!-- check for presence of TODO or FIXME in comments -->
 	<module name="RegexpSingleline">
 	    <property name="format" value="((//.*)|(\*.*))((TO|to|To)\-*(DO|do|Do)|FIXME|fixme|FixMe|Fixme)" />
-	    <property name="message" value="TODO or FIXME found in comment"/>
+	    <property name="message" value="TODO or FIXME found in comment."/>
 	</module>
 </module>
 	

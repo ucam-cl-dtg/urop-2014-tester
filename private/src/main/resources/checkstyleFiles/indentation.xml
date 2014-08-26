@@ -6,8 +6,8 @@
 			<property name="basicOffset"     value="4"/>  <!-- Number of spaces to take as equivalent to tab. Set to tab is equivalent to 4 spaces -->
 			<property name="braceAdjustment" value="0"/>  <!-- Checks that open braces which are moved to next line are not indented-->
 			<property name="throwsIndent"    value="4"/>  <!-- Checks that throws statements which are moved to next line are exactly one indentation level in-->
-			<message key="indentation.error"       value="Bad indentation ~ expected ''{2}'' spaces, found ''{1}''" />
-			<message key="indentation.child.error" value="Bad indentation ~ expected ''{2}'' spaces, found ''{1}''" /> <!-- I have no idea why I need this -->
+			<message key="indentation.error"       value="Bad indentation (expected ''{2}'' spaces, found ''{1}'')." />
+			<message key="indentation.child.error" value="Bad indentation (expected ''{2}'' spaces, found ''{1}'')." /> <!-- I have no idea why I need this -->
 			<property name="severity" value="warning" />
 		</module>
 	</module>

@@ -2,9 +2,9 @@
 	<module name="TreeWalker">
 		<!-- Checks for redundant import statements. An import is redundant if it is duplicated, in the same package, or imports java.lang -->
 		<module name="RedundantImport">
-			<message key="import.duplicate" value="Duplicate import ~ ''{1}'' already imported in line ''{0}''" />
-			<message key="import.lang"      value="Unnecessary import ~ java.lang is imported automatically" />
-			<message key="import.same"      value="Unnecessary import ~ ''{0}'' is imported automatically because it is in the same package"/>
+			<message key="import.duplicate" value="Duplicate import: ''{1}'' already imported in line ''{0}''." />
+			<message key="import.lang"      value="Unnecessary import: java.lang is imported automatically." />
+			<message key="import.same"      value="Unnecessary import: ''{0}'' is imported automatically because it is in the same package."/>
 			<property name="severity" value="warning" />
 		</module>
 	</module>

@@ -3,7 +3,7 @@
     	<!-- Checks that there is no whitespace after . ++ - - ! ~ -->
     	<module name="NoWhitespaceAfter">
     		<property name="tokens" value="DOT, INC, DEC, LNOT, BNOT" />
-    		<message  key ="ws.followed" value="Succeeding whitespace ~ ''{0}'' should not be followed by whitespace" />
+    		<message  key ="ws.followed" value="''{0}'' should not be followed by whitespace." />
     		<property name="severity" value="warning" />
     	</module>
 	</module>

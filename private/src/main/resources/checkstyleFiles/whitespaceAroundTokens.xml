@@ -9,8 +9,8 @@
         			LITERAL_SYNCHRONIZED, LITERAL_TRY, LITERAL_WHILE, LOR, LT, MINUS,
         			MINUS_ASSIGN, MOD, MOD_ASSIGN, NOT_EQUAL, PLUS, PLUS_ASSIGN, QUESTION,
         			SL, SL_ASSIGN, SR_ASSIGN, STAR, STAR_ASSIGN"/>
-        	<message key="ws.notPreceded" value="Operator whitespace ~ ''{0}'' should be preceded with whitespace" />
-        	<message key="ws.notFollowed" value="Operator whitespace ~ ''{0}'' should be followed with whitespace" />
+        	<message key="ws.notPreceded" value="Operator whitespace: ''{0}'' should be preceded with whitespace." />
+        	<message key="ws.notFollowed" value="Operator whitespace: ''{0}'' should be followed with whitespace." />
       		<property name="severity" value="warning" />
     	</module>
 	</module>
