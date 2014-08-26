@@ -15,11 +15,16 @@ import publicinterfaces.StaticOptions;
 public class ListWrapper {
     private String tickId;
     private List<StaticOptions> elements;
+    private String dynamicContainerId;
+    private String dynamicTestId;
 
     @JsonCreator
-    public ListWrapper(@JsonProperty("_id") String tickId, @JsonProperty("elements") List<StaticOptions> elements) {
+    public ListWrapper(@JsonProperty("_id") String tickId, @JsonProperty("elements") List<StaticOptions> elements,
+    		@JsonProperty("dynamicContainerId") String containerId,@JsonProperty("dynamicTestId") String testId) {
         this.tickId = tickId;
         this.elements = elements;
+        this.setDynamicContainerId(containerId);
+        this.setDynamicTestId(testId);
     }
 
     public ListWrapper() {}
@@ -41,4 +46,20 @@ public class ListWrapper {
     public void setTickId(String tickId) {
         this.tickId = tickId;
     }
+
+	public String getDynamicContainerId() {
+		return dynamicContainerId;
+	}
+
+	public void setDynamicContainerId(String dynamicContainerId) {
+		this.dynamicContainerId = dynamicContainerId;
+	}
+
+	public String getDynamicTestId() {
+		return dynamicTestId;
+	}
+
+	public void setDynamicTestId(String dynamicTestId) {
+		this.dynamicTestId = dynamicTestId;
+	}
 }

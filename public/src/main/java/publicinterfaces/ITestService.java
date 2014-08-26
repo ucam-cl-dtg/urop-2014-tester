@@ -6,7 +6,6 @@ import javax.ws.rs.core.Response;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -102,6 +101,8 @@ public interface ITestService {
      * already exists in the database, update its settings
      * @param tickId                Unique Id of the new test being created
      * @param checkstyleOpts        list containing xml files and settings for checkstyles
+     * @param containerId           forDynamicTests
+     * @param testId				for dynamic tests
      * @throws TestIDAlreadyExistsException       Thrown when the tickId supplied has been used before in
      * 											  the database, but something went wrong and the files
      * 											  aren't stored so add to database is called instead
@@ -113,7 +114,8 @@ public interface ITestService {
     @POST
     @Path("/{tickId}/create")
     @Consumes("application/json")
-	public Response createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts);
+	public Response createNewTest(@PathParam("tickId") String tickId,  List<StaticOptions> checkstyleOpts, 
+			 @QueryParam("containerId") String containerId,  @QueryParam("testId") String testId);
 
     //TODO: REMOVE?
     @GET
@@ -126,7 +128,7 @@ public interface ITestService {
      */
     @GET
     @Path("/testFiles")
-    public Response getTestFiles();
+    public TickSettings getTestFiles();
     
     /**
      * returns all static test settings that are available for the specified tick (for updating purposes)
@@ -136,7 +138,7 @@ public interface ITestService {
      */
     @GET
     @Path("{tickId}/testFiles")
-    public Response getTestFiles(@PathParam("tickId") String tickId) throws TestIDNotFoundException;
+    public TickSettings getTestFiles(@PathParam("tickId") String tickId) throws TestIDNotFoundException;
     
     /**
      * Allows ticker to pass/fail a student's tick by adding a tickerResult and tickerComment to one of their
@@ -158,6 +160,10 @@ public interface ITestService {
     		 	@QueryParam("commitId") String commitId, @QueryParam("date") long date) 
     				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
 
+    @GET
+    @Path("/unitTests")
+    public Response getAvailableDynamicTests();
+    
     //TODO: cancel test
     //@DELETE
     //@Path("/{crsid}/{tickid}/running")

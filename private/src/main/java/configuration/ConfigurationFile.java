@@ -4,19 +4,21 @@ import java.util.Map;
 
 public class ConfigurationFile {
     private String gitAPIPath;
+    private String testerPath;
     private String checkstyleResourcesPath;
     private String mongoHost;
     private String mongoReportDBName;
     private String databaseTestsPath;
     private String mongoUsersCollectionName;
-    private String mongoXMLSettingsCollectionName;
+    private String mongoTickSettingsCollectionName;
     private int mongoPort;
     private Map<String,Integer> xmlTestSettings;
 	private Map<String, String> xmlTestReadable;
 	private String filePath;
 	private String header;
 	private int threadNumber;
-    
+	private String repoTemplate;
+	
     public String getGitAPIPath()
     {
         return gitAPIPath;
@@ -69,16 +71,8 @@ public class ConfigurationFile {
 		this.databaseTestsPath = databaseTestsPath;
 	}
 
-    public String getMongoXMLSettingsCollectionName() {
-        return mongoXMLSettingsCollectionName;
-    }
-
     public String getMongoUsersCollectionName() {
         return mongoUsersCollectionName;
-    }
-
-    public void setMongoXMLSettingsCollectionName(String mongoXMLSettingsCollectionName) {
-        this.mongoXMLSettingsCollectionName = mongoXMLSettingsCollectionName;
     }
 
     public void setMongoUsersCollectionName(String mongoUsersCollectionName) {
@@ -123,6 +117,31 @@ public class ConfigurationFile {
 
 	public void setThreadNumber(int threadNumber) {
 		this.threadNumber = threadNumber;
+	}
+
+	public String getTesterPath() {
+		return testerPath;
+	}
+
+	public void setTesterPath(String testerPath) {
+		this.testerPath = testerPath;
+	}
+
+	public String getMongoTickSettingsCollectionName() {
+		return mongoTickSettingsCollectionName;
+	}
+
+	public void setMongoTickSettingsCollectionName(
+			String mongoTickSettingsCollectionName) {
+		this.mongoTickSettingsCollectionName = mongoTickSettingsCollectionName;
+	}
+
+	public String getRepoTemplate() {
+		return repoTemplate;
+	}
+
+	public void setRepoTemplate(String repoTemplate) {
+		this.repoTemplate = repoTemplate;
 	}
 	
 }

@@ -2,7 +2,7 @@ package testingharness;
 
 import database.Mongo;
 import database.MongoDBReportManager;
-import database.MongoDBXMLTestsManager;
+import database.MongoDBTestsManager;
 
 import org.apache.commons.io.FilenameUtils;
 import org.jboss.resteasy.client.jaxrs.ResteasyClient;
@@ -11,12 +11,9 @@ import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.puppycrawl.tools.checkstyle.Main;
-
 import configuration.ConfigurationLoader;
 import privateinterfaces.IDBReportManager;
-import privateinterfaces.IDBXMLTestsManager;
-import publicinterfaces.FailedToMakeTestException;
+import privateinterfaces.IDBTestsManager;
 import publicinterfaces.ITestService;
 import publicinterfaces.ITestSetting;
 import publicinterfaces.NoCommitsToRepoException;
@@ -24,28 +21,29 @@ import publicinterfaces.NoSuchTestException;
 import publicinterfaces.Report;
 import publicinterfaces.ReportNotFoundException;
 import publicinterfaces.ReportResult;
-import publicinterfaces.Severity;
 import publicinterfaces.StaticOptions;
 import publicinterfaces.Status;
 import publicinterfaces.TestIDAlreadyExistsException;
 import publicinterfaces.TestIDNotFoundException;
 import publicinterfaces.TestStillRunningException;
 import publicinterfaces.TickNotInDBException;
+import publicinterfaces.TickSettings;
 import publicinterfaces.UserNotInDBException;
 import threadcontroller.MyExecutor;
 import threadcontroller.TesterThread;
+import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
+import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestNotFoundException;
+import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestInfo;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -55,12 +53,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 /**
  * Implementation of the interface ITestService
  * 
@@ -75,8 +70,9 @@ public class TestService implements ITestService {
     private static final ExecutorService threadExecutor = MyExecutor.newFixedThreadPool(ConfigurationLoader.getConfig().getThreadNumber());
     // private static final ExecutorService threadExecutor = Executors.newFixedThreadPool(ConfigurationLoader.getConfig().getThreadNumber());
     private static final IDBReportManager dbReport = new MongoDBReportManager(Mongo.getDb());
-    private static final IDBXMLTestsManager dbXMLTests = new MongoDBXMLTestsManager(Mongo.getDb());
+    private static final IDBTestsManager dbTicks = new MongoDBTestsManager(Mongo.getDb());
     private WebInterface gitProxy;
+    private TestsApi testerProxyTest;
     private static final ConcurrentMap<String, TesterThread> ticksInProgress = new ConcurrentHashMap<>();
 
     public static ConcurrentMap<String, TesterThread> getTicksInProgress() {
@@ -84,13 +80,17 @@ public class TestService implements ITestService {
 	}
 
     public TestService() {
-        log.debug("Initialising TestService (including proxy to git service)");
+        log.info("Initialising TestService (including proxy to git service)");
 
 	    ResteasyClient rc = new ResteasyClientBuilder().build();
 	    
 	    ResteasyWebTarget forGit = rc.target(ConfigurationLoader.getConfig().getGitAPIPath());
 	    gitProxy = forGit.proxy(WebInterface.class);
 
+	    ResteasyClient rc2 = new ResteasyClientBuilder().build();
+	    
+	    ResteasyWebTarget forTester = rc2.target(ConfigurationLoader.getConfig().getTesterPath());
+	    testerProxyTest = forTester.proxy(TestsApi.class);	    
         log.debug("TestService initialised");
     }
 
@@ -121,16 +121,18 @@ public class TestService implements ITestService {
         log.debug(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
 
         for (String file : fileListFromGit) {
+        	//TODO: add check for other types of file eg .c etc
            if (FilenameUtils.getExtension(file).equals("java"))
             {
                 log.debug(crsId + " " + tickId + " " + commitId + ": Adding java file to test: " + file);
                 filesToTest.add(file);
             }
         }
-        log.debug(crsId + " " + tickId + " " + commitId + ": all java files loaded");
+        
+        log.debug(crsId + " " + tickId + " " + commitId + ": all files loaded");
         //obtain static tests to run on files according to what tick it is
         log.debug(crsId + " " + tickId + " " + commitId + ": Loading test settings for tickId");
-        List<StaticOptions> staticTests = dbXMLTests.getTestSettings(tickId);
+        List<StaticOptions> staticTests = dbTicks.getTestSettings(tickId);
     	
         for (StaticOptions test : staticTests) {
         	if (test.getCheckedIndex() != 0) {
@@ -143,7 +145,7 @@ public class TestService implements ITestService {
         // create a new Tester object
         final Tester tester = new Tester(tests, repoName, commitId);
 
-        TesterThread thread = new TesterThread(tester, crsId, tickId, commitId, gitProxy);
+        TesterThread thread = new TesterThread(tester, crsId, tickId, commitId, gitProxy, testerProxyTest);
         
         // add the object to the list of in-progress tests atomically
         //this key should be unique as they shouldn't be able to run the same tests more than once
@@ -228,21 +230,22 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
     @Override
-	public Response createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts) {
-    	log.debug("creating new test with tickId: " + tickId);
+	public Response createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts, String containerId, String testId) {
+    	log.info("creating new test with tickId: " + tickId);
     	try {
-    		TestService.dbXMLTests.addNewTest(tickId, checkstyleOpts);
-    		log.debug("XMLSettings created for tickId: " + tickId);
+    		TestService.dbTicks.addNewTest(tickId, checkstyleOpts , containerId , testId);
+    		log.info("Settings created for tickId: " + tickId);
     		return Response.ok().build();
     	}
     	catch (TestIDAlreadyExistsException e1) {
     		try {
-	    		TestService.dbXMLTests.update(tickId, checkstyleOpts);
-	    		log.debug("Updated XMLSettings for tickId: " + tickId);
+	    		TestService.dbTicks.update(tickId, checkstyleOpts , containerId , testId);
+	    		log.info("Updated settings for tickId: " + tickId);
 	    		return Response.ok().build();
     		}
     		catch (TestIDNotFoundException e2) {
-    			return Response.status(418).build();
+    			System.out.println("Error");
+    			return Response.status(500).entity(e2).build();
     			//should never happen!
     		}
     	}
@@ -252,8 +255,8 @@ public class TestService implements ITestService {
     	return TestService.dbReport;
     }
     
-    public static IDBXMLTestsManager getTestsDatabase() {
-    	return TestService.dbXMLTests;
+    public static IDBTestsManager getTestsDatabase() {
+    	return TestService.dbTicks;
     }
 
     /** {@inheritDoc} */
@@ -270,12 +273,12 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
 	@Override
-	public Response getTestFiles() {
+	public TickSettings getTestFiles() {
 	    log.debug("request received to get default java style settings");
+	    TickSettings settingsToReturn  = new TickSettings();
 		List<StaticOptions> toReturn = new LinkedList<>();
 		try {
 			URI dir = (TestService.class.getClassLoader().getResource("checkstyleFiles")).toURI();
-			System.out.println(dir);
 			File path = new File(dir);
 			String[] files = path.list();
 			File[] filesToRead = path.listFiles();
@@ -303,13 +306,14 @@ public class TestService implements ITestService {
 	               						fileContents));
 	            i++;
 			}
+			settingsToReturn.setCheckstylesFiles(toReturn);
 		} catch (URISyntaxException e) {
 			// this should never happen
 			e.printStackTrace();
 		}
 		finally {
-			log.debug("returning default tests poll status request received");
-			return Response.status(200).entity(toReturn).build();
+			log.debug("returning default tests");
+			return settingsToReturn;
 		} 
 	}
 
@@ -325,12 +329,22 @@ public class TestService implements ITestService {
 		log.debug("result set");
 	}
 
+	/** {@inheritDoc} */
 	@Override
-	public Response getTestFiles(String tickId) throws TestIDNotFoundException {
-		log.debug("get test files request received for " + tickId);
-		List<StaticOptions> toReturn = TestService.dbXMLTests.getTestSettings(tickId);
-		log.info("no of files found = " + toReturn.size());
-		return Response.status(200).entity(toReturn).build(); 
+	public TickSettings getTestFiles(String tickId) throws TestIDNotFoundException {
+		log.info("get test files request received for " + tickId);
+		List<StaticOptions> toReturn = TestService.dbTicks.getTestSettings(tickId);
+		if (toReturn != null) {
+			log.info("no of checkstyle settings found = " + toReturn.size());
+		}
+		else {
+			log.info("no checkstyle settings found for " + tickId);
+		}
+		String testId = TestService.dbTicks.getTestId(tickId);
+		log.info("testId found for " + tickId + ", creating object...");
+		TickSettings settings = new TickSettings(toReturn , testId);
+		log.info("returning object...");
+		return settings; 
 	}
 	
 	public int getQueuePosition(String crsId, String tickId) {
@@ -344,5 +358,30 @@ public class TestService implements ITestService {
 	           i++;
 	        }
 	    return 0;
+	}
+
+	@Override
+	public Response getAvailableDynamicTests() {
+		log.info("request for dynamic tests recieved");
+		List<TestInfo> tests =  null;
+		try {
+			log.info("accessing dynamic API");
+			try {
+				tests = testerProxyTest.listTests();
+			} catch (InternalServerErrorException e) {
+				System.err.println(e.getResponse().getEntity());
+			}
+			if(tests != null) {
+				log.info(tests.size() + " tests found, returning");
+				return Response.status(200).entity(tests).build();
+			}
+			else{
+				log.info("no available dynamic tests found");
+				return Response.status(200).entity(tests).build();
+			}
+		} catch (TestNotFoundException e) {
+			// TODO how to handle??? - error should probably be thrown
+			return Response.status(500).entity(e).build();
+		}	
 	}
 }

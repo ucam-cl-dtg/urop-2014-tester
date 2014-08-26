@@ -4,8 +4,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import publicinterfaces.Status;
+import publicinterfaces.TestIDNotFoundException;
 import testingharness.TestService;
 import testingharness.Tester;
+import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 public class TesterThread implements Runnable {
@@ -16,29 +18,36 @@ public class TesterThread implements Runnable {
 	private String commitId;
 	private WebInterface gitProxy;
 	private Status status = null;
+	private TestsApi testerProxyTest;
+	/* to access Andy's dynamic tests */
+	private String containerId;
+	private String testId;
 	
-	public TesterThread(Tester tester, String crsId, String tickId, String commitId, WebInterface gitProxy) {
+	public TesterThread(Tester tester, String crsId, String tickId, String commitId, WebInterface gitProxy, TestsApi testerProxyTest) throws TestIDNotFoundException {
 		this.tester = tester;
 		this.crsId = crsId;
 		this.tickId = tickId;
 		this.commitId = commitId;
 		this.gitProxy = gitProxy;
-		log.debug(crsId + " " + tickId + " " + commitId + ": Thread created");
+		this.testerProxyTest = testerProxyTest;
+		this.containerId = TestService.getTestsDatabase().getContainerId(tickId);
+		this.testId = TestService.getTestsDatabase().getTestId(tickId);
+		log.info(crsId + " " + tickId + " " + commitId + ": Thread created");
 	}
 
 	@Override
 	public void run() {
 		if(this.status == null) {
-			log.debug(crsId + " " + tickId + " " + commitId + ": Test was put straight in pool, creating status");
+			log.info(crsId + " " + tickId + " " + commitId + ": Test was put straight in pool, creating status");
 			this.status = new Status();
 		}
-		log.debug(crsId + " " + tickId + " " + commitId + ": Thread starting to run");
-		tester.runTests(crsId, tickId, commitId,gitProxy,status);
-		log.debug(crsId + " " + tickId + " " + commitId + ": Tests finished in thread");
-        assert TestService.getTicksInProgress().containsKey(crsId + tickId);
-        log.debug(crsId + " " + tickId + " " + commitId + ": removing thread from current active threads");
-        TestService.getTicksInProgress().remove(crsId + tickId);
-        log.debug(crsId + " " + tickId + " " + commitId + ": Thread removed");
+		log.info(crsId + " " + tickId + " " + commitId + ": Thread starting to run");
+		tester.runTests(crsId, tickId, commitId,gitProxy,status,testerProxyTest,containerId,testId);
+		log.info(crsId + " " + tickId + " " + commitId + ": Tests finished in thread");
+	    assert TestService.getTicksInProgress().containsKey(crsId + tickId);
+	    log.info(crsId + " " + tickId + " " + commitId + ": removing thread from current active threads");
+	    TestService.getTicksInProgress().remove(crsId + tickId);
+	    log.info(crsId + " " + tickId + " " + commitId + ": Thread removed");
 	}
 
 	public String getCrsId() {

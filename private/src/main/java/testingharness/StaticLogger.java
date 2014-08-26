@@ -7,8 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import publicinterfaces.Report;
 import publicinterfaces.CategoryNotInReportException;
-import publicinterfaces.Report;
-import publicinterfaces.ReportResult;
 import publicinterfaces.Severity;
 import publicinterfaces.StaticOptions;
 

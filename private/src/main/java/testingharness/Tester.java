@@ -2,15 +2,27 @@ package testingharness;
 
 import com.puppycrawl.tools.checkstyle.api.CheckstyleException;
 
+import configuration.ConfigurationLoader;
+
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import publicinterfaces.CategoryNotInReportException;
 import publicinterfaces.ITestSetting;
 import publicinterfaces.Report;
 import publicinterfaces.ReportResult;
+import publicinterfaces.Severity;
 import publicinterfaces.StaticOptions;
 import publicinterfaces.Status;
+import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
+import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.GitRepositoryCloneException;
+import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.InvalidNameException;
+import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestInstanceNotFoundException;
+import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestNotFoundException;
+import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestInstance;
+import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestStep;
+import uk.ac.cam.cl.dtg.teaching.exceptions.SerializableException;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
@@ -36,7 +48,7 @@ public class Tester {
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
     private Map<ITestSetting, LinkedList<String>> testingQueue;
-
+    private boolean dynamicPass;
 
     /**
      * Creates a new Tester
@@ -51,34 +63,43 @@ public class Tester {
      * Runs all tests required by the tick on all files required to be tested by the tick.
      * Note: only runs static analysis if dynamic analysis succeeded
      */
-    public void runTests(String crsId, String tickId, String commitId, WebInterface gitProxy, Status status)
+    public void runTests(String crsId, String tickId, String commitId, WebInterface gitProxy, Status status, TestsApi testerProxyTest, String dynamicContainerId, String dynamicTestId)
     {
-        log.debug(crsId + " " + tickId + " " + commitId + ": Tick analysis started");	     
+        log.info(crsId + " " + tickId + " " + commitId + ": Tick analysis started");	     
 
         try {
-            int noOfTests = testingQueue.size();
-            report.setNoOfTests(noOfTests);
+            int noOfTests = testingQueue.size()+2;
+            report.setNoOfTests(noOfTests+2);
             status.setCurrentPositionInQueue(0);
-            status.setMaxProgress(noOfTests + 1);
+            status.setMaxProgress(noOfTests + 3);
             status.setInfo("Loading tests");            
             
-            log.debug(crsId + " " + tickId + " " + commitId + ": Running dynamic tests");
-            runDynamicTests();
-            log.debug(crsId + " " + tickId + " " + commitId + ": Dynamic tests complete");
+            String repo = ConfigurationLoader.getConfig().getRepoTemplate() + crsId + "/" + tickId.replace(',', '/');
             
-            if (dynamicPass())
+            if (dynamicContainerId != null && dynamicTestId != null) {
+            	log.info(crsId + " " + tickId + " " + commitId + ": Running dynamic tests");
+            	runDynamicTests(testerProxyTest,crsId,tickId,dynamicContainerId,dynamicTestId,status,repo);
+            	log.info(crsId + " " + tickId + " " + commitId + ": Dynamic tests complete");
+            }
+            //TODO: will need to fill in checkstyles error bit
+            else {
+            	log.info(crsId + " " + tickId + " " + commitId + ": No dynamic tests specified");
+            	dynamicPass = true;
+            }
+            
+            if (dynamicPass)
             {
-            	log.debug(crsId + " " + tickId + " " + commitId + ": Running static checks");
+            	log.info(crsId + " " + tickId + " " + commitId + ": Running static checks");
                 runStaticTests(commitId,gitProxy,status);
-                log.debug(crsId + " " + tickId + " " + commitId + ": Static checks complete");
+                log.info(crsId + " " + tickId + " " + commitId + ": Static checks complete");
             }  
             else {
-            	log.debug(crsId + " " + tickId + " " + commitId + ": Dynamic tests failed");
+            	log.info(crsId + " " + tickId + " " + commitId + ": Dynamic tests failed");
             }
             
             report.calculateProblemStatuses();
 
-            log.debug("Tick analysis finished successfully");
+            log.info("Tick analysis finished successfully");
         }	
         catch (CheckstyleException | IOException | RepositoryNotFoundException e)
         {
@@ -102,17 +123,95 @@ public class Tester {
     /**
      * Runs all dynamic analysis tests required by the tick
      */
-    private void runDynamicTests()
+    private void runDynamicTests(TestsApi testerProxyTest, String crsId, String tickId, String dynamicContainerId, String dynamicTestId, Status status, String repo)
     {
-    	/*
-        log.info("Started dynamic analysis");
-        Map<String, LinkedList<String>> dynamicTests = getDynamicTestItems(this.testingQueue);
-        //TODO: actually run some tests
+    	log.info(tickId + " " + crsId +": started dynamic analysis");
+        try {
+			TestInstance dynamicTest = testerProxyTest.startTest(crsId, dynamicContainerId, dynamicTestId, repo , "TODO: privateKey");
+			String dynamicTestStatus = testerProxyTest.getTestStatus(crsId, dynamicContainerId).getStatus();
+			int progress = 0;
+			status.setProgress(1);
+			status.setInfo("Compiling code");
+			//poll status
+			while(dynamicTestStatus.equals(TestInstance.STATUS_UNINITIALIZED) || dynamicTestStatus.equals(TestInstance.STATUS_STARTING) || dynamicTestStatus.equals(TestInstance.STATUS_RUNNING)) {
+				log.info(tickId + " " + crsId +": status poll");
+				dynamicTestStatus = testerProxyTest.getTestStatus(crsId, dynamicContainerId).getStatus();
+				progress = testerProxyTest.getTestStatus(crsId, dynamicContainerId).getResults().size();
+				if(progress != 1) {
+					status.setProgress(2);
+					status.setInfo("Running correctness tests");
+				}
+				delay(1000);
+			}
+			//test is finished, find result
+			if(status.equals(TestInstance.STATUS_FAILED)) {
+				log.info(tickId + " " + crsId +": failed dynamic tests");
+				dynamicPass = false;
+			}
+			else {
+				dynamicPass = true;
+				log.info(tickId + " " + crsId +": passed dynamic tests");
+			}
+			log.info(tickId + " " + crsId +": putting dynamic test results in report");
+			unpackResults(dynamicTest.getException(),dynamicTest.getResults());
+			testerProxyTest.removeTest(crsId, dynamicContainerId);
+        } 
+        catch (GitRepositoryCloneException | InvalidNameException | TestNotFoundException | TestInstanceNotFoundException e) {
+        	log.error("Dynamic analysis failed. Exception message: " + e.getMessage());
+            report.setTestResult(ReportResult.UNDEFINED);
+            failCause = e;
+		}
         log.info("Dynamic analysis complete");
-        */
     }
 
-    /**
+    private void unpackResults(SerializableException exception,List<TestStep> results) {
+		if (exception == null) {
+			//tests ran successfully so put results in report
+			log.info("There was no exception from the tester, writing report as normal");
+			for(TestStep result: results) {
+				log.info("Adding " + result.getName());
+				if(result.getStatus().equals(TestStep.STATUS_FAIL)){
+					log.info(result.getName() + " result = error");
+					report.addProblem(result.getName() , Severity.ERROR);
+				}
+				else if(result.getStatus().equals(TestStep.STATUS_WARNING)) {
+					log.info(result.getName() + " result = warning");
+					report.addProblem(result.getName() , Severity.WARNING);
+				}
+				else {
+					log.info(result.getName() + " result = pass");
+					report.addProblem(result.getName() , Severity.WARNING);
+					//passed so don't add details and move on to next one
+					break;
+				}
+				log.info(result.getName() + " writing details for warning/error");
+				String message = "";
+				for(String m : result.getMessages()){
+					message += m + "\n";
+				}
+				message += "Expected result: " + result.getExpected() + "\n";
+				message += "Obtained result: " + result.getActual() + "\n";
+				try {
+					report.addDetail(result.getName() , result.getFileName(), (int) result.getStartLine(), message);
+				} 
+				catch (CategoryNotInReportException e) {
+					// TODO Auto-generated catch block
+					//should never be called
+					log.error("category not found in report");
+					e.printStackTrace();
+				}
+			}
+		}
+		else {
+			//there was an exception so put what went wrong in report
+			log.info("Dynamic tester threw an exception, see comment in report for details");
+			report.setTestResult(ReportResult.UNDEFINED);
+			report.setTickerComments(exception.getMessage());
+			dynamicPass = false;
+		}
+	}
+
+	/**
      * Runs all static analysis tests required by the tick
      * @throws CheckstyleException	Thrown if Checkstyle fails to run
      * @throws IOException 			Thrown if creating/making temp files fails
@@ -127,16 +226,6 @@ public class Tester {
             status.addProgress();
             runStaticAnalysis(e.getKey(), e.getValue(), commitId, gitProxy);
         }
-    }
-
-    /**
-     * Check if all the dynamic tests were passed
-     * @return  true if all dynamic analysis tests were passed; false otherwise
-     */
-    private boolean dynamicPass()
-    {
-        //TODO
-        return true;
     }
 
     /**

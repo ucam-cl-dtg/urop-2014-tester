@@ -9,14 +9,14 @@ import publicinterfaces.TestIDNotFoundException;
 /**
  * @author kls82
  */
-public interface IDBXMLTestsManager {
+public interface IDBTestsManager {
 	/**
      * creates a new test and stores its settings for access later
      *
      * @param tickId	            unique Id of the tick being created
      * @param staticTestSettings    settings to insert into database
      */
-    public void addNewTest(String tickId, List<StaticOptions> staticTestSettings) throws TestIDAlreadyExistsException;
+    public void addNewTest(String tickId, List<StaticOptions> staticTestSettings, String containerId, String testId) throws TestIDAlreadyExistsException;
 
 	/**
      * edits an existing test if it is stored - if it is not found an exception is thrown
@@ -25,7 +25,7 @@ public interface IDBXMLTestsManager {
      * @param staticTestSettings            settings to insert into database
      * @throws TestIDNotFoundException		if testId doesn't exist
      */
-    public void update(String tickId, List<StaticOptions> staticTestSettings) throws TestIDNotFoundException;
+    public void update(String tickId, List<StaticOptions> staticTestSettings, String containerId, String testId) throws TestIDNotFoundException;
 
     /**
      * deletes an existing test if it is stored - if it is not found an exception is thrown
@@ -43,6 +43,10 @@ public interface IDBXMLTestsManager {
      * @throws TestIDNotFoundException		if testId doesn't exist
      */
     public List<StaticOptions> getTestSettings (String tickId) throws TestIDNotFoundException;
+
+	public String getContainerId(String tickId) throws TestIDNotFoundException;
+
+	public String getTestId(String tickId) throws TestIDNotFoundException;
     
     
 }
