@@ -1,5 +1,6 @@
 package testingharness;
 
+import Security.*;
 import com.puppycrawl.tools.checkstyle.Checker;
 import com.puppycrawl.tools.checkstyle.ConfigurationLoader;
 import com.puppycrawl.tools.checkstyle.PropertiesExpander;
@@ -48,9 +49,11 @@ public class StaticParser {
 
         //get .java files to test
         for (String file : files) {
-        	log.info("obtaining " + file + " version " + commitId + " from " + repoName + " to test");
-	        String contents = gitProxy.getFile(file, commitId, repoName);
-	        log.info("obtained file " + file + " version " + commitId + " from " + repoName + " to test");
+
+        	log.debug("obtaining " + file + " version " + commitId + " from " + repoName + " to test");
+	        String contents = gitProxy.getFile(Security.SecurityManager.getSecurityToken(), file, commitId, repoName);
+	        log.debug("obtained file " + file + " version " + commitId + " from " + repoName + " to test");
+	        
 	        String fileName = file.substring(0,file.lastIndexOf("."));
 	        
 	        File javaFile = File.createTempFile(fileName,".java"); 

@@ -1,7 +1,10 @@
 package testingharness;
 
+import Security.SecurityManager;
+import configuration.ConfigurationLoader;
 import database.Mongo;
 import database.MongoDBReportManager;
+
 import database.MongoDBTestsManager;
 
 import org.apache.commons.io.FilenameUtils;
@@ -29,6 +32,11 @@ import publicinterfaces.TestStillRunningException;
 import publicinterfaces.TickNotInDBException;
 import publicinterfaces.TickSettings;
 import publicinterfaces.UserNotInDBException;
+
+import privateinterfaces.IDBReportManager;
+import privateinterfaces.IDBTestsManager;
+import publicinterfaces.*;
+
 import threadcontroller.MyExecutor;
 import threadcontroller.TesterThread;
 import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
@@ -38,21 +46,22 @@ import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.core.Response;
 
+import javax.ws.rs.core.Response;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -96,13 +105,15 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
     @Override
-    public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
-                           @PathParam("repoName") String repoName)
-            throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException, NoCommitsToRepoException {
+    public String runNewTest(String securityToken, final String crsId, final String tickId, String repoName)
+            throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException,
+            NoCommitsToRepoException {
+        SecurityManager.validateSecurityToken(securityToken);
+
         log.debug(crsId + " " + tickId + ": Preparing test suite");
 
         log.debug(crsId + " " + tickId + ": Querying git API for SHA of head of repository: " + repoName);
-        final String commitId = gitProxy.resolveCommit(repoName, "HEAD");
+        final String commitId = gitProxy.resolveCommit(SecurityManager.getSecurityToken(), repoName, "HEAD");
         log.debug(crsId + " " + tickId + ": SHA for repository: " + repoName + " is " + commitId);
     	
         if (commitId == null) {
@@ -116,7 +127,7 @@ public class TestService implements ITestService {
         //collect files to test from git
         log.debug(crsId + " " + tickId + " " + commitId
                 + ": Connecting to git API to obtain list of files in repo");
-        List<String> fileListFromGit = gitProxy.listFiles(repoName , commitId);
+        List<String> fileListFromGit = gitProxy.listFiles(SecurityManager.getSecurityToken(), repoName , commitId);
         
         log.debug(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
 
@@ -169,8 +180,10 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
     @Override
-    public Status pollStatus(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Status pollStatus(String securityToken, String crsId, String tickId)
             throws NoSuchTestException {
+        SecurityManager.validateSecurityToken(securityToken);
+
         log.debug(crsId+ " " + tickId + ": poll status request received");
         //if the test is currently running then return its status from memory
         if (ticksInProgress.containsKey(crsId + tickId) && !ticksInProgress.get(crsId + tickId).getStatus().getInfo().equals("Complete")) {
@@ -199,39 +212,51 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
     @Override
-    public Report getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Report getLastReport(String securityToken, String crsId, String tickId)
             throws UserNotInDBException, TickNotInDBException {
+        SecurityManager.validateSecurityToken(securityToken);
+
         log.debug(crsId+ " " + tickId + ": get last report request received...");
         return  dbReport.getLastReport(crsId, tickId);
     }
 
     /** {@inheritDoc} */
     @Override
-    public List<Report> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public List<Report> getAllReports(String securityToken, String crsId, String tickId)
             throws UserNotInDBException, TickNotInDBException {
+        SecurityManager.validateSecurityToken(securityToken);
+
         log.debug(crsId+ " " + tickId + ": get all reports request received...");
         return dbReport.getAllReports(crsId, tickId);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void deleteStudentReportData(@PathParam("crsId") String crsId) throws UserNotInDBException {
+    public void deleteStudentReportData(String securityToken, String crsId)
+            throws UserNotInDBException {
+        SecurityManager.validateSecurityToken(securityToken);
+
     	log.debug(crsId + ": delete request received");
         dbReport.removeUserReports(crsId);
     }
 
     /** {@inheritDoc} */
     @Override
-    public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public void deleteStudentTick(String securityToken, String crsId, String tickId)
             throws TickNotInDBException, UserNotInDBException {
+        SecurityManager.validateSecurityToken(securityToken);
+
     	log.debug(crsId+ " " + tickId + ": delete request received");
         dbReport.removeUserTickReports(crsId, tickId);
     }
 
     /** {@inheritDoc} */
     @Override
-	public Response createNewTest(@PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts, String containerId, String testId) {
-    	log.info("creating new test with tickId: " + tickId);
+	public Response createNewTest(String securityToken, String tickId, List<StaticOptions> checkstyleOpts, String containerId, String testId) {
+        SecurityManager.validateSecurityToken(securityToken);
+
+    	log.debug("creating new test with tickId: " + tickId);
+
     	try {
     		TestService.dbTicks.addNewTest(tickId, checkstyleOpts , containerId , testId);
     		log.info("Settings created for tickId: " + tickId);
@@ -260,20 +285,10 @@ public class TestService implements ITestService {
     }
 
     /** {@inheritDoc} */
-    @Override
-    public void test() throws NoSuchTestException {
-        ResteasyClient rc = new ResteasyClientBuilder().build();
-
-        ResteasyWebTarget t = rc.target(configuration.ConfigurationLoader.getConfig().getGitAPIPath());
-        ITestService proxy = t.proxy(ITestService.class);
-
-        proxy.pollStatus("as2388", "tick-test");
-        System.out.println("done");
-    }
-
-    /** {@inheritDoc} */
 	@Override
-	public TickSettings getTestFiles() {
+	public TickSettings getTestFiles(String securityToken) {
+        SecurityManager.validateSecurityToken(securityToken);
+
 	    log.debug("request received to get default java style settings");
 	    TickSettings settingsToReturn  = new TickSettings();
 		List<StaticOptions> toReturn = new LinkedList<>();
@@ -319,8 +334,8 @@ public class TestService implements ITestService {
 
 	/** {@inheritDoc} */
 	@Override
-	public void setTickerResult(String crsid, String tickId,
-			ReportResult tickerResult, String tickerComments, String commitId, long date)
+	public void setTickerResult(String securityToken, String crsid, String tickId, ReportResult tickerResult,
+                                String tickerComments, String commitId, long date)
 			throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
 		log.debug("setting ticker result...");
 		Date d = new Date(date);
@@ -331,7 +346,9 @@ public class TestService implements ITestService {
 
 	/** {@inheritDoc} */
 	@Override
-	public TickSettings getTestFiles(String tickId) throws TestIDNotFoundException {
+	public TickSettings getTestFiles(String securityToken , String tickId) throws TestIDNotFoundException {
+		SecurityManager.validateSecurityToken(securityToken);
+		
 		log.info("get test files request received for " + tickId);
 		List<StaticOptions> toReturn = TestService.dbTicks.getTestSettings(tickId);
 		if (toReturn != null) {
@@ -361,7 +378,9 @@ public class TestService implements ITestService {
 	}
 
 	@Override
-	public Response getAvailableDynamicTests() {
+	public Response getAvailableDynamicTests(String securityToken) {
+		SecurityManager.validateSecurityToken(securityToken);
+		
 		log.info("request for dynamic tests recieved");
 		List<TestInfo> tests =  null;
 		try {

@@ -32,8 +32,10 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/{repoName}")
-    public String runNewTest(@PathParam("crsId") final String crsId, @PathParam("tickId") final String tickId,
-                           @PathParam("repoName") String repoName)
+    public String runNewTest(@QueryParam("securityToken") String securityToken,
+                             @PathParam("crsId") final String crsId,
+                             @PathParam("tickId") final String tickId,
+                             @PathParam("repoName") String repoName)
             throws IOException, TestStillRunningException, TestIDNotFoundException, RepositoryNotFoundException, NoCommitsToRepoException;
 
     /**
@@ -45,7 +47,9 @@ public interface ITestService {
      */
     @GET
     @Path("{crsId}/{tickId}/poll")
-    public Status pollStatus(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Status pollStatus(@QueryParam("securityToken") String securityToken,
+                             @PathParam("crsId") String crsId,
+                             @PathParam("tickId") String tickId)
             throws NoSuchTestException;
 
     /**
@@ -60,7 +64,9 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/last")
-    public Report getLastReport(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public Report getLastReport(@QueryParam("securityToken") String securityToken,
+                                @PathParam("crsId") String crsId,
+                                @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException;
 
     /**
@@ -73,7 +79,9 @@ public interface ITestService {
      */
     @GET
     @Path("/{crsId}/{tickId}/all")
-    public List<Report> getAllReports(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public List<Report> getAllReports(@QueryParam("securityToken") String securityToken,
+                                      @PathParam("crsId") String crsId,
+                                      @PathParam("tickId") String tickId)
             throws UserNotInDBException, TickNotInDBException;
     /**
      * Deletes all student reports for every tick they have done
@@ -82,7 +90,9 @@ public interface ITestService {
      */
     @DELETE
     @Path("/{crsId}")
-    public void deleteStudentReportData(@PathParam("crsId") String crsId) throws UserNotInDBException;
+    public void deleteStudentReportData(@QueryParam("securityToken") String securityToken,
+                                        @PathParam("crsId") String crsId)
+            throws UserNotInDBException;
 
     /**
      * Deletes all generated reports for a given user and one of their ticks
@@ -93,7 +103,9 @@ public interface ITestService {
      */
     @DELETE
     @Path("/{crsId}/{tickId}")
-    public void deleteStudentTick(@PathParam("crsId") String crsId, @PathParam("tickId") String tickId)
+    public void deleteStudentTick(@QueryParam("securityToken") String securityToken,
+                                  @PathParam("crsId") String crsId,
+                                  @PathParam("tickId") String tickId)
             throws TickNotInDBException, UserNotInDBException;
 
     /**
@@ -114,13 +126,9 @@ public interface ITestService {
     @POST
     @Path("/{tickId}/create")
     @Consumes("application/json")
-	public Response createNewTest(@PathParam("tickId") String tickId,  List<StaticOptions> checkstyleOpts, 
-			 @QueryParam("containerId") String containerId,  @QueryParam("testId") String testId);
-
-    //TODO: REMOVE?
-    @GET
-    @Path("/test")
-    public void test() throws NoSuchTestException;
+	public Response createNewTest(@QueryParam("securityToken") String securityToken,
+                                  @PathParam("tickId") String tickId, List<StaticOptions> checkstyleOpts,
+                                  @QueryParam("containerId") String containerId,  @QueryParam("testId") String testId);
 
     /**
      * returns all default static test settings that are available for tick setters to use
@@ -128,7 +136,7 @@ public interface ITestService {
      */
     @GET
     @Path("/testFiles")
-    public TickSettings getTestFiles();
+    public TickSettings getTestFiles(@QueryParam("securityToken") String securityToken);
     
     /**
      * returns all static test settings that are available for the specified tick (for updating purposes)
@@ -138,7 +146,9 @@ public interface ITestService {
      */
     @GET
     @Path("{tickId}/testFiles")
-    public TickSettings getTestFiles(@PathParam("tickId") String tickId) throws TestIDNotFoundException;
+    public TickSettings getTestFiles(@QueryParam("securityToken") String securityToken,
+                                 @PathParam("tickId") String tickId)
+            throws TestIDNotFoundException;
     
     /**
      * Allows ticker to pass/fail a student's tick by adding a tickerResult and tickerComment to one of their
@@ -155,14 +165,18 @@ public interface ITestService {
     @POST
     @Path("/{crsid}/{tickId}/set/tickerResult")
     @Consumes("application/json")
-    public void setTickerResult( @PathParam("crsid") String crsid , @PathParam("tickId") String tickId ,  
-    		 @QueryParam("tickerResult") ReportResult tickerResult, @QueryParam("tickerComments") String tickerComments,
-    		 	@QueryParam("commitId") String commitId, @QueryParam("date") long date) 
+    public void setTickerResult(@QueryParam("securityToken") String securityToken,
+                                @PathParam("crsid") String crsid ,
+                                @PathParam("tickId") String tickId ,
+    		                    @QueryParam("tickerResult") ReportResult tickerResult,
+                                @QueryParam("tickerComments") String tickerComments,
+    		 	                @QueryParam("commitId") String commitId,
+                                @QueryParam("date") long date)
     				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
 
     @GET
     @Path("/unitTests")
-    public Response getAvailableDynamicTests();
+    public Response getAvailableDynamicTests(@QueryParam("securityToken") String securityToken);
     
     //TODO: cancel test
     //@DELETE

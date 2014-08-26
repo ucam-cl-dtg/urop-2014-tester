@@ -18,7 +18,8 @@ public class ConfigurationFile {
 	private String header;
 	private int threadNumber;
 	private String repoTemplate;
-	
+    private String securityToken;
+ 
     public String getGitAPIPath()
     {
         return gitAPIPath;
@@ -118,7 +119,6 @@ public class ConfigurationFile {
 	public void setThreadNumber(int threadNumber) {
 		this.threadNumber = threadNumber;
 	}
-
 	public String getTesterPath() {
 		return testerPath;
 	}
@@ -143,6 +143,12 @@ public class ConfigurationFile {
 	public void setRepoTemplate(String repoTemplate) {
 		this.repoTemplate = repoTemplate;
 	}
-	
+    public String getSecurityToken() {
+        return securityToken;
+    }
+
+    public void setSecurityToken(String securityToken) {
+        this.securityToken = securityToken;
+    }
 }
 
