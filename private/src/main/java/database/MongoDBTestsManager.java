@@ -82,6 +82,7 @@ public class MongoDBTestsManager implements IDBTestsManager {
 	@Override
 	public List<StaticOptions> getTestSettings(String tickId) throws TestIDNotFoundException {
         log.info("Obtaining stylistic settings from db for tickId " + tickId);
+        System.out.println(testSettingsColl.findOneById(tickId));
         if (testSettingsColl.findOneById(tickId) == null) {
             log.warn("tickId " + tickId + " not found in database; throwing TestIDNotFoundException");
             throw new TestIDNotFoundException(tickId);

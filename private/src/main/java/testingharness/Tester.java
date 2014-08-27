@@ -16,12 +16,14 @@ import publicinterfaces.ReportResult;
 import publicinterfaces.Severity;
 import publicinterfaces.StaticOptions;
 import publicinterfaces.Status;
-import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
+//changed here
+import dynamictesting.TestsApi;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.GitRepositoryCloneException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.InvalidNameException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestInstanceNotFoundException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestNotFoundException;
-import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestInstance;
+//changed here
+import dynamictesting.TestInstance;
 import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestStep;
 import uk.ac.cam.cl.dtg.teaching.exceptions.SerializableException;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
@@ -34,6 +36,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
+import javax.ws.rs.InternalServerErrorException;
 
 /**
  * Runs all the static and dynamic analysis tests for a given tick, and produces a report,
@@ -79,7 +83,7 @@ public class Tester {
             status.setMaxProgress(noOfTests + 3);
             status.setInfo("Loading tests");            
             
-            String repo = ConfigurationLoader.getConfig().getRepoTemplate() + crsId + "/" + tickId.replace(',', '/');
+            String repo = ConfigurationLoader.getConfig().getRepoTemplate() + this.repoName + ".git";
             
             if (dynamicContainerId != null && dynamicTestId != null) {
             	log.info(crsId + " " + tickId + " " + commitId + ": Running dynamic tests");
@@ -103,9 +107,11 @@ public class Tester {
             	log.info(crsId + " " + tickId + " " + commitId + ": Dynamic tests failed");
             }
             
-            report.calculateProblemStatuses();
-
-            log.info("Tick analysis finished successfully");
+            if (this.failCause == null) {
+            	report.calculateProblemStatuses();
+            }
+            
+            log.info("Tick analysis finished");
         }	
         catch (CheckstyleException | IOException | RepositoryNotFoundException e)
         {
@@ -140,19 +146,40 @@ public class Tester {
 		}
     	log.info(tickId + " " + crsId +": started dynamic analysis");
         try {
-			TestInstance dynamicTest = testerProxyTest.startTest(crsId, dynamicContainerId, dynamicTestId, repo , privateKey);
-			String dynamicTestStatus = testerProxyTest.getTestStatus(crsId, dynamicContainerId).getStatus();
+        	/* String[] lines = privateKey.split("\n");
+        	String key = "";
+        	for (String line : lines) {
+        		if(!(line.equals("-----BEGIN RSA PRIVATE KEY-----")) && !(line.equals("-----END RSA PRIVATE KEY-----"))) {
+        			key += line;
+        		}
+        	}
+        	privateKey = privateKey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
+        	privateKey = privateKey.replace("-----END RSA PRIVATE KEY-----", "");
+        	System.out.println("privateKey : " + privateKey); 
+        	System.out.println("privateKey2 : " + key); */
+        	String dynamicTestStatus = "";
+        	TestInstance testInstance = testerProxyTest.startTest(crsId, dynamicContainerId, dynamicTestId, repo , privateKey);
+        	String containerId = testInstance.getContainerID();
+        	dynamicTestStatus  = testInstance.getStatus();
 			int progress = 0;
 			status.setProgress(1);
 			status.setInfo("Compiling code");
+			log.info("Compiling ");
 			//poll status
 			while(dynamicTestStatus.equals(TestInstance.STATUS_UNINITIALIZED) || dynamicTestStatus.equals(TestInstance.STATUS_STARTING) || dynamicTestStatus.equals(TestInstance.STATUS_RUNNING)) {
-				log.info(tickId + " " + crsId +": status poll");
-				dynamicTestStatus = testerProxyTest.getTestStatus(crsId, dynamicContainerId).getStatus();
-				progress = testerProxyTest.getTestStatus(crsId, dynamicContainerId).getResults().size();
-				if(progress != 1) {
-					status.setProgress(2);
-					status.setInfo("Running correctness tests");
+				dynamicTestStatus = testerProxyTest.getTestStatus(crsId, containerId).getStatus();
+				log.info(tickId + " " + crsId +": status poll = " + dynamicTestStatus);
+				List<TestStep> results = testerProxyTest.getTestStatus(crsId, containerId).getResults();
+				if (!results.isEmpty()) {
+					progress = testerProxyTest.getTestStatus(crsId, containerId).getResults().size();
+					if(results.get(progress-1).getName().equals("Compilation")) {
+						log.info("Compiling");
+					}
+					else {
+						log.info("Running correctness tests");
+						status.setProgress(2);
+						status.setInfo("Running correctness tests");
+					}
 				}
 				delay(1000);
 			}
@@ -166,11 +193,12 @@ public class Tester {
 				log.info(tickId + " " + crsId +": passed dynamic tests");
 			}
 			log.info(tickId + " " + crsId +": putting dynamic test results in report");
-			unpackResults(dynamicTest.getException(),dynamicTest.getResults());
-			testerProxyTest.removeTest(crsId, dynamicContainerId);
+			unpackResults(testerProxyTest.getTestStatus(crsId, containerId).getException(),testerProxyTest.getTestStatus(crsId, containerId).getResults());
+			testerProxyTest.removeTest(crsId, containerId);
         } 
-        catch (GitRepositoryCloneException | InvalidNameException | TestNotFoundException | TestInstanceNotFoundException e) {
-        	log.error("Dynamic analysis failed. Exception message: " + e.getMessage());
+        catch (InternalServerErrorException | GitRepositoryCloneException | InvalidNameException | TestNotFoundException | TestInstanceNotFoundException e) {
+        	//TODO change back to error
+        	log.info("Dynamic analysis failed. Exception message: " + e.getMessage());
             report.setTestResult(ReportResult.UNDEFINED);
             failCause = e;
 		}
@@ -183,35 +211,35 @@ public class Tester {
 			log.info("There was no exception from the tester, writing report as normal");
 			for(TestStep result: results) {
 				log.info("Adding " + result.getName());
-				if(result.getStatus().equals(TestStep.STATUS_FAIL)){
-					log.info(result.getName() + " result = error");
-					report.addProblem(result.getName() , Severity.ERROR);
-				}
-				else if(result.getStatus().equals(TestStep.STATUS_WARNING)) {
-					log.info(result.getName() + " result = warning");
+				if(result.getStatus().equals(TestStep.STATUS_PASS)) {
+					log.info(result.getName() + " result = pass");
 					report.addProblem(result.getName() , Severity.WARNING);
 				}
 				else {
-					log.info(result.getName() + " result = pass");
-					report.addProblem(result.getName() , Severity.WARNING);
-					//passed so don't add details and move on to next one
-					break;
-				}
-				log.info(result.getName() + " writing details for warning/error");
-				String message = "";
-				for(String m : result.getMessages()){
-					message += m + "\n";
-				}
-				message += "Expected result: " + result.getExpected() + "\n";
-				message += "Obtained result: " + result.getActual() + "\n";
-				try {
-					report.addDetail(result.getName() , result.getFileName(), (int) result.getStartLine(), message);
-				} 
-				catch (CategoryNotInReportException e) {
-					// TODO Auto-generated catch block
-					//should never be called
-					log.error("category not found in report");
-					e.printStackTrace();
+					if(result.getStatus().equals(TestStep.STATUS_FAIL)){
+						log.info(result.getName() + " result = error");
+						report.addProblem(result.getName() , Severity.ERROR);
+					}
+					else if(result.getStatus().equals(TestStep.STATUS_WARNING)) {
+						log.info(result.getName() + " result = warning");
+						report.addProblem(result.getName() , Severity.WARNING);
+					}
+					log.info(result.getName() + " writing details for warning/error");
+					String message = "";
+					for(String m : result.getMessages()){
+						message += m + "\n";
+					}
+					message += "Expected result: " + result.getExpected() + "\n";
+					message += "Obtained result: " + result.getActual() + "\n";
+					try {
+						report.addDetail(result.getName() , result.getFileName(), (int) result.getStartLine(), message);
+					} 
+					catch (CategoryNotInReportException e) {
+						// TODO Auto-generated catch block
+						//should never be called
+						log.error("category not found in report");
+						e.printStackTrace();
+					}
 				}
 			}
 		}
