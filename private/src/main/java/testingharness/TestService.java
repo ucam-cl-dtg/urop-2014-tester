@@ -39,7 +39,8 @@ import publicinterfaces.*;
 
 import threadcontroller.MyExecutor;
 import threadcontroller.TesterThread;
-import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
+//changed here
+import dynamictesting.TestsApi;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestNotFoundException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestInfo;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
@@ -104,7 +105,7 @@ public class TestService implements ITestService {
 	    ResteasyWebTarget forTester = rc2.target(ConfigurationLoader.getConfig().getTesterPath());
 	    testerProxyTest = forTester.proxy(TestsApi.class);	 
 	    log.info("tester proxy initialised");
-        log.debug("TestService initialised");
+        log.info("TestService initialised");
     }
 
     /** {@inheritDoc} */
@@ -114,11 +115,12 @@ public class TestService implements ITestService {
             NoCommitsToRepoException {
         SecurityManager.validateSecurityToken(securityToken);
 
-        log.debug(crsId + " " + tickId + ": Preparing test suite");
+        repoName = repoName.replaceAll(",", "/");
+        log.info(crsId + " " + tickId + ": Preparing test suite");
 
-        log.debug(crsId + " " + tickId + ": Querying git API for SHA of head of repository: " + repoName);
+        log.info(crsId + " " + tickId + ": Querying git API for SHA of head of repository: " + repoName);
         final String commitId = gitProxy.resolveCommit(SecurityManager.getSecurityToken(), repoName, "HEAD");
-        log.debug(crsId + " " + tickId + ": SHA for repository: " + repoName + " is " + commitId);
+        log.info(crsId + " " + tickId + ": SHA for repository: " + repoName + " is " + commitId);
     	
         if (commitId == null) {
             log.warn(crsId + " " + tickId + ": commitId is null; throwing NoCommitsToRepoException");
@@ -126,15 +128,15 @@ public class TestService implements ITestService {
         }
 
         //collect files to test from git
-        log.debug(crsId + " " + tickId + " " + commitId
+        log.info(crsId + " " + tickId + " " + commitId
                 + ": Connecting to git API to obtain list of files in repo");
         List<String> fileListFromGit = gitProxy.listFiles(SecurityManager.getSecurityToken(), repoName , commitId);
         
-        log.debug(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
+        log.info(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
 
-        log.debug(crsId + " " + tickId + " " + commitId + ": all files loaded");
+        log.info(crsId + " " + tickId + " " + commitId + ": all files loaded");
         //obtain static tests to run on files according to what tick it is
-        log.debug(crsId + " " + tickId + " " + commitId + ": Loading test settings for tickId");
+        log.info(crsId + " " + tickId + " " + commitId + ": Loading test settings for tickId");
         List<StaticOptions> staticTests = dbTicks.getTestSettings(tickId);
     	
         List<StaticOptions> tests = new LinkedList<>();
@@ -142,11 +144,11 @@ public class TestService implements ITestService {
         for (StaticOptions test : staticTests) {
         	if (test.getCheckedIndex() != 0) {
         		tests.add(test);
-        		log.debug(crsId + " " + tickId + " " + commitId + ": Added stylistic check: " + test.getText());
+        		log.info(crsId + " " + tickId + " " + commitId + ": Added stylistic check: " + test.getText());
         	}
         }
         
-        log.debug(crsId + " " + tickId + " " + commitId + ": Tests loaded");
+        log.info(crsId + " " + tickId + " " + commitId + ": Tests loaded");
         
         // create a new Tester object
         final Tester tester = new Tester(tests, fileListFromGit, repoName, commitId);
@@ -165,7 +167,7 @@ public class TestService implements ITestService {
         TestService.threadExecutor.execute(thread);
         
         if(MyExecutor.getWaitingQueue().contains(thread)) {
-        	log.debug(crsId + " " + tickId + " " + commitId + ": Is waiting in queue");
+        	log.info(crsId + " " + tickId + " " + commitId + ": Is waiting in queue");
         	Status status = new Status(getQueuePosition(crsId,tickId));
         	thread.setStatus(status);
         }
@@ -179,24 +181,24 @@ public class TestService implements ITestService {
             throws NoSuchTestException {
         SecurityManager.validateSecurityToken(securityToken);
 
-        log.debug(crsId+ " " + tickId + ": poll status request received");
+        log.info(crsId+ " " + tickId + ": poll status request received");
         //if the test is currently running then return its status from memory
         if (ticksInProgress.containsKey(crsId + tickId) && !ticksInProgress.get(crsId + tickId).getStatus().getInfo().equals("Complete")) {
         	//if test is in queue then recalc position then return status
-        	log.debug(crsId+ " " + tickId + ": active thread found");
+        	log.info(crsId+ " " + tickId + ": active thread found");
         	TesterThread thread = ticksInProgress.get(crsId + tickId);
         	if(MyExecutor.getWaitingQueue().contains(thread)) {
-        		log.debug(crsId+ " " + tickId + ": thread still in wait queue");
+        		log.info(crsId+ " " + tickId + ": thread still in wait queue");
         		thread.getStatus().updateQueueStatus(getQueuePosition(crsId,tickId));
         	}
-            log.debug(crsId+ " " + tickId + ": returning status");
+            log.info(crsId+ " " + tickId + ": returning status");
             return ticksInProgress.get(crsId + tickId).getStatus();
         }
         else {
             //the test is not currently in memory, so try to get it from the DB
-        	log.debug(crsId+ " " + tickId + ": thread no longer active, attempting to access database");
+        	log.info(crsId+ " " + tickId + ": thread no longer active, attempting to access database");
             try {
-                log.debug(crsId+ " " + tickId + ": returning status from database");
+                log.info(crsId+ " " + tickId + ": returning status from database");
                 return dbReport.getLastStatus(crsId, tickId);
             } catch (UserNotInDBException | TickNotInDBException e) {
                 log.warn(crsId+ " " + tickId + ": Report not in map of ticks in progress or db, throwing NoSuchTestException");
@@ -211,7 +213,7 @@ public class TestService implements ITestService {
             throws UserNotInDBException, TickNotInDBException {
         SecurityManager.validateSecurityToken(securityToken);
 
-        log.debug(crsId+ " " + tickId + ": get last report request received...");
+        log.info(crsId+ " " + tickId + ": get last report request received...");
         return  dbReport.getLastReport(crsId, tickId);
     }
 
@@ -221,7 +223,7 @@ public class TestService implements ITestService {
             throws UserNotInDBException, TickNotInDBException {
         SecurityManager.validateSecurityToken(securityToken);
 
-        log.debug(crsId+ " " + tickId + ": get all reports request received...");
+        log.info(crsId+ " " + tickId + ": get all reports request received...");
         return dbReport.getAllReports(crsId, tickId);
     }
 
@@ -231,7 +233,7 @@ public class TestService implements ITestService {
             throws UserNotInDBException {
         SecurityManager.validateSecurityToken(securityToken);
 
-    	log.debug(crsId + ": delete request received");
+    	log.info(crsId + ": delete request received");
         dbReport.removeUserReports(crsId);
     }
 
@@ -241,7 +243,7 @@ public class TestService implements ITestService {
             throws TickNotInDBException, UserNotInDBException {
         SecurityManager.validateSecurityToken(securityToken);
 
-    	log.debug(crsId+ " " + tickId + ": delete request received");
+    	log.info(crsId+ " " + tickId + ": delete request received");
         dbReport.removeUserTickReports(crsId, tickId);
     }
 
@@ -250,7 +252,7 @@ public class TestService implements ITestService {
 	public Response createNewTest(String securityToken, String tickId, List<StaticOptions> checkstyleOpts, String containerId, String testId) {
         SecurityManager.validateSecurityToken(securityToken);
 
-    	log.debug("creating new test with tickId: " + tickId);
+    	log.info("creating new test with tickId: " + tickId);
 
     	try {
     		TestService.dbTicks.addNewTest(tickId, checkstyleOpts , containerId , testId);
@@ -284,7 +286,7 @@ public class TestService implements ITestService {
 	public TickSettings getTestFiles(String securityToken) throws IOException, TestNotFoundException {
         SecurityManager.validateSecurityToken(securityToken);
 
-	    log.debug("request received to get default java style settings");
+	    log.info("request received to get default java style settings");
 		List<StaticOptions> toReturn = new LinkedList<>();
 		try {
 			URI dir = (TestService.class.getClassLoader().getResource("checkstyleFiles")).toURI();
@@ -319,11 +321,22 @@ public class TestService implements ITestService {
 			// this should never happen
 			e.printStackTrace();
 		}
-
-        log.debug("returning default tests");
-        return new TickSettings(toReturn, null, getAvailableDynamicTests());
+		log.info("returning default tests");
+		return new TickSettings(toReturn, null, getAvailableDynamicTests());
 	}
 
+	/** {@inheritDoc} */
+    @Override
+    public void setTickerResult(String securityToken, String crsid, String tickId, ReportResult tickerResult,
+                                String tickerComments, String commitId, long date)
+            throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
+        log.debug("setting ticker result...");
+        Date d = new Date(date);
+        log.debug("transformed recieved millisecond date to: " + d);
+        TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId, d);
+        log.debug("result set");
+    }
+    
 	/** {@inheritDoc} */
 	@Override
 	public TickSettings getTestFiles(String securityToken , String tickId) throws TestIDNotFoundException, TestNotFoundException {
@@ -343,19 +356,6 @@ public class TestService implements ITestService {
 		log.info("returning object...");
 		return settings; 
 	}
-
-
-    /** {@inheritDoc} */
-    @Override
-    public void setTickerResult(String securityToken, String crsid, String tickId, ReportResult tickerResult,
-                                String tickerComments, String commitId, long date)
-            throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
-        log.debug("setting ticker result...");
-        Date d = new Date(date);
-        log.debug("transformed recieved millisecond date to: " + d);
-        TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId, d);
-        log.debug("result set");
-    }
 	
 	public int getQueuePosition(String crsId, String tickId) {
 		Iterator<Runnable> iterator = MyExecutor.getWaitingQueue().iterator();
@@ -374,28 +374,4 @@ public class TestService implements ITestService {
         log.info("Request for dynamic tests received");
         return testerProxyTest.listTests();
     }
-
-//	private List<TestInfo> getAvailableDynamicTests() {
-//		log.info("request for dynamic tests received");
-//		List<TestInfo> tests =  null;
-//		try {
-//			log.info("accessing dynamic API");
-//			try {
-//				tests = testerProxyTest.listTests();
-//			} catch (InternalServerErrorException e) {
-//				System.err.println(e.getResponse().getEntity());
-//			}
-//			if(tests != null) {
-//				log.info(tests.size() + " tests found, returning");
-//				return Response.status(200).entity(tests).build();
-//			}
-//			else{
-//				log.info("no available dynamic tests found");
-//				return Response.status(404).build();
-//			}
-//		} catch (TestNotFoundException e) {
-//			// TODO how to handle??? - error should probably be thrown
-//			return Response.status(500).entity(e).build();
-//		}
-//	}
 }
