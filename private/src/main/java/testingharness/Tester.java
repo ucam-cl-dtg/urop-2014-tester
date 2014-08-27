@@ -55,7 +55,7 @@ public class Tester {
     private String repoName;
     //Maps the path of a test (either static or dynamic) to a list of paths to files on which that test should be run
     private List<String> filesToTest;
-    private List<StaticOptions> testingQueue;
+    private List<StaticOptions> testingQueue = null;
     private boolean dynamicPass;
 
     /**
@@ -77,11 +77,20 @@ public class Tester {
         log.info(crsId + " " + tickId + " " + commitId + ": Tick analysis started");	     
 
         try {
-            int noOfTests = testingQueue.size()+2;
-            report.setNoOfTests(noOfTests);
-            status.setCurrentPositionInQueue(0);
-            status.setMaxProgress(noOfTests + 3);
-            status.setInfo("Loading tests");            
+        	if (testingQueue != null) {
+	            int noOfTests = testingQueue.size()+2;
+	            report.setNoOfTests(noOfTests);
+	            status.setCurrentPositionInQueue(0);
+	            status.setMaxProgress(noOfTests + 1);
+	            status.setInfo("Loading tests"); 
+        	}
+        	else {
+        		int noOfTests = 2;
+        		report.setNoOfTests(noOfTests);
+        		status.setCurrentPositionInQueue(0);
+	            status.setMaxProgress(noOfTests + 1);
+	            status.setInfo("Loading tests");
+        	}
             
             String repo = ConfigurationLoader.getConfig().getRepoTemplate() + this.repoName + ".git";
             

@@ -42,7 +42,7 @@ public class Status {
      */
     public void addProgress() {
         this.progress += 1;
-        this.info = "Running test " + this.progress + " of " + (this.maxProgress - 1);
+        this.info = "Running static check " + (this.progress - 2) + " of " + (this.maxProgress - 3);
     }
 
     /**
