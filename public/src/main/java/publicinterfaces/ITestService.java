@@ -3,6 +3,7 @@ package publicinterfaces;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
+import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestNotFoundException;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
 
 import java.io.IOException;
@@ -115,13 +116,6 @@ public interface ITestService {
      * @param checkstyleOpts        list containing xml files and settings for checkstyles
      * @param containerId           forDynamicTests
      * @param testId				for dynamic tests
-     * @throws TestIDAlreadyExistsException       Thrown when the tickId supplied has been used before in
-     * 											  the database, but something went wrong and the files
-     * 											  aren't stored so add to database is called instead
-     * 											  of update - shouldn't happen but just in case
-     * @throws FailedToMakeTestException       Thrown if I/O goes wrong when setting up the test files
-     * @throws TestIDNotFoundException 		Thrown when this is called in update mode and the tickId can't be
-     * 										found in the database
      */
     @POST
     @Path("/{tickId}/create")
@@ -132,35 +126,37 @@ public interface ITestService {
 
     /**
      * returns all default static test settings that are available for tick setters to use
-     * @return 		List of the names of the static tests available with their default severity
+     * @return      		Object containing dynamic tests available and default tests
+     * @throws IOException  Default files to return are stored on disk. IOException is thrown if there was a problem
+     *                      reading these
      */
     @GET
     @Path("/testFiles")
-    public TickSettings getTestFiles(@QueryParam("securityToken") String securityToken);
+    public TickSettings getTestFiles(@QueryParam("securityToken") String securityToken) throws IOException, TestNotFoundException;
     
     /**
      * returns all static test settings that are available for the specified tick (for updating purposes)
-     * @param tickId                Unique Id of the test with the test files being asked for
-     * @return 		List of the names and settings of the static tests for the tick
-     * @throws TestIDNotFoundException        Thrown if tick doesn't exist
+     * @param tickId                    Unique Id of the test with the test files being asked for
+     * @return                          List of the names and settings of the static tests for the tick
+     * @throws TestIDNotFoundException  Thrown if tick doesn't exist
      */
     @GET
     @Path("{tickId}/testFiles")
     public TickSettings getTestFiles(@QueryParam("securityToken") String securityToken,
-                                 @PathParam("tickId") String tickId)
-            throws TestIDNotFoundException;
+                                     @PathParam("tickId") String tickId)
+            throws TestIDNotFoundException, TestNotFoundException;
     
     /**
      * Allows ticker to pass/fail a student's tick by adding a tickerResult and tickerComment to one of their
      * reports
-     * @param crsId        Id of user whose reports should be edited
-     * @param tickId                Id of tick for which a report will be edited
-     * @param tickerResult			ReportResult defining PASS or FAIL according to the ticker
-     * @param tickerComments		String containing any comments the ticker may have
-     * @param commitId				commitId corresponding to the report that the ticker wants to edit
-     * @throws UserNotInDBException   Thrown if user record can't be found for the given crsid
-     * @throws TickNotInDBException   Thrown if user's reports for given tickId can't be found
-     * @throws ReportNotFoundException   Thrown if report with the commitId doesn't exist
+     * @param crsid                     Id of user whose reports should be edited
+     * @param tickId                    Id of tick for which a report will be edited
+     * @param tickerResult			    ReportResult defining PASS or FAIL according to the ticker
+     * @param tickerComments		    String containing any comments the ticker may have
+     * @param commitId				    commitId corresponding to the report that the ticker wants to edit
+     * @throws UserNotInDBException     Thrown if user record can't be found for the given crsid
+     * @throws TickNotInDBException     Thrown if user's reports for given tickId can't be found
+     * @throws ReportNotFoundException  Thrown if report with the commitId doesn't exist
      */
     @POST
     @Path("/{crsid}/{tickId}/set/tickerResult")
@@ -174,9 +170,9 @@ public interface ITestService {
                                 @QueryParam("date") long date)
     				throws UserNotInDBException, TickNotInDBException, ReportNotFoundException;
 
-    @GET
-    @Path("/unitTests")
-    public Response getAvailableDynamicTests(@QueryParam("securityToken") String securityToken);
+//    @GET
+//    @Path("/unitTests")
+//    public Response getAvailableDynamicTests(@QueryParam("securityToken") String securityToken);
     
     //TODO: cancel test
     //@DELETE

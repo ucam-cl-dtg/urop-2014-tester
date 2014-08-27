@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>uk.ac.cam.cl.urop-test</groupId>
   <artifactId>public</artifactId>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   
   <repositories>
 		<repository>
@@ -45,6 +45,13 @@
             <groupId>org.codehaus.jackson</groupId>
             <artifactId>jackson-core-asl</artifactId>
             <version>1.9.12</version>
+        </dependency>
+
+        <!-- Dynamic Tester -->
+        <dependency>
+            <groupId>uk.ac.cam.cl.dtg.teaching</groupId>
+            <artifactId>containers-api</artifactId>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
 
 		<!-- Git API -->
