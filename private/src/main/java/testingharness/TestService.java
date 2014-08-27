@@ -281,11 +281,10 @@ public class TestService implements ITestService {
 
     /** {@inheritDoc} */
 	@Override
-	public TickSettings getTestFiles(String securityToken) {
+	public TickSettings getTestFiles(String securityToken) throws IOException, TestNotFoundException {
         SecurityManager.validateSecurityToken(securityToken);
 
 	    log.debug("request received to get default java style settings");
-	    TickSettings settingsToReturn  = new TickSettings();
 		List<StaticOptions> toReturn = new LinkedList<>();
 		try {
 			URI dir = (TestService.class.getClassLoader().getResource("checkstyleFiles")).toURI();
@@ -316,32 +315,18 @@ public class TestService implements ITestService {
 	               						fileContents));
 	            i++;
 			}
-			settingsToReturn.setCheckstylesFiles(toReturn);
 		} catch (URISyntaxException e) {
 			// this should never happen
 			e.printStackTrace();
 		}
-		finally {
-			log.debug("returning default tests");
-			return settingsToReturn;
-		} 
+
+        log.debug("returning default tests");
+        return new TickSettings(toReturn, null, getAvailableDynamicTests());
 	}
 
 	/** {@inheritDoc} */
 	@Override
-	public void setTickerResult(String securityToken, String crsid, String tickId, ReportResult tickerResult,
-                                String tickerComments, String commitId, long date)
-			throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
-		log.debug("setting ticker result...");
-		Date d = new Date(date);
-		log.debug("transformed recieved millisecond date to: " + d);
-		TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId, d);
-		log.debug("result set");
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public TickSettings getTestFiles(String securityToken , String tickId) throws TestIDNotFoundException {
+	public TickSettings getTestFiles(String securityToken , String tickId) throws TestIDNotFoundException, TestNotFoundException {
 		SecurityManager.validateSecurityToken(securityToken);
 		
 		log.info("get test files request received for " + tickId);
@@ -354,10 +339,23 @@ public class TestService implements ITestService {
 		}
 		String testId = TestService.dbTicks.getTestId(tickId);
 		log.info("testId found for " + tickId + ", creating object...");
-		TickSettings settings = new TickSettings(toReturn , testId);
+		TickSettings settings = new TickSettings(toReturn , testId, getAvailableDynamicTests());
 		log.info("returning object...");
 		return settings; 
 	}
+
+
+    /** {@inheritDoc} */
+    @Override
+    public void setTickerResult(String securityToken, String crsid, String tickId, ReportResult tickerResult,
+                                String tickerComments, String commitId, long date)
+            throws UserNotInDBException, TickNotInDBException, ReportNotFoundException {
+        log.debug("setting ticker result...");
+        Date d = new Date(date);
+        log.debug("transformed recieved millisecond date to: " + d);
+        TestService.dbReport.editReportTickerResult(crsid,tickId,tickerResult,tickerComments, commitId, d);
+        log.debug("result set");
+    }
 	
 	public int getQueuePosition(String crsId, String tickId) {
 		Iterator<Runnable> iterator = MyExecutor.getWaitingQueue().iterator();
@@ -372,30 +370,32 @@ public class TestService implements ITestService {
 	    return 0;
 	}
 
-	@Override
-	public Response getAvailableDynamicTests(String securityToken) {
-		SecurityManager.validateSecurityToken(securityToken);
-		
-		log.info("request for dynamic tests recieved");
-		List<TestInfo> tests =  null;
-		try {
-			log.info("accessing dynamic API");
-			try {
-				tests = testerProxyTest.listTests();
-			} catch (InternalServerErrorException e) {
-				System.err.println(e.getResponse().getEntity());
-			}
-			if(tests != null) {
-				log.info(tests.size() + " tests found, returning");
-				return Response.status(200).entity(tests).build();
-			}
-			else{
-				log.info("no available dynamic tests found");
-				return Response.status(200).entity(tests).build();
-			}
-		} catch (TestNotFoundException e) {
-			// TODO how to handle??? - error should probably be thrown
-			return Response.status(500).entity(e).build();
-		}	
-	}
+    private List<TestInfo> getAvailableDynamicTests() throws TestNotFoundException {
+        log.info("Request for dynamic tests received");
+        return testerProxyTest.listTests();
+    }
+
+//	private List<TestInfo> getAvailableDynamicTests() {
+//		log.info("request for dynamic tests received");
+//		List<TestInfo> tests =  null;
+//		try {
+//			log.info("accessing dynamic API");
+//			try {
+//				tests = testerProxyTest.listTests();
+//			} catch (InternalServerErrorException e) {
+//				System.err.println(e.getResponse().getEntity());
+//			}
+//			if(tests != null) {
+//				log.info(tests.size() + " tests found, returning");
+//				return Response.status(200).entity(tests).build();
+//			}
+//			else{
+//				log.info("no available dynamic tests found");
+//				return Response.status(404).build();
+//			}
+//		} catch (TestNotFoundException e) {
+//			// TODO how to handle??? - error should probably be thrown
+//			return Response.status(500).entity(e).build();
+//		}
+//	}
 }
