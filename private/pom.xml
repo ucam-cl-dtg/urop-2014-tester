@@ -169,7 +169,10 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>2.1.1</version>
 				<configuration>
+					<!-- Not needed due to webappDirectory
 					<webXml>WebContent/WEB-INF/web.xml</webXml>
+					-->
+					<webappDirectory>WebContent</webappDirectory>
 				</configuration>
 			</plugin>
 			<plugin>
