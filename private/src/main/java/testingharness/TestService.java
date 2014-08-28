@@ -39,8 +39,7 @@ import publicinterfaces.*;
 
 import threadcontroller.MyExecutor;
 import threadcontroller.TesterThread;
-//changed here
-import dynamictesting.TestsApi;
+import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestNotFoundException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestInfo;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;

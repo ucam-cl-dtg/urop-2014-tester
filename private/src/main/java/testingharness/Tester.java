@@ -19,13 +19,13 @@ import publicinterfaces.Severity;
 import publicinterfaces.StaticOptions;
 import publicinterfaces.Status;
 //changed here
-import dynamictesting.TestsApi;
+import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.GitRepositoryCloneException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.InvalidNameException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestInstanceNotFoundException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestNotFoundException;
 //changed here
-import dynamictesting.TestInstance;
+import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestInstance;
 import exceptions.DynamicException;
 import uk.ac.cam.cl.dtg.teaching.containers.api.model.Attachment;
 import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestStep;

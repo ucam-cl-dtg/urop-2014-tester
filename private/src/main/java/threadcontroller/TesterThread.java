@@ -7,8 +7,8 @@ import publicinterfaces.Status;
 import publicinterfaces.TestIDNotFoundException;
 import testingharness.TestService;
 import testingharness.Tester;
-//changed here
-import dynamictesting.TestsApi;
+
+import uk.ac.cam.cl.dtg.teaching.containers.api.TestsApi;
 import uk.ac.cam.cl.git.interfaces.WebInterface;
 
 public class TesterThread implements Runnable {

@@ -34,8 +34,6 @@ public class Report{
     private String commitId;
     //Name of the repo the java files tested have come from
     private String repoName;
-    //says whether any attachments the ticker must check exists
-    private boolean attachments;
     //list of these attachments
     private List<NewAttachment> attachmentList = new LinkedList<>();
 
@@ -213,14 +211,6 @@ public class Report{
 
 	public void setFailCause(String failCause) {
 		this.failCause = failCause;
-	}
-
-	public boolean isAttachments() {
-		return attachments;
-	}
-
-	public void setAttachments(boolean attachments) {
-		this.attachments = attachments;
 	}
 
 	public List<NewAttachment> getAttachmentList() {
