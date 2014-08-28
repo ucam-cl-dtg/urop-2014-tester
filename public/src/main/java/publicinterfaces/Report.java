@@ -107,8 +107,11 @@ public class Report{
 		    	if (e.getSeverity() == Severity.ERROR) {
 	            	e.setOutcome(Outcome.ERROR);
 	            }
-	            else {
+	            else if (e.getSeverity() == Severity.WARNING){
 	            	e.setOutcome(Outcome.WARNING);
+	            }
+	            else {
+	            	e.setOutcome(Outcome.PASS);
 	            }
 		    }
 		    else {

@@ -10,8 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import publicinterfaces.CategoryNotInReportException;
+import publicinterfaces.FileItem;
 import publicinterfaces.ITestSetting;
 import publicinterfaces.NewAttachment;
+import publicinterfaces.Outcome;
 import publicinterfaces.Problem;
 import publicinterfaces.Report;
 import publicinterfaces.ReportResult;
@@ -249,19 +251,7 @@ public class Tester {
 				List<Problem> problems = report.getItems();
 				boolean found = false;
 				log.info("Adding " + result.getName());
-				if(result.getStatus().equals(TestStep.STATUS_PASS)) {
-					log.info(result.getName() + " result = pass");
-					for(Problem p : problems) {
-						if(p.getProblemDescription().equals(result.getName())) {
-							found = true;
-							break;
-						}
-					}
-					if(!found) {
-						report.addProblem(result.getName() , Severity.WARNING);
-					}
-				}
-				else if (result.getStatus().equals(TestStep.STATUS_MANUALCHECK)){
+				if (result.getStatus().equals(TestStep.STATUS_MANUALCHECK)){
 					log.info(result.getName() + " adding attachments");
 					List<Attachment> attachments = result.getAttachments();
 					int i = 1;
@@ -281,9 +271,27 @@ public class Tester {
 					}
 				}
 				else {
-					if(result.getStatus().equals(TestStep.STATUS_FAIL)){
+					if(result.getStatus().equals(TestStep.STATUS_PASS)){
 						for(Problem p : problems) {
 							if(p.getProblemDescription().equals(result.getName())) {
+								if (!(p.getSeverity().equals(Severity.ERROR)) && !(p.getSeverity().equals(Severity.WARNING))) {
+									log.info("setting result for " + result.getName() + " as PASS");
+									p.setSeverity(Severity.PASS);
+								}
+								found = true;
+								break;
+							}
+						}
+						if(!found) {
+							log.info(result.getName() + " result = pass");
+							report.addProblem(result.getName() , Severity.PASS);
+						}
+					}
+					else if(result.getStatus().equals(TestStep.STATUS_FAIL)){
+						for(Problem p : problems) {
+							if(p.getProblemDescription().equals(result.getName())) {
+								log.info("setting result for " + result.getName() + " as ERROR");
+								p.setSeverity(Severity.ERROR);
 								found = true;
 								break;
 							}
@@ -296,6 +304,10 @@ public class Tester {
 					else if(result.getStatus().equals(TestStep.STATUS_WARNING)) {
 						for(Problem p : problems) {
 							if(p.getProblemDescription().equals(result.getName())) {
+								if (!p.getSeverity().equals(Severity.ERROR)) {
+									log.info("setting result for " + result.getName() + " as WARNING");
+									p.setSeverity(Severity.WARNING);
+								}
 								found = true;
 								break;
 							}
@@ -306,7 +318,7 @@ public class Tester {
 						}
 					}
 					if(result.getFileName() != null) {
-						log.info(result.getName() + " writing details for warning/error");
+						log.info(result.getName() + " " + " writing details");
 						String message = "";
 						for(String m : result.getMessages()){
 							message += m + "\n";
@@ -315,8 +327,8 @@ public class Tester {
 						message += "Obtained result: " + result.getActual() + "\n";
 						try {
 							String fileName = result.getFileName();
-							fileName = fileName.split(".git")[1];
-							fileName = fileName.substring(1,fileName.length());
+							//fileName = fileName.split(".git")[1];
+							//fileName = fileName.substring(1,fileName.length());
 							report.addDetail(result.getName() , fileName, (int) result.getStartLine(), message);
 						} 
 						catch (CategoryNotInReportException e) {

@@ -19,7 +19,7 @@ public class FileItem {
      * @param detail   detail specific to this particular instance of the problem
      * @param file   file where the problem was found
      */
-    protected FileItem(int lineNumber, String detail, String file) {
+    public FileItem(int lineNumber, String detail, String file) {
         this.lineNumber = lineNumber;
         this.detail = detail;
         this.file = file;
