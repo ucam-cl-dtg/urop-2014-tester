@@ -22,6 +22,8 @@ public class Report{
 	private ReportResult reportResult = ReportResult.UNDEFINED;
 	// any comments the ticker wished to add to the report
 	private String tickerComments = null;
+	//any internal error the checker comes across
+	private String failCause = null;
 	// list of the problems the tests have checked for
     private List<Problem> problemsTestedFor = new LinkedList<>();
     // creation date of the report
@@ -32,6 +34,10 @@ public class Report{
     private String commitId;
     //Name of the repo the java files tested have come from
     private String repoName;
+    //says whether any attachments the ticker must check exists
+    private boolean attachments;
+    //list of these attachments
+    private List<NewAttachment> attachmentList = new LinkedList<>();
 
     /** Constructor for use in code
      * @param repoName    Name of the repo you can find the corresponding test files in
@@ -50,6 +56,10 @@ public class Report{
      */	
     public void addProblem(String category, Severity severity) {
         problemsTestedFor.add(new Problem(category, severity));
+    }
+    
+    public void addProblem(Problem p) {
+    	problemsTestedFor.add(p);
     }
 
     /**
@@ -92,7 +102,10 @@ public class Report{
     public void calculateProblemStatuses() {
 		for (Problem e : problemsTestedFor)
 		{
-		    if (e.getFileDetails().size() > 0) {
+			if(e.getSeverity() == Severity.MANUALCHECK) {
+				e.setOutcome(Outcome.MANUALCHECK);
+			}
+			else if (e.getFileDetails().size() > 0) {
 		    	if (e.getSeverity() == Severity.ERROR) {
 	            	e.setOutcome(Outcome.ERROR);
 	            }
@@ -192,5 +205,29 @@ public class Report{
 	}
 	public void setRepoName(String repoName) {
 		this.repoName = repoName;
+	}
+
+	public String getFailCause() {
+		return failCause;
+	}
+
+	public void setFailCause(String failCause) {
+		this.failCause = failCause;
+	}
+
+	public boolean isAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(boolean attachments) {
+		this.attachments = attachments;
+	}
+
+	public List<NewAttachment> getAttachmentList() {
+		return attachmentList;
+	}
+
+	public void setAttachmentList(List<NewAttachment> attachmentList) {
+		this.attachmentList = attachmentList;
 	}
 }

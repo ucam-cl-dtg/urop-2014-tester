@@ -14,7 +14,9 @@ public class Status {
     private int maxProgress; 
     //string describing progress e.g. running test 1 of 3
     private String info; //string describing progress e.g. running test 1 of 3
-
+    //boolean stating whether there are dynamic tests or not
+    private boolean containsDynamic;
+    
     public Status(int initQueuePos) {
         this.setOriginalPositionInQueue(initQueuePos);
         this.setCurrentPositionInQueue(initQueuePos);
@@ -42,7 +44,12 @@ public class Status {
      */
     public void addProgress() {
         this.progress += 1;
-        this.info = "Running static check " + (this.progress - 2) + " of " + (this.maxProgress - 3);
+        if (this.containsDynamic) {
+        	this.info = "Running static check " + (this.progress - 2) + " of " + (this.maxProgress - 3);
+        }
+        else {
+        	this.info = "Running static check " + this.progress + " of " + (this.maxProgress - 1);
+        }
     }
 
     /**
@@ -94,5 +101,13 @@ public class Status {
 
 	public void setCurrentPositionInQueue(int currentPositionInQueue) {
 		this.currentPositionInQueue = currentPositionInQueue;
+	}
+
+	public boolean isContainsDynamic() {
+		return containsDynamic;
+	}
+
+	public void setContainsDynamic(boolean containsDynamic) {
+		this.containsDynamic = containsDynamic;
 	}
 }

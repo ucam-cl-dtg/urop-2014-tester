@@ -6,5 +6,5 @@ package publicinterfaces;
  * @author kls82
  */
 public enum Severity {
-    WARNING, ERROR
+    WARNING, ERROR, MANUALCHECK
 }

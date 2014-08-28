@@ -119,60 +119,62 @@ public class TestService implements ITestService {
         log.info(crsId + " " + tickId + ": Preparing test suite");
 
         log.info(crsId + " " + tickId + ": Querying git API for SHA of head of repository: " + repoName);
+        
         final String commitId = gitProxy.resolveCommit(SecurityManager.getSecurityToken(), repoName, "HEAD");
-        log.info(crsId + " " + tickId + ": SHA for repository: " + repoName + " is " + commitId);
-    	
-        if (commitId == null) {
-            log.warn(crsId + " " + tickId + ": commitId is null; throwing NoCommitsToRepoException");
-        	throw new NoCommitsToRepoException();
-        }
-
-        //collect files to test from git
-        log.info(crsId + " " + tickId + " " + commitId
-                + ": Connecting to git API to obtain list of files in repo");
-        List<String> fileListFromGit = gitProxy.listFiles(SecurityManager.getSecurityToken(), repoName , commitId);
         
-        log.info(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
-
-        log.info(crsId + " " + tickId + " " + commitId + ": all files loaded");
-        //obtain static tests to run on files according to what tick it is
-        log.info(crsId + " " + tickId + " " + commitId + ": Loading test settings for tickId");
-        List<StaticOptions> staticTests = dbTicks.getTestSettings(tickId);
-    	
-        List<StaticOptions> tests = new LinkedList<>();
-        
-        for (StaticOptions test : staticTests) {
-        	if (test.getCheckedIndex() != 0) {
-        		tests.add(test);
-        		log.info(crsId + " " + tickId + " " + commitId + ": Added stylistic check: " + test.getText());
-        	}
-        }
-        
-        log.info(crsId + " " + tickId + " " + commitId + ": Tests loaded");
-        
-        // create a new Tester object
-        final Tester tester = new Tester(tests, fileListFromGit, repoName, commitId);
-
-        TesterThread thread = new TesterThread(tester, crsId, tickId, commitId, gitProxy, testerProxyTest);
-        
-        // add the object to the list of in-progress tests atomically
-        //this key should be unique as they shouldn't be able to run the same tests more than once
-        //at the same time
-        if (ticksInProgress.putIfAbsent(crsId + tickId, thread) != null) {
-        	log.warn(crsId + " " + tickId + " " + commitId + ": Test is already running; throwing TestStillRunningException");
-        	throw new TestStillRunningException("You can't submit this tick as you already have the same one running");
-        }
-        
-        // start the test in an asynchronous thread
-        TestService.threadExecutor.execute(thread);
-        
-        if(MyExecutor.getWaitingQueue().contains(thread)) {
-        	log.info(crsId + " " + tickId + " " + commitId + ": Is waiting in queue");
-        	Status status = new Status(getQueuePosition(crsId,tickId));
-        	thread.setStatus(status);
-        }
-        
-        return "Test Started";
+	    log.info(crsId + " " + tickId + ": SHA for repository: " + repoName + " is " + commitId);
+	    
+	    if (commitId == null) {
+	        log.warn(crsId + " " + tickId + ": commitId is null; throwing NoCommitsToRepoException");
+	      	throw new NoCommitsToRepoException();
+	    }
+	
+	    //collect files to test from git
+	    log.info(crsId + " " + tickId + " " + commitId
+	            + ": Connecting to git API to obtain list of files in repo");
+	    List<String> fileListFromGit = gitProxy.listFiles(SecurityManager.getSecurityToken(), repoName , commitId);
+	        
+	    log.info(crsId + " " + tickId + " " + commitId + ": file list obtained from git API");
+	
+	    log.info(crsId + " " + tickId + " " + commitId + ": all files loaded");
+	    //obtain static tests to run on files according to what tick it is
+	    log.info(crsId + " " + tickId + " " + commitId + ": Loading test settings for tickId");
+	    List<StaticOptions> staticTests = dbTicks.getTestSettings(tickId);
+	    
+	    List<StaticOptions> tests = new LinkedList<>();
+	        
+	    for (StaticOptions test : staticTests) {
+	      	if (test.getCheckedIndex() != 0) {
+	       		tests.add(test);
+	       		log.info(crsId + " " + tickId + " " + commitId + ": Added stylistic check: " + test.getText());
+	       	}
+	    }
+	        
+	    log.info(crsId + " " + tickId + " " + commitId + ": Tests loaded");
+	        
+	    // create a new Tester object
+	    final Tester tester = new Tester(tests, fileListFromGit, repoName, commitId);
+	
+	    TesterThread thread = new TesterThread(tester, crsId, tickId, commitId, gitProxy, testerProxyTest);
+	        
+	    // add the object to the list of in-progress tests atomically
+	    //this key should be unique as they shouldn't be able to run the same tests more than once
+	    //at the same time
+	    if (ticksInProgress.putIfAbsent(crsId + tickId, thread) != null) {
+	      	log.warn(crsId + " " + tickId + " " + commitId + ": Test is already running; throwing TestStillRunningException");
+	      	throw new TestStillRunningException("You can't submit this tick as you already have the same one running");
+	    }
+	        
+	    // start the test in an asynchronous thread
+	    TestService.threadExecutor.execute(thread);
+	       
+	    if(MyExecutor.getWaitingQueue().contains(thread)) {
+	      	log.info(crsId + " " + tickId + " " + commitId + ": Is waiting in queue");
+	       	Status status = new Status(getQueuePosition(crsId,tickId));
+	       	thread.setStatus(status);
+	    }
+	        
+	    return "Test Started";
     }
 
     /** {@inheritDoc} */
