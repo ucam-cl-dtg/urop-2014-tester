@@ -11,6 +11,8 @@ import org.slf4j.LoggerFactory;
 
 import publicinterfaces.CategoryNotInReportException;
 import publicinterfaces.ITestSetting;
+import publicinterfaces.NewAttachment;
+import publicinterfaces.Problem;
 import publicinterfaces.Report;
 import publicinterfaces.ReportResult;
 import publicinterfaces.Severity;
@@ -24,6 +26,8 @@ import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestInstanceNotFoundE
 import uk.ac.cam.cl.dtg.teaching.containers.api.exceptions.TestNotFoundException;
 //changed here
 import dynamictesting.TestInstance;
+import exceptions.DynamicException;
+import uk.ac.cam.cl.dtg.teaching.containers.api.model.Attachment;
 import uk.ac.cam.cl.dtg.teaching.containers.api.model.TestStep;
 import uk.ac.cam.cl.dtg.teaching.exceptions.SerializableException;
 import uk.ac.cam.cl.git.api.RepositoryNotFoundException;
@@ -57,6 +61,7 @@ public class Tester {
     private List<String> filesToTest;
     private List<StaticOptions> testingQueue = null;
     private boolean dynamicPass;
+    private String message = "Tick analysis failed, exception message : ";
 
     /**
      * Creates a new Tester
@@ -77,19 +82,39 @@ public class Tester {
         log.info(crsId + " " + tickId + " " + commitId + ": Tick analysis started");	     
 
         try {
-        	if (testingQueue != null) {
-	            int noOfTests = testingQueue.size()+2;
-	            report.setNoOfTests(noOfTests);
-	            status.setCurrentPositionInQueue(0);
-	            status.setMaxProgress(noOfTests + 1);
-	            status.setInfo("Loading tests"); 
+        	if(dynamicContainerId != null && dynamicTestId != null) {
+        		status.setContainsDynamic(true); 
+	        	if (testingQueue != null) {
+		            int noOfTests = testingQueue.size()+2;
+		            report.setNoOfTests(noOfTests);
+		            status.setCurrentPositionInQueue(0);
+		            status.setMaxProgress(noOfTests + 1);
+		            status.setInfo("Loading tests"); 
+	        	}
+	        	else {
+	        		int noOfTests = 2;
+	        		report.setNoOfTests(noOfTests);
+	        		status.setCurrentPositionInQueue(0);
+		            status.setMaxProgress(noOfTests + 1);
+		            status.setInfo("Loading tests");
+	        	}
         	}
         	else {
-        		int noOfTests = 2;
-        		report.setNoOfTests(noOfTests);
-        		status.setCurrentPositionInQueue(0);
-	            status.setMaxProgress(noOfTests + 1);
-	            status.setInfo("Loading tests");
+        		status.setContainsDynamic(false);
+        		if (testingQueue != null) { 
+		            int noOfTests = testingQueue.size();
+		            report.setNoOfTests(noOfTests);
+		            status.setCurrentPositionInQueue(0);
+		            status.setMaxProgress(noOfTests + 1);
+		            status.setInfo("Loading tests"); 
+	        	}
+	        	else {
+	        		int noOfTests = 0;
+	        		report.setNoOfTests(noOfTests);
+	        		status.setCurrentPositionInQueue(0);
+		            status.setMaxProgress(noOfTests + 1);
+		            status.setInfo("Loading tests");
+	        	}
         	}
             
             String repo = ConfigurationLoader.getConfig().getRepoTemplate() + this.repoName + ".git";
@@ -130,10 +155,8 @@ public class Tester {
         }
         finally
         {
-        	//TODO: Is this a viable option? error will appear as ticker comment but won't be able to sign up so
-        	//shouldn't be overwritten
         	if (this.failCause != null) {
-        		this.report.setTickerComments("Test failed to complete, error: " + this.failCause.getMessage());
+        		this.report.setFailCause(this.message + " " + this.failCause.getMessage());
         	}
             Report reportToAdd = this.report;
             TestService.getDatabase().addReport(crsId, tickId, reportToAdd);
@@ -147,6 +170,7 @@ public class Tester {
     private void runDynamicTests(TestsApi testerProxyTest, String crsId, String tickId, String dynamicContainerId, String dynamicTestId, Status status, String repo, WebInterface gitProxy)
     {
     	String privateKey = "";
+    	boolean compiling = true;
     	try {
 			privateKey = gitProxy.getPrivateKey(ConfigurationLoader.getConfig().getSecurityToken(),crsId);
 		} catch (IOException | JSchException e1) {
@@ -155,17 +179,6 @@ public class Tester {
 		}
     	log.info(tickId + " " + crsId +": started dynamic analysis");
         try {
-        	/* String[] lines = privateKey.split("\n");
-        	String key = "";
-        	for (String line : lines) {
-        		if(!(line.equals("-----BEGIN RSA PRIVATE KEY-----")) && !(line.equals("-----END RSA PRIVATE KEY-----"))) {
-        			key += line;
-        		}
-        	}
-        	privateKey = privateKey.replace("-----BEGIN RSA PRIVATE KEY-----", "");
-        	privateKey = privateKey.replace("-----END RSA PRIVATE KEY-----", "");
-        	System.out.println("privateKey : " + privateKey); 
-        	System.out.println("privateKey2 : " + key); */
         	String dynamicTestStatus = "";
         	TestInstance testInstance = testerProxyTest.startTest(crsId, dynamicContainerId, dynamicTestId, repo , privateKey);
         	String containerId = testInstance.getContainerID();
@@ -185,6 +198,7 @@ public class Tester {
 						log.info("Compiling");
 					}
 					else {
+						compiling = false;
 						log.info("Running correctness tests");
 						status.setProgress(2);
 						status.setInfo("Running correctness tests");
@@ -193,61 +207,124 @@ public class Tester {
 				delay(1000);
 			}
 			//test is finished, find result
-			if(status.equals(TestInstance.STATUS_FAILED)) {
-				log.info(tickId + " " + crsId +": failed dynamic tests");
+			if(dynamicTestStatus.equals(TestInstance.STATUS_FAILED)) {
+				List<TestStep> results = testerProxyTest.getTestStatus(crsId, containerId).getResults();
+				if (results.get(progress-1).getName().equals("Compilation")) {
+					log.info(tickId + " " + crsId + " " + dynamicTestStatus + ": failed to compile");
+				}
+				else {
+					log.info(tickId + " " + crsId + " " + dynamicTestStatus + ": failed dynamic tests");
+				}
 				dynamicPass = false;
 			}
 			else {
 				dynamicPass = true;
-				log.info(tickId + " " + crsId +": passed dynamic tests");
+				log.info(tickId + " " + crsId + " " + dynamicTestStatus + ": passed dynamic tests");
 			}
 			log.info(tickId + " " + crsId +": putting dynamic test results in report");
-			unpackResults(testerProxyTest.getTestStatus(crsId, containerId).getException(),testerProxyTest.getTestStatus(crsId, containerId).getResults());
+			unpackResults(compiling, testerProxyTest.getTestStatus(crsId, containerId).getException(),testerProxyTest.getTestStatus(crsId, containerId).getResults());
 			testerProxyTest.removeTest(crsId, containerId);
         } 
         catch (InternalServerErrorException | GitRepositoryCloneException | InvalidNameException | TestNotFoundException | TestInstanceNotFoundException e) {
         	//TODO change back to error
-        	log.info("Dynamic analysis failed. Exception message: " + e.getMessage());
-            report.setTestResult(ReportResult.UNDEFINED);
+			if(compiling) {
+				log.info("Dynamic compilation failed. Exception message: " + e.getMessage());
+				report.setTestResult(ReportResult.UNDEFINED);
+				this.message = "Failed to compile test file : ";
+			}
+			else {
+	        	log.info("Dynamic analysis failed. Exception message: " + e.getMessage());
+	            report.setTestResult(ReportResult.UNDEFINED);
+			}
             failCause = e;
 		}
         log.info("Dynamic analysis complete");
     }
 
-    private void unpackResults(SerializableException exception,List<TestStep> results) {
+    private void unpackResults(boolean compiling, SerializableException exception,List<TestStep> results) {
 		if (exception == null) {
 			//tests ran successfully so put results in report
 			log.info("There was no exception from the tester, writing report as normal");
 			for(TestStep result: results) {
+				List<Problem> problems = report.getItems();
+				boolean found = false;
 				log.info("Adding " + result.getName());
 				if(result.getStatus().equals(TestStep.STATUS_PASS)) {
 					log.info(result.getName() + " result = pass");
-					report.addProblem(result.getName() , Severity.WARNING);
+					for(Problem p : problems) {
+						if(p.getProblemDescription().equals(result.getName())) {
+							found = true;
+							break;
+						}
+					}
+					if(!found) {
+						report.addProblem(result.getName() , Severity.WARNING);
+					}
+				}
+				else if (result.getStatus().equals(TestStep.STATUS_MANUALCHECK)){
+					log.info(result.getName() + " adding attachments");
+					List<Attachment> attachments = result.getAttachments();
+					int i = 1;
+					Problem p = new Problem(result.getName() , Severity.MANUALCHECK);
+					report.addProblem(p);
+					for(Attachment attachment : attachments) {
+						String name = result.getName() + "_" + i;
+						report.getAttachmentList().add(new NewAttachment(name , 
+								attachment.getContent() , attachment.getMimeType()));
+						try {
+							report.addDetail(result.getName(), name, 1, "Ticker should review this");
+						} catch (CategoryNotInReportException e) {
+							// This should never happen
+							e.printStackTrace();
+						}
+						i++;
+					}
 				}
 				else {
 					if(result.getStatus().equals(TestStep.STATUS_FAIL)){
-						log.info(result.getName() + " result = error");
-						report.addProblem(result.getName() , Severity.ERROR);
+						for(Problem p : problems) {
+							if(p.getProblemDescription().equals(result.getName())) {
+								found = true;
+								break;
+							}
+						}
+						if(!found) {
+							log.info(result.getName() + " result = error");
+							report.addProblem(result.getName() , Severity.ERROR);
+						}
 					}
 					else if(result.getStatus().equals(TestStep.STATUS_WARNING)) {
-						log.info(result.getName() + " result = warning");
-						report.addProblem(result.getName() , Severity.WARNING);
+						for(Problem p : problems) {
+							if(p.getProblemDescription().equals(result.getName())) {
+								found = true;
+								break;
+							}
+						}
+						if(!found) {
+							log.info(result.getName() + " result = warning");
+							report.addProblem(result.getName() , Severity.WARNING);
+						}
 					}
-					log.info(result.getName() + " writing details for warning/error");
-					String message = "";
-					for(String m : result.getMessages()){
-						message += m + "\n";
-					}
-					message += "Expected result: " + result.getExpected() + "\n";
-					message += "Obtained result: " + result.getActual() + "\n";
-					try {
-						report.addDetail(result.getName() , result.getFileName(), (int) result.getStartLine(), message);
-					} 
-					catch (CategoryNotInReportException e) {
-						// TODO Auto-generated catch block
-						//should never be called
-						log.error("category not found in report");
-						e.printStackTrace();
+					if(result.getFileName() != null) {
+						log.info(result.getName() + " writing details for warning/error");
+						String message = "";
+						for(String m : result.getMessages()){
+							message += m + "\n";
+						}
+						message += "Expected result: " + result.getExpected() + "\n";
+						message += "Obtained result: " + result.getActual() + "\n";
+						try {
+							String fileName = result.getFileName();
+							fileName = fileName.split(".git")[1];
+							fileName = fileName.substring(1,fileName.length());
+							report.addDetail(result.getName() , fileName, (int) result.getStartLine(), message);
+						} 
+						catch (CategoryNotInReportException e) {
+							// TODO Auto-generated catch block
+							//should never be called
+							log.error("category not found in report");
+							e.printStackTrace();
+						}
 					}
 				}
 			}
@@ -256,7 +333,10 @@ public class Tester {
 			//there was an exception so put what went wrong in report
 			log.info("Dynamic tester threw an exception, see comment in report for details");
 			report.setTestResult(ReportResult.UNDEFINED);
-			report.setTickerComments(exception.getMessage());
+			this.failCause = new DynamicException(exception.getMessage());
+			if(compiling){
+				this.message = "Tick analysis failed, tester threw an exception compiling : ";
+			}
 			dynamicPass = false;
 		}
 	}

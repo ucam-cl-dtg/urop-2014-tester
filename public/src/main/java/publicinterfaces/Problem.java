@@ -48,11 +48,19 @@ public class Problem implements Comparable<Problem>{
 			return 0;
 		}
 		else {
-			if (this.getOutcome() == Outcome.ERROR) {
+			if (this.getOutcome() == Outcome.MANUALCHECK) {
 				return -1;
 			}
+			else if (this.getOutcome() == Outcome.ERROR) {
+				if (m.getOutcome() == Outcome.MANUALCHECK){
+					return 1;
+				}
+				else {
+					return -1;
+				}
+			}
 			else if (this.getOutcome() == Outcome.WARNING) {
-				if (m.getOutcome() == Outcome.ERROR) {
+				if (m.getOutcome() == Outcome.MANUALCHECK || m.getOutcome() == Outcome.ERROR){
 					return 1;
 				}
 				else {

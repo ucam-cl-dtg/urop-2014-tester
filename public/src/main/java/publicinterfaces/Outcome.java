@@ -5,5 +5,5 @@ package publicinterfaces;
  * @author kls82
  */
 public enum Outcome {
-    ERROR, WARNING, PASS
+    ERROR, WARNING, PASS, MANUALCHECK
 }
