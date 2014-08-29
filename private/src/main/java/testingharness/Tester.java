@@ -226,8 +226,14 @@ public class Tester {
 			log.info(tickId + " " + crsId +": putting dynamic test results in report");
 			unpackResults(compiling, testerProxyTest.getTestStatus(crsId, containerId).getException(),testerProxyTest.getTestStatus(crsId, containerId).getResults());
 			testerProxyTest.removeTest(crsId, containerId);
-        } 
-        catch (InternalServerErrorException | GitRepositoryCloneException | InvalidNameException | TestNotFoundException | TestInstanceNotFoundException e) {
+        }
+        catch (InternalServerErrorException e) {
+        	this.failCause = e;
+        	String message = e.getResponse().readEntity(String.class);
+        	report.setTestResult(ReportResult.UNDEFINED);
+        	this.message = message;
+        }
+        catch (GitRepositoryCloneException | InvalidNameException | TestNotFoundException | TestInstanceNotFoundException e) {
         	//TODO change back to error
 			if(compiling) {
 				log.info("Dynamic compilation failed. Exception message: " + e.getMessage());
@@ -327,8 +333,6 @@ public class Tester {
 						message += "Obtained result: " + result.getActual() + "\n";
 						try {
 							String fileName = result.getFileName();
-							//fileName = fileName.split(".git")[1];
-							//fileName = fileName.substring(1,fileName.length());
 							report.addDetail(result.getName() , fileName, (int) result.getStartLine(), message);
 						} 
 						catch (CategoryNotInReportException e) {
